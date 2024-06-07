@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # List the contents of the /app directory
-echo "SharewareZ container strapping boots"
+echo "HackPlanet.EU container strapping boots"
 # Function to check if PostgreSQL is ready
 wait_for_postgres() {
     until psql -h <database_host> -U <database_user> -c '\q' &>/dev/null; do

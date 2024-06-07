@@ -6,7 +6,7 @@
     <meta charset="utf-8">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>Sharewarez</title>
+    <title>HackPlanet.EU</title>
     {% block styles %}
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
     <script src="https://code.jquery.com/jquery-3.7.1.js" integrity="sha256-eKhayi8LEQwp4NKxN+CfCh+3qOVUtJn3QNZ0TciWLP4=" crossorigin="anonymous"></script>
@@ -43,7 +43,7 @@
         </div>
     </div>
     {% endif %}
-    <a href="/discover">
+    <a href="/">
         {% if show_logo %}
             <div class="menu-logo-image">
                 <!-- Your CSS will apply here, displaying the logo -->
@@ -59,8 +59,6 @@
     </div>
     <div class="sidebar-menu">
         {% if current_user.is_authenticated %}
-            <a href="{{ url_for('main.library') }}" class="sidebar-link"><i class="fas fa-gamepad"></i><span class="link-text">Library</span></a>
-            <a href="{{ url_for('main.downloads') }}" class="sidebar-link"><i class="fas fa-download"></i><span class="link-text">Downloads</span></a>
     
             {% if current_user.role == 'admin' %}
                 <a href="/admin/dashboard" class="sidebar-link"><i class="fas fa-cogs"></i><span class="link-text">Dashboard</span></a>
@@ -74,7 +72,7 @@
             <a href="{{ url_for('main.login') }}" class="sidebar-link"><i class="fas fa-sign-in-alt"></i><span class="link-text">Login</span></a>
             <a href="{{ url_for('main.register') }}" class="sidebar-link"><i class="fas fa-user-plus"></i><span class="link-text">Register</span></a>
         {% endif %}
-        {% include 'games/library_filters.html' %}
+     
     </div>
     
 </div>

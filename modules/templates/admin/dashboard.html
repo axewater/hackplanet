@@ -15,15 +15,7 @@
         <li class="nav-item">
             <a class="nav-link" id="userManager-tab" data-bs-toggle="tab" href="#userManager">User Manager</a>
         </li>
-        <li class="nav-item">
-            <a class="nav-link" id="filtersManager-tab" data-bs-toggle="tab" href="#filtersManager">Filters Manager</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" id="apiDebugger-tab" data-bs-toggle="tab" href="#apiDebugger">API Debugger</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" id="downloadsManager-tab" data-bs-toggle="tab" href="#downloadsManager">Downloads Manager</a>
-        </li>
+
         <li class="nav-item">
             <a class="nav-link" id="newsletter-tab" data-bs-toggle="tab" href="#newsletter">Newsletter</a>
         </li>
@@ -44,7 +36,7 @@
     <div class="content-login">
         <div class="content-textblock">
             
-        <h2>Pirate crew membership</h2>
+        <h2>HackPlanet clan membership</h2>
         </div>
         <form method="POST" action="">
             {{ user_management_form.hidden_tag() }}
@@ -83,7 +75,7 @@
 
         <!-- List of users -->
         <div class="content-textblock-usermanager">
-            <h3>Ship's manifest:</h3>
+            <h3>Registered users:</h3>
             
             {% if users %}
             <table class="table table-striped table-hover custom-table rounded-lg">
@@ -126,41 +118,8 @@
 </div>
 <script src="{{ url_for('static', filename='js/admin_usermanager.js') }}"></script>
         </div>
-        <div id="filtersManager" class="container tab-pane fade"><br>
-            <h3>Filters Manager</h3>
-            
-<div class="glass-filter-editor">
-    <h2>Edit Release Group Filters</h2>
-    <form action="" method="post">
-        {{ releasegroup_form.hidden_tag() }}
-        <div class="form-group">
-            {{ releasegroup_form.rlsgroup.label }} {{ releasegroup_form.rlsgroup() }}
-        </div>
-        <div class="form-group">
-            {{ releasegroup_form.rlsgroupcs.label }} {{ releasegroup_form.rlsgroupcs() }}
-        </div>
-        <div class="form-group">
-            {{ releasegroup_form.submit() }}
-        </div>
-    </form>
-    <hr>
-    <h3>Existing Filters</h3>
-    <ul>
-    {% for group in groups %}
-        <li>{{ group.rlsgroup }} (CS: {{ group.rlsgroupcs }}) - <a href="{{ url_for('main.delete_filter', id=group.id) }}">Remove</a></li>
-    {% endfor %}
-    </ul>
-</div>
-        </div>
-        <div id="apiDebugger" class="container tab-pane fade"><br>
-            <h3>API Debugger</h3>
-            <!-- API Debugger content goes here -->
-        </div>
-        <div id="downloadsManager" class="container tab-pane fade"><br>
-            <h3>Downloads Manager</h3>
-            <!-- Downloads Manager content goes here -->
-        </div>
-
+        
+      
 <div id="newsletter" class="container tab-pane fade"><br>
     <h3>Newsletter</h3>
     <!-- Newsletter content here -->

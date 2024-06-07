@@ -13,12 +13,6 @@ def helpfaq():
 
 
 
-@site_bp.route('/restricted')
-@login_required
-def restricted():
-    print("Route: /restricted")
-    return render_template('site/restricted_area.html', title='Restricted Area')
-
 
 @site_bp.route('/logout')
 def logout():

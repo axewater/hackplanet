@@ -18,7 +18,7 @@
     
     </div>
     <div class="content-restricted-textblock" style="background-color: rgba(255, 255, 255, 0.8); padding: 20px; border-radius: 15px; color: #333;">
-        <h2 style="text-align: center; color: #000;">Pirate Profile</h2>
+        <h2 style="text-align: center; color: #000;">Hacker Profile</h2>
         <div style="margin-bottom: 20px;">
             <img src="{{ url_for('static', filename=current_user.avatarpath) }}" alt="User Avatar" style="display: block; margin: auto; border-radius: 50%; width: 150px; height: 150px; object-fit: cover;">
         </div>
@@ -32,9 +32,9 @@
             <a href="{{ url_for('main.settings_profile_edit') }}" style="display: inline-block; padding: 10px 20px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px;">Edit Profile</a>
         </p>
         <div style="background-color: #f8f9fa; padding: 15px; border-radius: 10px;">
-            <p>Ahoy, {{ current_user.name }}, welcome to ShareWareZ!</p>
-            <p>Set sail through vast digital seas where treasures abound in every corner. Here, ye can effortlessly chart yer course through libraries brimming with the finest games, each chest filled with images and lore.</p>
-            <p>Seek and ye shall find with our trusty maps (search and filters), uncovering the jewels of your liking. And fret not, for every treasure is yours for the taking, cracked and ready to embark upon your device. Aye, for we are pirates, and the horizon is ours to explore!</p>
+            <p>Welcome, {{ current_user.name }}, to HackPlanet.EU!</p>
+            <p>Embark on a journey through the realms of cybersecurity, where challenges and flags await at every turn. Here, you can hone your hacking skills and solve intricate puzzles designed to test your mettle.</p>
+            <p>Search and conquer with our advanced filters, uncovering the challenges that suit your expertise. Remember, every flag is a testament to your skill and determination. Dive in, hacker, and let the digital adventure begin!</p>
         </div>
     </div>
 </div>

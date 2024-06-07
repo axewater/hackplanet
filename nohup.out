@@ -1,6 +1,0 @@
-Traceback (most recent call last):
-  File "/var/www/sharewarez/app.py", line 2, in <module>
-    from modules import create_app
-  File "/var/www/sharewarez/modules/__init__.py", line 6, in <module>
-    from flask_mail import Mail, Message as MailMessage
-ModuleNotFoundError: No module named 'flask_mail'

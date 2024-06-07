@@ -5,24 +5,13 @@
 
 <div class="admin-panel">
     <div class="admin-header">
-        <h1>Captain's Cabin</h1>
+        <h1>HackPlanet.EU Admin Panel</h1>
         <img src="{{ url_for('static', filename='newstyle/captainscabin.png') }}" alt="Captain's Cabin" class="captains-image">
     </div>
     <div class="container-fluid h-100">
         <div class="row h-100">
             <!-- Row 1: Library Manager, Server Settings, Server Info -->
-            <div class="col-3 d-flex align-items-stretch">
-                <a href="{{ url_for('main.libraries') }}" class="btn btn-primary dashboard-button">
-                    <i class="fas fa-book dashboard-icon"></i>
-                    Library Manager
-                </a>
-            </div>
-            <div class="col-3 d-flex align-items-stretch">
-                <a href="{{ url_for('main.scan_management') }}" class="btn btn-primary dashboard-button">
-                    <i class="fas fa-book dashboard-icon"></i>
-                    Scan Manager
-                </a>
-            </div>
+
             <div class="col-3 d-flex align-items-stretch">
                 <a href="{{ url_for('main.manage_settings') }}" class="btn btn-info dashboard-button">
                     <i class="fas fa-cogs dashboard-icon"></i>
@@ -38,14 +27,6 @@
             </div>
             {% endif %}
 
-
-            <div class="col-3 d-flex align-items-stretch">
-                <a href="{{ url_for('main.clear_downloads') }}" class="btn btn-danger dashboard-button">
-                    <i class="fas fa-download dashboard-icon"></i>
-                    Downloads
-                </a>
-            </div>
-            
 
             <!-- Row 2: Add User, Invite System, Whitelist, Downloads -->
             <div class="col-3 d-flex align-items-stretch">
@@ -83,12 +64,6 @@
                 </a>
             </div>
             {% endif %}
-            <div class="col-3 d-flex align-items-stretch">
-                <a href="{{ url_for('main.api_debug') }}" class="btn btn-info dashboard-button">
-                    <i class="fas fa-bug dashboard-icon"></i>
-                    API Debug
-                </a>
-            </div> 
             <!-- Additional buttons if any can go here -->
         </div>
     </div>
