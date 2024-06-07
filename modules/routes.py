@@ -812,26 +812,6 @@ def manage_invites():
     users = User.query.all()
     return render_template('admin/manage_invites.html', users=users)
 
-@bp.route('/admin/dashboard')
-@login_required
-@admin_required
-def admin_dashboard():
-    pass
-    return render_template('admin/admin_dashboard.html')
-
-@bp.route('/admin/dashboard2')
-@login_required
-@admin_required
-def admin_dashboard2():
-    user_management_form = UserManagementForm()
-    newsletter_form = NewsletterForm()
-    return render_template('admin/dashboard.html', user_management_form=user_management_form, newsletter_form=newsletter_form)
-
-
-
-
-
-
 
 
 
