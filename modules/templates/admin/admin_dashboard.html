@@ -27,7 +27,6 @@
             </div>
             {% endif %}
 
-
             <!-- Row 2: Add User, Invite System, Whitelist, Downloads -->
             <div class="col-3 d-flex align-items-stretch">
                 <a href="{{ url_for('main.create_user') }}" class="btn btn-secondary dashboard-button">
@@ -55,7 +54,19 @@
                 </a>
             </div>
 
-            <!-- Row 3: Newsletter, API Debug -->
+            <!-- Row 3: Lab Editor, Lab Manager, Newsletter, API Debug -->
+            <div class="col-3 d-flex align-items-stretch">
+                <a href="{{ url_for('main.lab_editor') }}" class="btn btn-primary dashboard-button">
+                    <i class="fas fa-flask dashboard-icon"></i>
+                    Add Lab
+                </a>
+            </div>
+            <div class="col-3 d-flex align-items-stretch">
+                <a href="{{ url_for('main.lab_manager') }}" class="btn btn-primary dashboard-button">
+                    <i class="fas fa-flask dashboard-icon"></i>
+                    Lab Manager
+                </a>
+            </div>
             {% if enable_newsletter %}
             <div class="col-3 d-flex align-items-stretch">
                 <a href="{{ url_for('main.newsletter') }}" class="btn btn-dark dashboard-button">

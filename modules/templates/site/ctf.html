@@ -1,0 +1,19 @@
+<!-- /modules/templates/ctf.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1>CTF Training Ground</h1>
+    <div class="row">
+        <div class="col-md-4">
+            <a href="{{ url_for('main.leaderboard') }}" class="btn btn-primary btn-block">Leaderboard</a>
+        </div>
+        <div class="col-md-4">
+            <a href="{{ url_for('main.hacking_labs') }}" class="btn btn-primary btn-block">Hacking Labs</a>
+        </div>
+        <div class="col-md-4">
+            <a href="{{ url_for('main.challenges') }}" class="btn btn-primary btn-block">Challenges</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

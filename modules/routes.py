@@ -28,13 +28,14 @@ from authlib.jose import jwt
 from urllib.parse import unquote
 
 
+
 from modules.forms import (
     UserPasswordForm, UserDetailForm, EditProfileForm, NewsletterForm, WhitelistForm, EditUserForm, 
     UserManagementForm, CsrfProtectForm, LoginForm, ResetPasswordRequestForm, RegistrationForm, 
-    CreateUserForm, UserPreferencesForm, InviteForm, CsrfForm
+    CreateUserForm, UserPreferencesForm, InviteForm, CsrfForm, LabForm
 )
 from modules.models import (
-    User, User, Whitelist, UserPreference, GlobalSettings, InviteToken
+    User, Whitelist, UserPreference, GlobalSettings, InviteToken, Lab, Challenge
 )
 from modules.utilities import (
     admin_required, _authenticate_and_redirect, square_image, send_email, send_password_reset_email
@@ -760,7 +761,7 @@ def manage_settings():
 @login_required
 @admin_required
 def admin_status_page():
-    
+    print("Route: /admin/status_page")
     settings_record = GlobalSettings.query.first()
     enable_server_status = settings_record.settings.get('enableServerStatusFeature', False) if settings_record else False
 
@@ -817,3 +818,137 @@ def manage_invites():
 def admin_dashboard():
     pass
     return render_template('admin/admin_dashboard.html')
+
+@bp.route('/admin/dashboard2')
+@login_required
+@admin_required
+def admin_dashboard2():
+    user_management_form = UserManagementForm()
+    newsletter_form = NewsletterForm()
+    return render_template('admin/dashboard.html', user_management_form=user_management_form, newsletter_form=newsletter_form)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+@bp.route('/ctf')
+def ctf_home():
+    return render_template('site/ctf.html')
+
+@bp.route('/ctf/leaderboard')
+def leaderboard():
+    # Fetch user scores from the database
+    users = User.query.order_by(User.score_total.desc()).all()
+    return render_template('site/leaderboard.html', users=users)
+
+@bp.route('/ctf/hacking_labs')
+def hacking_labs():
+    # Fetch labs and their hosts from the database
+    labs = Lab.query.all()
+    return render_template('site/hacking_labs.html', labs=labs)
+
+@bp.route('/ctf/challenges')
+def challenges():
+    # Fetch challenges from the database
+    challenges = Challenge.query.all()
+    return render_template('site/challenges.html', challenges=challenges)
+
+@bp.route('/admin/lab_editor/<int:lab_id>', methods=['GET', 'POST'])
+@bp.route('/admin/lab_editor', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def lab_editor(lab_id=None):
+    form = LabForm()
+    lab = Lab.query.get(lab_id) if lab_id else None
+
+    if form.validate_on_submit():
+        try:
+            if lab:
+                lab.name = form.name.data
+                lab.image = form.image.data
+                lab.description = form.description.data
+            else:
+                lab = Lab(
+                    name=form.name.data,
+                    image=form.image.data,
+                    description=form.description.data,
+                    date_created=datetime.utcnow()
+                )
+                db.session.add(lab)
+            
+            db.session.commit()
+            flash('Lab saved successfully.', 'success')
+            return redirect(url_for('main.lab_manager'))
+        except Exception as e:
+            db.session.rollback()
+            print(f"Error saving lab: {str(e)}")
+            flash('An error occurred while saving the lab. Please try again.', 'danger')
+
+    if lab:
+        form.name.data = lab.name
+        form.image.data = lab.image
+        form.description.data = lab.description
+
+    return render_template('admin/lab_editor.html', form=form, lab=lab)
+
+@bp.route('/admin/lab_manager', methods=['GET'])
+@login_required
+@admin_required
+def lab_manager():
+    print("Entered lab_manager route")
+    labs = Lab.query.all()
+    csrf_form = CsrfProtectForm()
+    return render_template('admin/lab_manager.html', labs=labs, form=csrf_form)
+
+@bp.route('/admin/delete_lab/<int:lab_id>', methods=['POST'])
+@login_required
+@admin_required
+def delete_lab(lab_id):
+    lab = Lab.query.get(lab_id)
+    if lab:
+        db.session.delete(lab)
+        db.session.commit()
+        return jsonify({'success': True})
+    else:
+        return jsonify({
+            'success': False,
+            'message': 'Lab not found'
+        }), 404

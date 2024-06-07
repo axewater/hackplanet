@@ -1,0 +1,31 @@
+<!-- /modules/templates/site/hacking_labs.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="glass-panel">
+        <div class="labs_title">
+            <h1>Hacking Labs</h1>
+        </div>
+    {% for lab in labs %}
+    <div class="lab">
+        <h2>{{ lab.name }}</h2>
+        <p>{{ lab.description }}</p>
+        <div class="hosts">
+            {% for host in lab.hosts %}
+            <div class="host">
+                <h3>{{ host.name }}</h3>
+                <p>Difficulty: {{ host.difficulty }}</p>
+                <p>Status: {{ 'Online' if host.status else 'Offline' }}</p>
+                <p>Rating: {{ host.rating }} stars</p>
+                <img src="{{ '/static/library/images/' + host.image_url }}" alt="{{ host.name }}">
+                <button class="btn btn-success">Submit User Flag</button>
+                <button class="btn btn-danger">Submit Root Flag</button>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+    {% endfor %}
+</div>
+{% endblock %}

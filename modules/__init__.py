@@ -75,6 +75,3 @@ def create_app():
 def load_user(user_id):
     from modules.models import User
     return User.query.get(int(user_id))
-
-
-

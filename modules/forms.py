@@ -6,10 +6,16 @@ from flask_wtf.file import FileField, FileAllowed, FileRequired
 from wtforms.validators import DataRequired, Length, Optional, NumberRange, Regexp, URL,Email, EqualTo
 from wtforms.widgets import TextInput
 from wtforms_sqlalchemy.fields import QuerySelectMultipleField
-from wtforms.widgets import ListWidget, CheckboxInput
+from wtforms.widgets import ListWidget, CheckboxInput, TextArea
 from wtforms.fields import URLField, DateField
 from urllib.parse import urlparse
 
+class LabForm(FlaskForm):
+    name = StringField('Lab Name', validators=[DataRequired(), Length(max=128)])
+    image = StringField('Image URL', validators=[Optional(), URL(), Length(max=256)])
+    description = TextAreaField('Description', validators=[Optional(), Length(max=5000)])
+    submit = SubmitField('Save Lab')
+    
 class LoginForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
     password = PasswordField('Password', validators=[DataRequired()])
@@ -64,7 +70,7 @@ class EditUserForm(FlaskForm):
     
 class UserManagementForm(FlaskForm):
     user_id = SelectField('Choose pirate', coerce=int)
-    name = StringField('Pirate Name', validators=[Length(max=64)])
+    name = StringField('User Name', validators=[Length(max=64)])
     email = StringField('Email', validators=[DataRequired(), Email(), Length(max=120)])
     role = StringField('Role', validators=[Length(max=64)])
     state = BooleanField('Account Enabled')
@@ -72,7 +78,7 @@ class UserManagementForm(FlaskForm):
     is_email_verified = BooleanField('Email Verified', validators=[Optional()])
     about = TextAreaField('Admin Notes', validators=[Optional()])
     submit = SubmitField('Save Changes')
-    delete = SubmitField('Walk the plank!')
+    delete = SubmitField('Delete User')
 
 
 class CreateUserForm(FlaskForm):

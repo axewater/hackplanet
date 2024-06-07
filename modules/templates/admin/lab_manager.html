@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block content %}
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+    <div class="alert alert-info" role="alert">
+        {% for message in messages %}
+            {{ message }}<br>
+        {% endfor %}
+    </div>
+{% endif %}
+{% endwith %}
+<div class="container">
+    <div class="glass-panel">
+        <h1>Lab Manager</h1>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Image</th>
+                    <th>Description</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for lab in labs %}
+                <tr>
+                    <td>{{ lab.name }}</td>
+                    <td>{{ lab.image }}</td>
+                    <td>{{ lab.description }}</td>
+                    <td>
+                        <button class="btn btn-primary edit-lab" data-lab-id="{{ lab.id }}">Edit</button>
+                        <button class="btn btn-danger delete-lab" data-lab-id="{{ lab.id }}">Delete</button>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+<script src="{{ url_for('static', filename='js/lab_manager.js') }}"></script>
+{% endblock %}

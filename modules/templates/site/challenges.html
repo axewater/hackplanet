@@ -1,0 +1,22 @@
+<!-- /modules/templates/site/challenges.html -->
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1>Challenges</h1>
+    <div class="row">
+        {% for challenge in challenges %}
+        <div class="col-md-4">
+            <div class="card">
+                <img src="{{ challenge.image }}" class="card-img-top" alt="{{ challenge.name }}">
+                <div class="card-body">
+                    <h5 class="card-title">{{ challenge.name }}</h5>
+                    <p class="card-text">Category: {{ challenge.category }}</p>
+                    <button class="btn btn-primary">Attempt Challenge</button>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
