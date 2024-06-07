@@ -812,6 +812,14 @@ def manage_invites():
     users = User.query.all()
     return render_template('admin/manage_invites.html', users=users)
 
+@bp.route('/admin/dashboard')
+@login_required
+@admin_required
+def admin_dashboard():
+    pass
+    return render_template('admin/admin_dashboard.html')
+
+
 
 
 
