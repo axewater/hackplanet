@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block content %}
+<html>
+<head>
+    <title>Registration</title>
+    <link rel="stylesheet" href="/static/css/newstyle.css">
+</head>
+<body>
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <div class="flashes">
+        {% for message in messages %}
+        <div class="flash">{{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
+
+    <div class="container-login">
+
+                <div class="content-login">
+                    <img src="{{ url_for('static', filename='newstyle/sharewarez_pirate.png') }}" alt="ShareWareZ Logo" class="login-logo">
+
+                    <h2 style="text-align: center; margin-top: 5px;">Register now!</h1>
+                        (You can only register if your email has been whitelisted)
+
+
+
+                        <form action="{{ url_for('main.register', token=request.args.get('token')) }}" method="post">
+
+                        {{ form.csrf_token }}
+                        <div class="form-group">
+                            {{ form.username.label }}
+                            {{ form.username(class_="input-glass") }}
+                        </div>
+                        <div class="form-group">
+                            {{ form.email.label }}
+                            {{ form.email(class_="input-glass") }}
+                        </div>
+                        <div class="form-group">
+                            {{ form.password.label }}
+                            {{ form.password(class_="input-glass") }}
+                        </div>
+                        <input type="submit" value="Register" class="button-glass">
+                    </form>
+                </div>
+        </div>
+    </div>
+</body>
+{% endblock %}
