@@ -17,7 +17,11 @@ function submitFlag(hostId, flagType) {
         console.log('Response data:', data);
         if (data.error) {
             console.error('Error:', data.error);
-            alert('Error: ' + data.error);
+            if (data.error === 'Sorry you already submitted this flag') {
+                alert('Sorry you already submitted this flag');
+            } else {
+                alert('Error: ' + data.error);
+            }
         } else {
             console.log('Flag submission result:', data.result);
             alert('Flag submission result: ' + data.result);
