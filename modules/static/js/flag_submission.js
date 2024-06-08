@@ -17,18 +17,29 @@ function submitFlag(hostId, flagType) {
         console.log('Response data:', data);
         if (data.error) {
             console.error('Error:', data.error);
-            if (data.error === 'Sorry you already submitted this flag') {
-                alert('Sorry you already submitted this flag');
-            } else {
-                alert('Error: ' + data.error);
-            }
+            showModal(data.error === 'Sorry you already submitted this flag' ? '😕' : '❌', data.error);
         } else {
             console.log('Flag submission result:', data.result);
-            alert('Flag submission result: ' + data.result);
+            showModal('✅', 'Flag submission result: ' + data.result);
         }
     })
     .catch(error => {
         console.error('An error occurred while submitting the flag:', error);
-        alert('An error occurred while submitting the flag. Please try again.');
+        showModal('❌', 'An error occurred while submitting the flag. Please try again.');
     });
+}
+
+function showModal(emoticon, message) {
+    const modal = document.getElementById('flagModal');
+    const modalEmoticon = document.getElementById('modalEmoticon');
+    const modalMessage = document.getElementById('modalMessage');
+
+    modalEmoticon.textContent = emoticon;
+    modalMessage.textContent = message;
+
+    modal.style.display = 'block';
+
+    setTimeout(() => {
+        modal.style.display = 'none';
+    }, 5000);
 }

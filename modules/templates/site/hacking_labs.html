@@ -8,6 +8,7 @@
         <div class="labs_title">
             <h1>HACKPLANET.EU LABS</h1>
         </div>
+
     {% for lab in labs %}
     <div class="lab">
 
@@ -24,8 +25,16 @@
         </div>
 
         <div class="hosts">
+
             {% for host in lab.hosts %}
             <div class="host">
+                <!-- Modal -->
+                <div id="flagModal" class="modal">
+                    <div class="modal-content">
+                        <span id="modalEmoticon" class="modal-emoticon"></span>
+                        <p id="modalMessage"></p>
+                    </div>
+                </div>
                 <h3>{{ host.name }} {{ host.id }}</h3>
                 <div class="host-image-container">
                     <img src="{{ '/static/library/images/' + host.image_url }}" alt="{{ host.name }}" class="host-image">
@@ -65,4 +74,7 @@
     </div>
     {% endfor %}
 </div>
+
+
+
 {% endblock %}
