@@ -2,6 +2,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<script src="{{ url_for('static', filename='/js/flag_submission.js') }}"></script>
 <div class="container">
     <div class="glass-panel">
         <div class="labs_title">
@@ -25,7 +26,7 @@
         <div class="hosts">
             {% for host in lab.hosts %}
             <div class="host">
-                <h3>{{ host.name }}</h3>
+                <h3>{{ host.name }} {{ host.id }}</h3>
                 <div class="host-image-container">
                     <img src="{{ '/static/library/images/' + host.image_url }}" alt="{{ host.name }}" class="host-image">
                 </div>
@@ -42,24 +43,14 @@
 
                 <div class="host-inputarea">
                     {% if host.name != 'kalismurf' %}
-                    <form method="POST" action="{{ url_for('main.submit_flag') }}">
-                        {{ form.hidden_tag() }}
-                        <input type="hidden" name="host_id" value="{{ host.id }}">
-                        <input type="hidden" name="flag_type" value="user">
-                        <div class="flag-input-container">
-                            <input type="text" name="flag" placeholder="Enter User Flag" class="flag-input">
-                            <button type="submit" class="btn btn-success">Submit</button>
-                        </div>
-                    </form>
-                    <form method="POST" action="{{ url_for('main.submit_flag') }}">
-                        {{ form.hidden_tag() }}
-                        <input type="hidden" name="host_id" value="{{ host.id }}">
-                        <input type="hidden" name="flag_type" value="root">
-                        <div class="flag-input-container">
-                            <input type="text" name="flag" placeholder="Enter Root Flag" class="flag-input">
-                            <button type="submit" class="btn btn-danger">Submit</button>
-                        </div>
-                    </form>
+                    <div class="flag-input-container">
+                        <input type="text" id="user-flag-{{ host.id }}" placeholder="Enter User Flag" class="flag-input">
+                        <button type="button" class="btn btn-success" onclick="submitFlag('{{ host.id }}', 'user')">Submit</button>
+                    </div>
+                    <div class="flag-input-container">
+                        <input type="text" id="root-flag-{{ host.id }}" placeholder="Enter Root Flag" class="flag-input">
+                        <button type="button" class="btn btn-danger" onclick="submitFlag('{{ host.id }}', 'root')">Submit</button>
+                    </div>
                     {% else %}
                     <div class="kalismurf-credentials">
                         <p>username : kali</p>
