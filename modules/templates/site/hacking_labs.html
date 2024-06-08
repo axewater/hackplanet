@@ -10,14 +10,17 @@
     {% for lab in labs %}
     <div class="lab">
         <p>Available labs:</p>
-        <h2>{{ lab.name }}</h2>
-        {% if lab.image %}
-        <img src="{{ url_for('static', filename='library/images/labs/' + lab.image) }}" alt="{{ lab.name }}" class="lab-image">
-        {% endif %}
-        <p>{{ lab.description }}</p>
-        {% if lab.vpn_file %}
-        <a href="{{ '/static/library/labs/' + lab.vpn_file }}" class="btn btn-primary">Download Lab Access</a>
-        {% endif %}
+        <div class="labschip">
+            <h2>{{ lab.name }}</h2>
+            {% if lab.image %}
+            <img src="{{ url_for('static', filename='library/images/labs/' + lab.image) }}" alt="{{ lab.name }}" class="lab-image">
+            {% endif %}
+            <p>{{ lab.description }}</p>
+            {% if lab.vpn_file %}
+            <a href="{{ '/static/library/labs/' + lab.vpn_file }}" class="btn btn-primary">Download Lab Access</a>
+            {% endif %}
+        </div>
+
         <div class="hosts">
             {% for host in lab.hosts %}
             <div class="host">

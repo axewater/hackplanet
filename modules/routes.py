@@ -852,11 +852,6 @@ def admin_dashboard():
 
 
 
-
-
-
-
-
 @bp.route('/ctf')
 def ctf_home():
     return render_template('site/ctf.html')
@@ -864,7 +859,8 @@ def ctf_home():
 @bp.route('/ctf/leaderboard')
 def leaderboard():
     # Fetch user scores from the database
-    users = User.query.order_by(User.score_total.desc()).all()
+    users = User.query.with_entities(User.name, User.score_total, User.avatarpath).order_by(User.score_total.desc()).all()
+    
     return render_template('site/leaderboard.html', users=users)
 
 @bp.route('/ctf/hacking_labs')
