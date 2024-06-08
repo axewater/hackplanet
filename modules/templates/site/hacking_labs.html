@@ -26,6 +26,9 @@
             {% for host in lab.hosts %}
             <div class="host">
                 <h3>{{ host.name }}</h3>
+                <div class="host-image-container">
+                    <img src="{{ '/static/library/images/' + host.image_url }}" alt="{{ host.name }}" class="host-image">
+                </div>
                 <p>IP Address: {{ host.ip }}</p>
                 <p>Difficulty: {{ host.difficulty }} {% if host.difficulty == 1 %}😊{% elif host.difficulty == 2 %}🙂{% elif host.difficulty == 3 %}😐{% elif host.difficulty == 4 %}😕{% elif host.difficulty == 5 %}😟{% elif host.difficulty == 6 %}😦{% elif host.difficulty == 7 %}😧{% elif host.difficulty == 8 %}😨{% elif host.difficulty == 9 %}😰{% elif host.difficulty == 10 %}😱{% endif %}</p>
                 <p>Status: {{ 'Online' if host.status else 'Offline' }}</p>
@@ -36,9 +39,7 @@
                     <p style="font-size: 0.2em;">Root Flag: {{ host.flags|selectattr('type', '==', 'root')|map(attribute='uuid')|first }}</p>
                 </div>
                 {% endif %}
-                <div class="host-image-container">
-                    <img src="{{ '/static/library/images/' + host.image_url }}" alt="{{ host.name }}" class="host-image">
-                </div>
+
                 <div class="host-inputarea">
                     {% if host.name != 'kalismurf' %}
                     <form method="POST" action="{{ url_for('main.submit_flag') }}">
@@ -59,8 +60,13 @@
                             <button type="submit" class="btn btn-danger">Submit</button>
                         </div>
                     </form>
+                    {% else %}
+                    <div class="kalismurf-credentials">
+                        <p>username : kali</p>
+                        <p>password : KaliLinux2024!</p>
+                    </div>
+                    {% endif %}
                 </div>
-                {% endif %}
             </div>
             {% endfor %}
         </div>

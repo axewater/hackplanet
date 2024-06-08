@@ -878,7 +878,7 @@ def leaderboard():
 def hacking_labs():
     # Fetch labs and their hosts from the database
     labs = Lab.query.options(joinedload(Lab.hosts).joinedload(Host.flags)).all()
-
+    print(f"Labs: {labs} host: {labs[0].hosts} flags: {labs[0].hosts[0].flags}")
     # Check if the user is an admin
     is_admin = current_user.role == 'admin'
 
@@ -958,23 +958,33 @@ def delete_lab(lab_id):
 
 @bp.route('/ctf/submit_flag', methods=['POST'])
 def submit_flag():
+    print("Entered submit_flag route")
     form = FlagSubmissionForm()
+    print(f"Received flag: {form.flag.data}, host_id: {form.host_id.data}, flag_type: {form.flag_type.data}")
     if form.validate_on_submit():
         flag = form.flag.data
         host_id = form.host_id.data
         flag_type = form.flag_type.data
 
+        print(f"Form submitted with flag: {flag}, host_id: {host_id}, flag_type: {flag_type}")
+
         try:
             # Retrieve the flag from the database
+            print("Retrieving flag record from the database...")
             flag_record = Flag.query.filter_by(host_id=host_id, type=flag_type).first()
+            print(f"Flag record retrieved: {flag_record}")
+
             if flag_record and flag_record.uuid == flag:
+                print("Flag is correct.")
                 # Flag is correct, update user progress and score
                 user_progress = UserProgress.query.filter_by(user_id=current_user.id).first()
                 if not user_progress:
                     user_progress = UserProgress(user_id=current_user.id, obtained_flags={}, score_total=0)
+                    print("New user progress created.")
 
                 obtained_flags = user_progress.obtained_flags or {}
                 if flag_record.uuid not in obtained_flags:
+                    print("Flag has not been submitted before. Updating progress and score.")
                     obtained_flags[flag_record.uuid] = True
                     user_progress.obtained_flags = obtained_flags
                     user_progress.score_total += flag_record.point_value
@@ -983,13 +993,18 @@ def submit_flag():
                     db.session.add(user_progress)
                     db.session.commit()
 
+                    print("User progress and score updated successfully.")
                     flash('Flag submitted successfully!', 'success')
                 else:
+                    print("Flag has already been submitted.")
                     flash('Flag has already been submitted.', 'warning')
             else:
+                print("Invalid flag.")
                 flash('Invalid flag.', 'danger')
         except SQLAlchemyError as e:
             db.session.rollback()
+            print(f"An error occurred: {str(e)}")
             flash(f'An error occurred: {str(e)}', 'danger')
 
+    print("Exiting submit_flag route")
     return redirect(url_for('main.hacking_labs'))
