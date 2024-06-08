@@ -11,21 +11,27 @@
     <div class="lab">
         <h2>{{ lab.name }}</h2>
         <p>{{ lab.description }}</p>
+        {% if lab.vpn_file %}
+        <a href="{{ '/static/library/labs/' + lab.vpn_file }}" class="btn btn-primary">Download OVPN file to access this Lab</a>
+        {% endif %}
         <div class="hosts">
             {% for host in lab.hosts %}
             <div class="host">
                 <h3>{{ host.name }}</h3>
-                <p>Difficulty: {{ host.difficulty }}</p>
+                <p>IP Address: {{ host.ip }}</p>
+                <p>Difficulty: {{ host.difficulty }} {% if host.difficulty == 1 %}😊{% elif host.difficulty == 2 %}🙂{% elif host.difficulty == 3 %}😐{% elif host.difficulty == 4 %}😕{% elif host.difficulty == 5 %}😟{% elif host.difficulty == 6 %}😦{% elif host.difficulty == 7 %}😧{% elif host.difficulty == 8 %}😨{% elif host.difficulty == 9 %}😰{% elif host.difficulty == 10 %}😱{% endif %}</p>
                 <p>Status: {{ 'Online' if host.status else 'Offline' }}</p>
-                <p>Rating: {{ host.rating }} stars</p>
-                <img src="{{ '/static/library/images/' + host.image_url }}" alt="{{ host.name }}">
+                <p>Rating: {% for _ in range(host.rating) %}★{% endfor %}{% for _ in range(5 - host.rating) %}☆{% endfor %}</p>
+                <div class="host-image-container">
+                    <img src="{{ '/static/library/images/' + host.image_url }}" alt="{{ host.name }}" class="host-image">
+                </div>
                 <button class="btn btn-success">Submit User Flag</button>
                 <button class="btn btn-danger">Submit Root Flag</button>
             </div>
             {% endfor %}
         </div>
+ 
     </div>
-</div>
     {% endfor %}
 </div>
 {% endblock %}

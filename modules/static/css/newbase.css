@@ -264,7 +264,26 @@
     margin-bottom: 20px;
     flex-basis: calc(33.33% - 20px);
     text-align: center;
+    border: 1px solid #ccc;
 }
+
+.host-image-container {
+    width: 150px;
+    height: 150px;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto; /* Add this line */
+}
+
+.host-image {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: cover;
+}
+
+
 
 .host h3 {
     color: #fff;

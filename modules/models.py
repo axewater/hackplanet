@@ -147,9 +147,14 @@ class Lab(db.Model):
     date_created = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     description = db.Column(db.String(5000), nullable=True)
     hosts = relationship('Host', backref='lab', lazy=True)
+    vpn_file = db.Column(db.String(256), nullable=True)
 
     def __repr__(self):
         return f"<Lab id={self.id}, name={self.name}, date_created={self.date_created}>"
+
+
+
+
 
 class Host(db.Model):
     __tablename__ = 'hosts'
@@ -164,10 +169,14 @@ class Host(db.Model):
     hint = db.Column(db.String(1000), nullable=True)
     lab_id = db.Column(db.Integer, db.ForeignKey('labs.id'), nullable=False)
     image_url = db.Column(db.String(256), nullable=True)
-
+    
 
     def __repr__(self):
         return f"<Host id={self.id}, name={self.name}, difficulty={self.difficulty}>"
+
+
+
+
 
 class Challenge(db.Model):
     __tablename__ = 'challenges'
@@ -181,6 +190,7 @@ class Challenge(db.Model):
     def __repr__(self):
         return f"<Challenge id={self.id}, name={self.name}, flag_uuid={self.flag_uuid}, point_value={self.point_value}>"
 
+
 class Flag(db.Model):
     __tablename__ = 'flags'
     id = db.Column(db.Integer, primary_key=True)
@@ -190,7 +200,7 @@ class Flag(db.Model):
 
     def __repr__(self):
         return f"<Flag id={self.id}, type={self.type}, uuid={self.uuid}, point_value={self.point_value}>"
-
+    
 class UserProgress(db.Model):
     __tablename__ = 'user_progress'
     id = db.Column(db.Integer, primary_key=True)
