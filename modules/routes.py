@@ -35,11 +35,11 @@ from urllib.parse import unquote
 from modules.forms import (
     UserPasswordForm, UserDetailForm, EditProfileForm, NewsletterForm, WhitelistForm, EditUserForm, 
     UserManagementForm, CsrfProtectForm, LoginForm, ResetPasswordRequestForm, RegistrationForm, 
-    CreateUserForm, UserPreferencesForm, InviteForm, CsrfForm, LabForm
+    CreateUserForm, UserPreferencesForm, InviteForm, CsrfForm, LabForm, FlagSubmissionForm
 )
 
 from modules.models import (
-    User, Whitelist, UserPreference, GlobalSettings, InviteToken, Lab, Challenge, Host, Flag
+    User, Whitelist, UserPreference, GlobalSettings, InviteToken, Lab, Challenge, Host, Flag, UserProgress
 )
 from modules.utilities import (
     admin_required, _authenticate_and_redirect, square_image, send_email, send_password_reset_email
@@ -882,7 +882,10 @@ def hacking_labs():
     # Check if the user is an admin
     is_admin = current_user.role == 'admin'
 
-    return render_template('site/hacking_labs.html', labs=labs, is_admin=is_admin)
+    # Instantiate the FlagSubmissionForm
+    form = FlagSubmissionForm()
+
+    return render_template('site/hacking_labs.html', labs=labs, is_admin=is_admin, form=form)
 
 @bp.route('/ctf/challenges')
 def challenges():
@@ -951,3 +954,42 @@ def delete_lab(lab_id):
             'success': False,
             'message': 'Lab not found'
         }), 404
+
+
+@bp.route('/ctf/submit_flag', methods=['POST'])
+def submit_flag():
+    form = FlagSubmissionForm()
+    if form.validate_on_submit():
+        flag = form.flag.data
+        host_id = form.host_id.data
+        flag_type = form.flag_type.data
+
+        try:
+            # Retrieve the flag from the database
+            flag_record = Flag.query.filter_by(host_id=host_id, type=flag_type).first()
+            if flag_record and flag_record.uuid == flag:
+                # Flag is correct, update user progress and score
+                user_progress = UserProgress.query.filter_by(user_id=current_user.id).first()
+                if not user_progress:
+                    user_progress = UserProgress(user_id=current_user.id, obtained_flags={}, score_total=0)
+
+                obtained_flags = user_progress.obtained_flags or {}
+                if flag_record.uuid not in obtained_flags:
+                    obtained_flags[flag_record.uuid] = True
+                    user_progress.obtained_flags = obtained_flags
+                    user_progress.score_total += flag_record.point_value
+                    current_user.score_total += flag_record.point_value
+
+                    db.session.add(user_progress)
+                    db.session.commit()
+
+                    flash('Flag submitted successfully!', 'success')
+                else:
+                    flash('Flag has already been submitted.', 'warning')
+            else:
+                flash('Invalid flag.', 'danger')
+        except SQLAlchemyError as e:
+            db.session.rollback()
+            flash(f'An error occurred: {str(e)}', 'danger')
+
+    return redirect(url_for('main.hacking_labs'))

@@ -32,16 +32,34 @@
                 <p>Rating: {% for _ in range(host.rating) %}★{% endfor %}{% for _ in range(5 - host.rating) %}☆{% endfor %}</p>
                 {% if is_admin %}
                 <div class="flags">
-                    <p style="font-size: 0.5em;">User Flag: {{ host.flags|selectattr('type', '==', 'user')|map(attribute='uuid')|first }}</p>
-                    <p style="font-size: 0.5em;">Root Flag: {{ host.flags|selectattr('type', '==', 'root')|map(attribute='uuid')|first }}</p>
+                    <p style="font-size: 0.2em;">User Flag: {{ host.flags|selectattr('type', '==', 'user')|map(attribute='uuid')|first }}</p>
+                    <p style="font-size: 0.2em;">Root Flag: {{ host.flags|selectattr('type', '==', 'root')|map(attribute='uuid')|first }}</p>
                 </div>
                 {% endif %}
                 <div class="host-image-container">
                     <img src="{{ '/static/library/images/' + host.image_url }}" alt="{{ host.name }}" class="host-image">
                 </div>
-                {% if host.name != 'kalismurf' %}
-                <button class="btn btn-success">Submit User Flag</button>
-                <button class="btn btn-danger">Submit Root Flag</button>
+                <div class="host-inputarea">
+                    {% if host.name != 'kalismurf' %}
+                    <form method="POST" action="{{ url_for('main.submit_flag') }}">
+                        {{ form.hidden_tag() }}
+                        <input type="hidden" name="host_id" value="{{ host.id }}">
+                        <input type="hidden" name="flag_type" value="user">
+                        <div class="flag-input-container">
+                            <input type="text" name="flag" placeholder="Enter User Flag" class="flag-input">
+                            <button type="submit" class="btn btn-success">Submit</button>
+                        </div>
+                    </form>
+                    <form method="POST" action="{{ url_for('main.submit_flag') }}">
+                        {{ form.hidden_tag() }}
+                        <input type="hidden" name="host_id" value="{{ host.id }}">
+                        <input type="hidden" name="flag_type" value="root">
+                        <div class="flag-input-container">
+                            <input type="text" name="flag" placeholder="Enter Root Flag" class="flag-input">
+                            <button type="submit" class="btn btn-danger">Submit</button>
+                        </div>
+                    </form>
+                </div>
                 {% endif %}
             </div>
             {% endfor %}

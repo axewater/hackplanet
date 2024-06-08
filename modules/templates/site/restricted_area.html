@@ -1,48 +1,73 @@
 {% extends 'base.html' %}
 
 {% block content %}
-
-
-
 <div class="container-base">
     {% with messages = get_flashed_messages() %}
     {% if messages %}
         <div class="flashes">
-        {% for message in messages %}
-            <div class="flash">{{ message }}</div>
+            {% for message in messages %}
+                <div class="flash">{{ message }}</div>
             {% endfor %}
         </div>
-        
     {% endif %}
     {% endwith %}
-
 </div>
+
 {% if current_user.is_authenticated %}
 <div class="content-restricted">
-    <img src="{{ url_for('static', filename='newstyle/hackplanet.png') }}" alt="ShareWareZ Logo" class="login-logo">
+    
 
-    <div class="content-restricted-textblock">
-        {{ current_user.name }}, welcome to HackPlanet.EU!<br>
-        <br>
-        Embark on an exhilarating journey through the realm of ethical hacking. 
-        Here, you can sharpen your skills, uncover vulnerabilities, and rise to the top of the leaderboards. 
-        <br><br>
-        Immerse yourself in our meticulously crafted LAB environments, each presenting unique challenges that will put your expertise to the test. 
-        Collect flags as you conquer each obstacle, earning points and proving your mastery in the art of ethical hacking.
-        <br><br>
-        Collaborate with fellow hackers, learn from the best, and compete against the brightest minds in the field. 
-        The path to becoming an elite ethical hacker starts here at HackPlanet.EU. Are you ready to accept the challenge?<br>
-    </div>
-    {% else %}
-    <div class="content-restricted">
-        <img src="{{ url_for('static', filename='newstyle/hackplanet_logo.png') }}" alt="HackPlanet Logo" class="login-logo">
-        <div class="content-restricted-textblock">
-        Welcome to HackPlanet.EU!<br>
-        Please login or register to start hacking.
-    </div>
+    <header class="header">
+        <div class="logo-hack-container">
+            <img src="{{ url_for('static', filename='newstyle/hackplanet.png') }}" alt="HackPlanet Logo" class="logo-hack">
+            <h1>HackPlanet.EU</h1>
+        <div class="logo-hack-container">
+    </header>
+
+    <section class="intro">
+        <p>Welcome to HackPlanet.EU, the destination for aspiring ethical hackers!</p>
+    </section>
+
+    <section class="features">
+        <h2>What You Can Expect</h2>
+        <div class="feature-block">
+            <h3>Interactive LABs</h3>
+            <p>Engage with diverse and dynamic LABs designed to challenge your hacking skills. Each LAB presents unique scenarios and vulnerabilities for you to discover and exploit.</p>
+        </div>
+        <div class="feature-block">
+            <h3>Collaborative Community</h3>
+            <p>Join a vibrant community of ethical hackers. Collaborate, share knowledge, and learn from your peers as you work together to overcome complex challenges.</p>
+        </div>
+        <div class="feature-block">
+            <h3>Real-World Scenarios</h3>
+            <p>Experience realistic hacking scenarios that simulate real-world security issues. Hone your skills in a safe and legal environment, preparing you for actual cybersecurity challenges.</p>
+        </div>
+        <div class="feature-block">
+            <h3>Leaderboards & Rewards</h3>
+            <p>Compete against other participants to climb the leaderboards. Earn points and recognition as you submit flags and complete LABs, proving your prowess in ethical hacking.</p>
+        </div>
+        <div class="feature-block">
+            <h3>Continuous Learning</h3>
+            <p>Stay ahead of the curve with our continuously updated LABs and training materials. Enhance your knowledge and skills with new challenges and content regularly added to the platform.</p>
+        </div>
+    </section>
+
+    <section class="call-to-action">
+        <a href="/ctf/hacking_labs" class="button-glass">Start Hacking</a>
+        <a href="/ctf/leaderboard" class="button-glass">View Leaderboards</a>
+        <a href="/ctf/help" class="button-glass">Get Support</a>
+    </section>
 </div>
+{% else %}
+<div class="content-restricted">
+    <header class="header">
+        <img src="{{ url_for('static', filename='newstyle/hackplanet_logo.png') }}" alt="HackPlanet Logo" class="logo">
+        <h1>Welcome to HackPlanet.EU!</h1>
+    </header>
 
-    <h1></h1>
+    <section class="intro">
+        <p>Your journey into the world of ethical hacking begins here. Sign up or log in to start exploring our interactive LABs and join our community of hackers.</p>
+    </section>
 
     <div class="container-login">
         <form action="/login" method="post">
@@ -56,7 +81,103 @@
             </div>
         </form>
     </div>
-    {% endif %}
 </div>
-
+{% endif %}
+</div>
 {% endblock %}
+
+<style>
+.container-base {
+    padding: 20px;
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.logo {
+    max-width: 200px;
+    margin: 0 auto;
+    display: block;
+}
+
+.intro {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 1.2em;
+    color: #333;
+}
+
+.features {
+    margin: 20px 0;
+}
+
+.features h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #0056b3;
+}
+
+.feature-block {
+    margin-bottom: 20px;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.feature-block h3 {
+    margin-top: 0;
+    color: #333;
+}
+
+.feature-block p {
+    margin: 10px 0;
+    color: #555;
+}
+
+.call-to-action {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.button-glass {
+    display: inline-block;
+    padding: 10px 20px;
+    margin: 10px;
+    background: #0056b3;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background 0.3s;
+}
+
+.button-glass:hover {
+    background: #003d80;
+}
+
+.container-login {
+    text-align: center;
+}
+
+.input-glass {
+    width: 80%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.button-container {
+    text-align: center;
+}
+
+.flash {
+    background-color: #f8d7da;
+    color: #721c24;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #f5c6cb;
+    border-radius: 5px;
+}
+</style>

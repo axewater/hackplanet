@@ -127,3 +127,9 @@ class UserPreferencesForm(FlaskForm):
     default_sort = SelectField('Default Sort', choices=default_sort_choices)
     default_sort_order = SelectField('Default Sort Order', choices=default_sort_order_choices)
     submit = SubmitField('Save Preferences')
+
+class FlagSubmissionForm(FlaskForm):
+    flag = StringField('Flag', validators=[DataRequired()])
+    host_id = HiddenField('Host ID', validators=[DataRequired()])
+    flag_type = HiddenField('Flag Type', validators=[DataRequired()])
+    submit = SubmitField('Submit Flag')
