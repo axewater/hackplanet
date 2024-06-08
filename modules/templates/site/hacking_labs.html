@@ -9,16 +9,17 @@
         </div>
     {% for lab in labs %}
     <div class="lab">
-        <p>Available labs:</p>
+
         <div class="labschip">
+
             <h2>{{ lab.name }}</h2>
             {% if lab.image %}
             <img src="{{ url_for('static', filename='library/images/labs/' + lab.image) }}" alt="{{ lab.name }}" class="lab-image">
             {% endif %}
-            <p>{{ lab.description }}</p>
             {% if lab.vpn_file %}
-            <a href="{{ '/static/library/labs/' + lab.vpn_file }}" class="btn btn-primary">Download Lab Access</a>
+            <a href="{{ '/static/library/labs/' + lab.vpn_file }}" class="download-button btn btn-primary">Download Lab Access</a>
             {% endif %}
+            <p>{{ lab.description }}</p>
         </div>
 
         <div class="hosts">
@@ -29,11 +30,19 @@
                 <p>Difficulty: {{ host.difficulty }} {% if host.difficulty == 1 %}😊{% elif host.difficulty == 2 %}🙂{% elif host.difficulty == 3 %}😐{% elif host.difficulty == 4 %}😕{% elif host.difficulty == 5 %}😟{% elif host.difficulty == 6 %}😦{% elif host.difficulty == 7 %}😧{% elif host.difficulty == 8 %}😨{% elif host.difficulty == 9 %}😰{% elif host.difficulty == 10 %}😱{% endif %}</p>
                 <p>Status: {{ 'Online' if host.status else 'Offline' }}</p>
                 <p>Rating: {% for _ in range(host.rating) %}★{% endfor %}{% for _ in range(5 - host.rating) %}☆{% endfor %}</p>
+                {% if is_admin %}
+                <div class="flags">
+                    <p style="font-size: 0.5em;">User Flag: {{ host.flags|selectattr('type', '==', 'user')|map(attribute='uuid')|first }}</p>
+                    <p style="font-size: 0.5em;">Root Flag: {{ host.flags|selectattr('type', '==', 'root')|map(attribute='uuid')|first }}</p>
+                </div>
+                {% endif %}
                 <div class="host-image-container">
                     <img src="{{ '/static/library/images/' + host.image_url }}" alt="{{ host.name }}" class="host-image">
                 </div>
+                {% if host.name != 'kalismurf' %}
                 <button class="btn btn-success">Submit User Flag</button>
                 <button class="btn btn-danger">Submit Root Flag</button>
+                {% endif %}
             </div>
             {% endfor %}
         </div>

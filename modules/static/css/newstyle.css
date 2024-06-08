@@ -15,6 +15,7 @@ body {
     background-size: contain;
     background-position: center;
     background-repeat: no-repeat;
+    margin-top: 10px;
   }
 
 .h2 {
@@ -459,9 +460,7 @@ font-size: large;
     padding: 20px 20px;
 }
 
-.content-textblock-help-q1 {
-    flex-basis: 40%; /* Adjusts the base size of the image block */
-}
+
 
 .content-textblock-help {
     display: flex;
@@ -681,7 +680,7 @@ form textarea {
 .help-logo {
     display: flex;
     justify-content: center;
-    width: 500px;
+    width: 400px;
     padding: 30px;
     border-radius: 15px;
 }
@@ -1093,7 +1092,7 @@ form textarea {
 
 #content {
     transition: margin-left .5s;
-    padding: 20px;
+    
     margin-left: 180px;
 }
 
@@ -1160,11 +1159,6 @@ form textarea {
     transition: max-height 0.5s ease-in;
 }
 
-.labs_title {
-    color: #fff;
-    font-weight: bold;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-    }
     
 .content-help-kadertje {
     max-width: 800px;

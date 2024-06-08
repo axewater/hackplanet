@@ -4,30 +4,35 @@
 <body>
 <div class="container-base">
     <div class="glass-panel">
-        <h1>Help !</h1>
-        Thank you for using our ethical hacking training platform.<br>
 
         <div class="content-textblock-help">
             <div class="content-textblock-help-q1">
-                <h2>USER TIPS :</h2>
+                <h3>Getting Started :</h3>
     
                 <br>
-                - You can browse the available LAB environments<br>
-                - To access the LAB environments, use the provided VPN connection details<br>
+                - Each LAB is a seperate network with machines you can hack. To access each LAB, an OpenVPN connection file can be downloaded<br>
                 - Submit your flags to check your progress and earn points<br>
-    
-                <br>
-                <h2>ADDITIONAL TIPS :</h2>
-    
-                <br>
                 - Check the leaderboards to see how you rank among other participants<br>
-                - Each LAB environment is designed to test your ethical hacking skills<br>
-                - Look for vulnerabilities, misconfigurations, and other security weaknesses<br>
-                - Document your findings and submit detailed reports<br>
-                - Respect the rules of engagement and do not attack or disrupt other participants<br>
-                - If you encounter any issues or have questions, reach out to our support team<br>
+    
                 <br>
-                </p>
+                <h3>Rules of Engagement:</h3>
+    
+                <br>
+                - Brute force password cracking is never (intended) way to the goal. You are allowed to try, but you are probably on the wrong path.<br>
+                - Do not attack the VPN server or the Hackplanet.eu webserver.<br>
+                - Do not attack or disrupt other participants.<br>
+                - Once you get root, do not delete flags. It is appreciated if you cleanup exploit related files when you are done. (To prevent spoilers)
+                - If a host seems to have stopped responding, contact support for a reboot/rebuild<br>
+                <br>
+                <br>
+                <h3>Technical Details:</h3>
+                - The VPN is using a TUN interface, this makes it incompatible with nmap under Windows.
+                - There is a KALI host available inside each LAB network; for all HackPlanet users.
+                <br>
+                
+                    
+            
+            </p>
             </div>
             <div class="help-image">
                 <img src="{{ url_for('static', filename='newstyle/hackplanet_help.jpg') }}" alt="HackPlanet.EU Logo" class="help-logo">

@@ -59,7 +59,7 @@ class User(db.Model):
     password_reset_token = db.Column(db.String(256), nullable=True)
     token_creation_time = db.Column(db.DateTime, nullable=True)
     invite_quota = db.Column(db.Integer, default=0)
-    invited_by = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
+    invited_by = Column(String(36), ForeignKey('users.user_id'), nullable=True)
     score_total = db.Column(db.Integer, default=0)
     
     def set_password(self, password):
@@ -164,6 +164,7 @@ class Host(db.Model):
     difficulty = db.Column(db.Integer, nullable=False)
     ip = db.Column(db.String(45), nullable=True)
     status = db.Column(db.Boolean, default=True)
+    flags = relationship('Flag', backref='host', lazy=True)
     rating = db.Column(db.Integer, nullable=True)
     release_date = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     hint = db.Column(db.String(1000), nullable=True)
@@ -197,6 +198,7 @@ class Flag(db.Model):
     type = db.Column(db.String(128), nullable=False)
     uuid = db.Column(db.String(36), unique=True, nullable=False, default=str(uuid4()))
     point_value = db.Column(db.Integer, nullable=False)
+    host_id = db.Column(db.Integer, db.ForeignKey('hosts.id'), nullable=False)
 
     def __repr__(self):
         return f"<Flag id={self.id}, type={self.type}, uuid={self.uuid}, point_value={self.point_value}>"

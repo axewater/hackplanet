@@ -3,11 +3,12 @@
 
 {% block content %}
 <div class="container">
-    <h1>Leaderboard</h1>
+    <h1>HackPlanet.EU World Leaderboard</h1>
     <table class="table table-striped">
         <thead>
             <tr>
                 <th>Rank</th>
+                <th>Avatar</th>
                 <th>Username</th>
                 <th>Score</th>
             </tr>
@@ -16,6 +17,9 @@
             {% for user in users %}
             <tr>
                 <td>{{ loop.index }}</td>
+                <td>
+                    <img src="{{ url_for('static', filename=user.avatarpath) }}" alt="Avatar" style="width: 50px; height: 50px; border-radius: 50%;">
+                </td>
                 <td>{{ user.name }}</td>
                 <td>{{ user.score_total }}</td>
             </tr>

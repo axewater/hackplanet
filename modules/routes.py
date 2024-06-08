@@ -16,6 +16,9 @@ from werkzeug.utils import secure_filename
 
 from werkzeug.security import generate_password_hash, check_password_hash
 
+
+
+
 from modules import db, mail, cache
 from functools import wraps
 from uuid import uuid4
@@ -34,8 +37,9 @@ from modules.forms import (
     UserManagementForm, CsrfProtectForm, LoginForm, ResetPasswordRequestForm, RegistrationForm, 
     CreateUserForm, UserPreferencesForm, InviteForm, CsrfForm, LabForm
 )
+
 from modules.models import (
-    User, Whitelist, UserPreference, GlobalSettings, InviteToken, Lab, Challenge
+    User, Whitelist, UserPreference, GlobalSettings, InviteToken, Lab, Challenge, Host, Flag
 )
 from modules.utilities import (
     admin_required, _authenticate_and_redirect, square_image, send_email, send_password_reset_email
@@ -220,7 +224,7 @@ def register():
                 email_verification_token=s.dumps(form.email.data, salt='email-confirm'),
                 token_creation_time=datetime.utcnow(),
                 created=datetime.utcnow(),
-                invited_by=invite.creator_user_id if invite else None
+                # invited_by=invite.creator_user_id if invite else None
             )
             user.set_password(form.password.data)
             db.session.add(user)
@@ -856,18 +860,29 @@ def admin_dashboard():
 def ctf_home():
     return render_template('site/ctf.html')
 
+
 @bp.route('/ctf/leaderboard')
 def leaderboard():
     # Fetch user scores from the database
+    print("Fetching user scores from the database...")
     users = User.query.with_entities(User.name, User.score_total, User.avatarpath).order_by(User.score_total.desc()).all()
     
+    # Debug print to verify fetched data
+    if users:
+        print(f"Users: {users} avatarpath: {users[0].avatarpath}")
+
     return render_template('site/leaderboard.html', users=users)
+
 
 @bp.route('/ctf/hacking_labs')
 def hacking_labs():
     # Fetch labs and their hosts from the database
-    labs = Lab.query.all()
-    return render_template('site/hacking_labs.html', labs=labs)
+    labs = Lab.query.options(joinedload(Lab.hosts).joinedload(Host.flags)).all()
+
+    # Check if the user is an admin
+    is_admin = current_user.role == 'admin'
+
+    return render_template('site/hacking_labs.html', labs=labs, is_admin=is_admin)
 
 @bp.route('/ctf/challenges')
 def challenges():
