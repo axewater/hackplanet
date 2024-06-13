@@ -129,31 +129,21 @@ body {
     text-align: center;
 }
 
-.button-pagination-glass {
 
-    width: 6%;
-    gap: 2px;
-    backdrop-filter: blur(10px);
-    background: rgba(255, 255, 255, 0.1);
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: transform 0.3s;
-    font-size: 1rem;
+
+.btn-green {
+    background-color: #0e461b;
+    border-color: #28a745;
     color: white;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    
-    align-items: center;
-    justify-content: center;
-    margin-bottom: 5px;
-
 }
-
-.button-pagination-glass:hover {
-
-    transform: translateY(-3px);
+.btn-green:hover {
+    background-color: #08b72e;
+    border-color: #00ff3c;
+    color: white;
+    transform: translateY(-5px);
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
 }
+
 
 .button-login {
 font-size: large;
