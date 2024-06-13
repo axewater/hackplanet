@@ -1,47 +1,18 @@
 # modules/routes_ctf.py
-from flask import Flask, render_template, flash, current_user, request, redirect, url_for, jsonify
+
+from flask import Flask, render_template, request, Blueprint, jsonify
+from flask_login import current_user
+from flask_wtf import FlaskForm
 from sqlalchemy.orm import joinedload
-from .models import User, Lab, Host, Flag, Challenge, UserProgress
-from .forms import FlagSubmissionForm
-from sqlalchemy.exc import SQLAlchemyError
-from . import db
-
-@bp.route('/ctf')
-def ctf_home():
-    return render_template('site/ctf.html')
-
-
-@bp.route('/ctf/challenges')
-def challenges():
-    # Fetch challenges from the database
-    challenges = Challenge.query.all()
-    return render_template('site/challenges.html', challenges=challenges)
-
-@bp.route('/ctf/leaderboard')
-def leaderboard():
-    # Fetch user scores from the database
-    print("Fetching user scores from the database...")
-    users = User.query.with_entities(User.name, User.score_total, User.avatarpath).order_by(User.score_total.desc()).all()
-    print(f"Users: {users} avatarpath: {users[0].avatarpath}")
-    return render_template('site/leaderboard.html', users=users)
-
-@bp.route('/ctf/hacking_labs')
-def hacking_labs():
-    # Check if the user is an admin
-    is_admin = current_user.role == 'admin'
-
-    if is_admin:
-        # Fetch labs and their hosts along with flags for admin users
-        labs = Lab.query.options(joinedload(Lab.hosts).joinedload(Host.flags)).all()
-    else:
-        # Fetch labs and their hosts without flags for non-admin users
-        labs = Lab.query.options(joinedload(Lab.hosts)).all()
-
-    # Instantiate the FlagSubmissionForm
-    form = FlagSubmissionForm()
-
-    return render_template('site/hacking_labs.html', labs=labs, is_admin=is_admin, form=form)
-
+from modules import db, mail, cache
+from functools import wraps
+from uuid import uuid4
+from modules.forms import (
+FlagSubmissionForm
+)
+from modules.models import (
+    Lab, Host, Flag, UserProgress
+)
 
 @bp.route('/ctf/submit_flag_api', methods=['GET'])
 def submit_flag_api():
@@ -80,3 +51,16 @@ def submit_flag_api():
         return jsonify({'error': str(e)}), 500
 
     return jsonify({'host_id': host_id, 'flag_type': flag_type, 'result': 'failed'})
+
+@bp.route('/ctf/hacking_labs')
+def hacking_labs():
+    # Fetch labs and their hosts from the database
+    labs = Lab.query.options(joinedload(Lab.hosts).joinedload(Host.flags)).all()
+    print(f"Labs: {labs} host: {labs[0].hosts} flags: {labs[0].hosts[0].flags}")
+    # Check if the user is an admin
+    is_admin = current_user.role == 'admin'
+
+    # Instantiate the FlagSubmissionForm
+    form = FlagSubmissionForm()
+
+    return render_template('site/hacking_labs.html', labs=labs, is_admin=is_admin, form=form)

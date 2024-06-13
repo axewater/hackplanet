@@ -1,24 +1,24 @@
-# Project Summary
+### Project Summary
 
-## Overview
-- **Languages**: Python, HTML, CSS, JavaScript
-- **Frameworks**: Flask
-- **Main Libraries**: SQLAlchemy, Flask-Mail, Flask-WTF, Werkzeug
+- **Languages, Frameworks, and Main Libraries Used:**
+  - Languages: Python
+  - Frameworks: Flask
+  - Main Libraries: SQLAlchemy, Flask-Mail, Flask-WTF, psycopg2-binary, Flask-Limiter, Flask-Login, etc.
 
-## Purpose
-The project is a web application named HackPlanet that seems to be related to ethical hacking. It includes functionalities for user management, challenges, leaderboards, and more.
+- **Purpose of the Project:**
+  The project is a web application named HackPlanet that seems to be related to hacking challenges or CTF (Capture The Flag) competitions. It involves user management, database interactions, email sending, and various other functionalities related to running a hacking competition platform.
 
-## Relevant Files for Configuration and Building
-1. **Dockerfile**: `/Dockerfile`
-2. **Configuration File**: `/config.py`
-3. **Docker Compose File**: `/docker-compose.yml`
-4. **Requirements File**: `/requirements.txt`
-5. **App Entry Point Script**: `/app.py`
-6. **Database Management Script**: `/manage_db.py`
-7. **Setup Script for User Creation without SMTP**: `/setup_nosmtp.py`
+- **Configuration and Building Files:**
+  1. Dockerfile: `/Dockerfile`
+  2. Docker Compose Configuration: `/docker-compose.yml`
+  3. Requirements for Python Packages: `/requirements.txt`
 
-## Source Files Directory
-- **Source Files**: `/modules`
+- **Source Files Directory:**
+  - Main Application File: `/app.py`
+  - Database Management File: `/manage_db.py`
+  - User Setup File without SMTP Configuration: `/setup_nosmtp.py`
 
-## Documentation Files Location
-- **Documentation Files**: Located in the `/modules/templates` directory, containing HTML templates for various pages like admin settings, login, registration, etc.
+- **Documentation Files Location:**
+  - README: `/README.md`
+
+This project involves a Flask web application with various modules for different functionalities, including user management, database setup, and more. The Dockerfile and docker-compose.yml are provided for containerization, and the app can be run on port 5001. The database setup, user creation, and other configurations are handled in the Python scripts within the project.

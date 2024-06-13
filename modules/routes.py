@@ -874,18 +874,7 @@ def leaderboard():
     return render_template('site/leaderboard.html', users=users)
 
 
-@bp.route('/ctf/hacking_labs')
-def hacking_labs():
-    # Fetch labs and their hosts from the database
-    labs = Lab.query.options(joinedload(Lab.hosts).joinedload(Host.flags)).all()
-    print(f"Labs: {labs} host: {labs[0].hosts} flags: {labs[0].hosts[0].flags}")
-    # Check if the user is an admin
-    is_admin = current_user.role == 'admin'
 
-    # Instantiate the FlagSubmissionForm
-    form = FlagSubmissionForm()
-
-    return render_template('site/hacking_labs.html', labs=labs, is_admin=is_admin, form=form)
 
 @bp.route('/ctf/challenges')
 def challenges():
@@ -995,3 +984,16 @@ def submit_flag_api():
         return jsonify({'error': str(e)}), 500
 
     return jsonify({'host_id': host_id, 'flag_type': flag_type, 'result': 'failed'})
+
+@bp.route('/ctf/hacking_labs')
+def hacking_labs():
+    # Fetch labs and their hosts from the database
+    labs = Lab.query.options(joinedload(Lab.hosts).joinedload(Host.flags)).all()
+    print(f"Labs: {labs} host: {labs[0].hosts} flags: {labs[0].hosts[0].flags}")
+    # Check if the user is an admin
+    is_admin = current_user.role == 'admin'
+
+    # Instantiate the FlagSubmissionForm
+    form = FlagSubmissionForm()
+
+    return render_template('site/hacking_labs.html', labs=labs, is_admin=is_admin, form=form)

@@ -212,5 +212,9 @@ class UserProgress(db.Model):
     score_total = db.Column(db.Integer, nullable=False, default=0)
     user = db.relationship('User', backref=db.backref('progress', uselist=False))
 
+    def __init__(self, user_id, obtained_flags=None):
+        self.user_id = user_id
+        self.obtained_flags = obtained_flags or {}
+
     def __repr__(self):
         return f"<UserProgress id={self.id}, user_id={self.user_id}>"

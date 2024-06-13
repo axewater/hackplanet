@@ -10,7 +10,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from config import Config
 from modules.routes_site import site_bp
-from modules.filters import setup_filters
+
 from urllib.parse import urlparse
 from flask_caching import Cache
 
@@ -67,7 +67,7 @@ def create_app():
         db.create_all()
     app.register_blueprint(routes.bp)
     app.register_blueprint(site_bp)
-    setup_filters(app)
+
     return app
 
 
