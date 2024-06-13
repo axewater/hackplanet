@@ -8,7 +8,7 @@ from modules import db, mail, cache
 from functools import wraps
 from uuid import uuid4
 from modules.forms import (
-FlagSubmissionForm
+    FlagSubmissionForm
 )
 from modules.models import (
     Lab, Host, Flag, UserProgress
@@ -32,10 +32,8 @@ def submit_flag_api():
             if not user_progress:
                 user_progress = UserProgress(user_id=current_user.id, obtained_flags={}, score_total=0)
 
-            obtained_flags = user_progress.obtained_flags or {}
-            if flag_record.uuid not in obtained_flags:
-                obtained_flags[flag_record.uuid] = True
-                user_progress.obtained_flags = obtained_flags
+            if flag_record.uuid not in user_progress.obtained_flags:
+                user_progress.obtained_flags[flag_record.uuid] = True
                 user_progress.score_total += flag_record.point_value
                 current_user.score_total += flag_record.point_value
 

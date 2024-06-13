@@ -207,8 +207,6 @@ class UserProgress(db.Model):
     __tablename__ = 'user_progress'
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    completed_challenges = db.Column(JSONEncodedDict, nullable=True)
-    obtained_flags = db.Column(JSONEncodedDict, nullable=True)
     score_total = db.Column(db.Integer, nullable=False, default=0)
     user = db.relationship('User', backref=db.backref('progress', uselist=False))
 
@@ -218,3 +216,25 @@ class UserProgress(db.Model):
 
     def __repr__(self):
         return f"<UserProgress id={self.id}, user_id={self.user_id}>"
+
+class FlagsObtained(db.Model):
+    __tablename__ = 'flags_obtained'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    flag_id = db.Column(db.Integer, db.ForeignKey('flags.id'), nullable=False)
+    user = db.relationship('User', backref=db.backref('flags_obtained', lazy=True))
+    flag = db.relationship('Flag', backref=db.backref('users_obtained', lazy=True))
+
+    def __repr__(self):
+        return f"<FlagsObtained id={self.id}, user_id={self.user_id}, flag_id={self.flag_id}>"
+    
+class ChallengesObtained(db.Model):
+    __tablename__ = 'challenges_obtained'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    challenge_id = db.Column(db.Integer, db.ForeignKey('challenges.id'), nullable=False)
+    user = db.relationship('User', backref=db.backref('challenges_obtained', lazy=True))
+    challenge = db.relationship('Challenge', backref=db.backref('users_obtained', lazy=True))
+
+    def __repr__(self):
+        return f"<ChallengesObtained id={self.id}, user_id={self.user_id}, challenge_id={self.challenge_id}>"
