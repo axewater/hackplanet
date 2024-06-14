@@ -1,4 +1,5 @@
 # modules/models.py
+from argon2.exceptions import VerifyMismatchError
 from modules import db
 from sqlalchemy import Boolean
 from sqlalchemy import Table, Column, Integer, String, ForeignKey, Float, DateTime, Enum
@@ -69,7 +70,7 @@ class User(db.Model):
         if self.password_hash.startswith('$argon2'):
             try:
                 return ph.verify(self.password_hash, password)
-            except argon2_exceptions.VerifyMismatchError:
+            except VerifyMismatchError:
                 return False
         else:
             return check_password_hash(self.password_hash, password)
