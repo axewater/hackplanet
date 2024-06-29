@@ -435,6 +435,7 @@ form select {
 .help-logo img {
     border-radius: 15px;
 }
+
 .glass-panel-text {
 
     flex-direction: column;
@@ -465,19 +466,11 @@ form select {
 
 
 .profile_avatar img {
-
     max-width: 90%;
     max-height: 90%;
     border-radius: 10px;
 
-
 }
-
-
-/* Style for the popup menu */
-
-/* You might want to style the option elements as well */
-
 
 
 .sidebar {
@@ -512,9 +505,6 @@ form select {
 
 }
 
-.sidebar-menu {
-   
-}
 
 .sidebar-link {
     display: flex;
