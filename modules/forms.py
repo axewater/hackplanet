@@ -133,3 +133,8 @@ class FlagSubmissionForm(FlaskForm):
     host_id = HiddenField('Host ID', validators=[DataRequired()])
     flag_type = HiddenField('Flag Type', validators=[DataRequired()])
     submit = SubmitField('Submit Flag')
+
+class ChallengeSubmissionForm(FlaskForm):
+    flag = StringField('Flag', validators=[DataRequired()])
+    challenge_id = HiddenField('Challenge ID', validators=[DataRequired()])
+    submit = SubmitField('Submit Flag')

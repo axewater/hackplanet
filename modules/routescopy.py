@@ -149,7 +149,30 @@ def leaderboard():
 def challenges():
     # Fetch challenges from the database
     challenges = Challenge.query.all()
-    return render_template('site/challenges.html', challenges=challenges)
+    form = ChallengeSubmissionForm()
+    return render_template('site/challenges.html', challenges=challenges, form=form)
+
+@bp.route('/ctf/submit_challenge_flag', methods=['POST'])
+@login_required
+def submit_challenge_flag():
+    form = ChallengeSubmissionForm()
+    if form.validate_on_submit():
+        challenge = Challenge.query.get(form.challenge_id.data)
+        if challenge and challenge.flag_uuid == form.flag.data:
+            # Check if the user has already completed this challenge
+            if not ChallengesObtained.query.filter_by(user_id=current_user.id, challenge_id=challenge.id).first():
+                # Add points to user's score
+                current_user.score_total += challenge.point_value
+                # Mark challenge as completed
+                completed_challenge = ChallengesObtained(user_id=current_user.id, challenge_id=challenge.id)
+                db.session.add(completed_challenge)
+                db.session.commit()
+                flash('Congratulations! You solved the challenge.', 'success')
+            else:
+                flash('You have already completed this challenge.', 'info')
+        else:
+            flash('Incorrect flag. Try again.', 'error')
+    return redirect(url_for('main.challenges'))
 
 @bp.route('/admin/lab_editor/<int:lab_id>', methods=['GET', 'POST'])
 @bp.route('/admin/lab_editor', methods=['GET', 'POST'])

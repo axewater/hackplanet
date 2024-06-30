@@ -15,7 +15,14 @@
                     <div class="card-body">
                         <h5 class="card-title">{{ challenge.name }}</h5>
                         <p class="card-text">Category: {{ challenge.category }}</p>
-                        <button class="btn btn-primary">Attempt Challenge</button>
+                        <p class="card-text">Points: {{ challenge.point_value }}</p>
+                        <p class="card-text">{{ challenge.description }}</p>
+                        <form method="POST" action="{{ url_for('main.submit_challenge_flag') }}">
+                            {{ form.hidden_tag() }}
+                            {{ form.challenge_id(value=challenge.id) }}
+                            {{ form.flag(class="form-control", placeholder="Enter flag") }}
+                            {{ form.submit(class="btn btn-primary mt-2") }}
+                        </form>
                     </div>
                 </div>
             </div>
