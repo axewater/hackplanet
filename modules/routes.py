@@ -336,13 +336,20 @@ def invites():
             token = str(uuid.uuid4())
             invite_token = InviteToken(token=token, creator_user_id=current_user.user_id)
             db.session.add(invite_token)
-            db.session.commit()
 
-            invite_url = url_for('main.register', token=token, _external=True, _scheme='https')
+            # Add the invited email to the whitelist
+            whitelist_entry = Whitelist(email=email)
+            db.session.add(whitelist_entry)
 
-            send_invite_email(email, invite_url)
-
-            flash('Invite sent successfully. The invite expires after 48 hours.', 'success')
+            try:
+                db.session.commit()
+            except IntegrityError:
+                db.session.rollback()
+                flash('This email is already whitelisted.', 'info')
+            else:
+                invite_url = url_for('main.register', token=token, _external=True, _scheme='https')
+                send_invite_email(email, invite_url)
+                flash('Invite sent successfully and email added to whitelist. The invite expires after 48 hours.', 'success')
         else:
             flash('You have reached your invite limit.', 'danger')
         return redirect(url_for('main.invites'))
@@ -355,8 +362,8 @@ def invites():
 
 
 def send_invite_email(email, invite_url):
-    subject = "You're Invited!"
-    html_content = render_template('login/invite_email.html', invite_url=invite_url)
+    subject = "You're Invited to Join HackPlanet.EU!"
+    html_content = render_template('login/invite_email.html', invite_url=invite_url, email=email)
     send_email(email, subject, html_content)
 
 
