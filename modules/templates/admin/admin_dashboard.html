@@ -28,12 +28,7 @@
             {% endif %}
 
             <!-- Row 2: Add User, Invite System, Whitelist, Downloads -->
-            <div class="col-3 d-flex align-items-stretch">
-                <a href="{{ url_for('main.create_user') }}" class="btn btn-secondary dashboard-button">
-                    <i class="fas fa-user-plus dashboard-icon"></i>
-                    Add User
-                </a>
-            </div>
+
             <div class="col-3 d-flex align-items-stretch">
                 <a href="{{ url_for('main.manage_invites') }}" class="btn btn-dark dashboard-button">
                     <i class="fas fa-envelope-open-text dashboard-icon"></i>
@@ -55,18 +50,18 @@
             </div>
 
             <!-- Row 3: Lab Editor, Lab Manager, Newsletter, API Debug -->
-            <div class="col-3 d-flex align-items-stretch">
-                <a href="{{ url_for('main.lab_editor') }}" class="btn btn-primary dashboard-button">
-                    <i class="fas fa-flask dashboard-icon"></i>
-                    Add Lab
-                </a>
-            </div>
+
             <div class="col-3 d-flex align-items-stretch">
                 <a href="{{ url_for('main.lab_manager') }}" class="btn btn-primary dashboard-button">
                     <i class="fas fa-flask dashboard-icon"></i>
                     Lab Manager
                 </a>
-                <a href="{{ url_for('main.challenge_manager') }}">Manage Challenges</a>
+            </div>
+            <div class="col-3 d-flex align-items-stretch">
+                <a href="{{ url_for('main.challenge_manager') }}" class="btn btn-primary dashboard-button">
+                    <i class="fas fa-cog dashboard-icon"></i>
+                    Challenge Manager
+                </a>
 
             </div>
             {% if enable_newsletter %}

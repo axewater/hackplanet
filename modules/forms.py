@@ -69,7 +69,7 @@ class EditUserForm(FlaskForm):
     
     
 class UserManagementForm(FlaskForm):
-    user_id = SelectField('Choose pirate', coerce=int)
+    user_id = SelectField('Choose hacker', coerce=int)
     name = StringField('User Name', validators=[Length(max=64)])
     email = StringField('Email', validators=[DataRequired(), Email(), Length(max=120)])
     role = StringField('Role', validators=[Length(max=64)])

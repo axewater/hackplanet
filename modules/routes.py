@@ -371,34 +371,29 @@ def send_invite_email(email, invite_url):
 @login_required
 @admin_required
 def create_user():
-    # Initialize the user creation form
     form = CreateUserForm()
 
-    # Handle form submission
     if form.validate_on_submit():
         try:
-            # Create a new user
             user = User(
                 name=form.username.data,
                 email=form.email.data.lower(),
                 role='user',
-                is_email_verified=True,  # Automatically set to True
-                user_id=str(uuid4()),  # Generate a UUID for the user
+                is_email_verified=True,
+                user_id=str(uuid4()),
                 created=datetime.utcnow()
             )
-            user.set_password(form.password.data)  # Set the user's password
+            user.set_password(form.password.data)
             logging.info(f"Debug: User created: {user}")
             db.session.add(user)
             db.session.commit()
 
-            # Redirect to a success page
             flash('User created successfully.', 'success')
-            return redirect(url_for('main.user_created'))
+            return redirect(url_for('main.usermanager'))
         except Exception as e:
             db.session.rollback()
             flash(f'An error occurred: {str(e)}', 'danger')
 
-    # Render the registration form
     return render_template('admin/create_user.html', form=form)
 
 @bp.route('/admin/user_created')

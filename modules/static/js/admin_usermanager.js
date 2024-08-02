@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', function() {
         deleteButton.addEventListener('click', function(event) {
             var userNameField = document.getElementById('name');
             var userName = userNameField ? userNameField.value : 'this user';
-            var confirmDeletion = confirm("Remove " + userName + " from your pirate crew?");
+            var confirmDeletion = confirm("Remove " + userName + " from your hacker crew?");
             if (!confirmDeletion) {
                 event.preventDefault();
             }

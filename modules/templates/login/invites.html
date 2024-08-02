@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% block content %}
 <div class="glass-panel container py-4">
-    <h2 class="mb-3">Invite friends to your pirate crew!</h2>
+    <h2 class="mb-3">Invite friends to your hacker crew!</h2>
     <p>Invites expire automatically after 48 hours. If not used by then, the invite is returned to you.</p>
     <div class="alert alert-info" role="alert">
         You have <strong>{{ remaining_invites }}</strong> out of <strong>{{ invite_quota }}</strong> invites left to send.
@@ -37,7 +37,7 @@
             onclick="copyToClipboard(this, '{{ url_for('main.register', token=invite.token, _external=True) }}')">Copy Invite URL</button>
         </div>
         {% else %}
-        <div class="list-group-item">You have no active invites. Invite some pirates onto your crew!</div>
+        <div class="list-group-item">You have no active invites. Invite some hackers onto your crew!</div>
         {% endfor %}
     </div>
 </div>
