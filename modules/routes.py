@@ -887,6 +887,11 @@ def leaderboard():
 def challenges():
     # Fetch challenges from the database
     challenges = Challenge.query.all()
+    for challenge in challenges:
+        if challenge.html_link:
+            challenge.image = challenge.html_link
+        else:
+            challenge.image = 'default_challenge_image.jpg'
     form = ChallengeSubmissionForm()
     return render_template('site/challenges.html', challenges=challenges, form=form)
 

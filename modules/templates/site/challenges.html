@@ -18,7 +18,12 @@
             {% for challenge in challenges %}
             <div class="col-md-4">
                 <div class="card">
-                    <img src="{{ challenge.image }}" class="card-img-top" alt="{{ challenge.name }}">
+                    <div style="display: flex; justify-content: center; margin-top: 15px;">
+                        <img src="{{ url_for('static', filename='library/images/challenges/' + challenge.html_link) }}" 
+                             class="card-img-top" 
+                             alt="{{ challenge.name }}"
+                             style="width: 100px; height: 100px; object-fit: cover;">
+                    </div>
                     <div class="card-body">
                         <h5 class="card-title">{{ challenge.name }}</h5>
                         <p class="card-text">Category: {{ challenge.category }}</p>
