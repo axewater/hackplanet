@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <h1>{% if challenge %}Edit Challenge{% else %}Add New Challenge{% endif %}</h1>
+    <form method="POST">
+        {{ form.hidden_tag() }}
+        <div class="form-group">
+            {{ form.name.label }}
+            {{ form.name(class="form-control") }}
+        </div>
+        <div class="form-group">
+            {{ form.description.label }}
+            {{ form.description(class="form-control") }}
+        </div>
+        <div class="form-group">
+            {{ form.flag_uuid.label }}
+            {{ form.flag_uuid(class="form-control") }}
+        </div>
+        <div class="form-group">
+            {{ form.html_link.label }}
+            {{ form.html_link(class="form-control") }}
+        </div>
+        <div class="form-group">
+            {{ form.point_value.label }}
+            {{ form.point_value(class="form-control") }}
+        </div>
+        {{ form.submit(class="btn btn-primary") }}
+        <a href="{{ url_for('main.challenge_manager') }}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+{% endblock %}

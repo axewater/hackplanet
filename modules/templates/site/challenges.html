@@ -2,7 +2,14 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<script src="{{ url_for('static', filename='js/flag_submission.js') }}"></script>
 <div class="container">
+    <div id="flagModal" class="modal">
+        <div class="modal-content">
+            <span id="modalEmoticon" class="modal-emoticon"></span>
+            <p id="modalMessage"></p>
+        </div>
+    </div>
     <div class="glass-panel">
         <div class="labs_title">
             <h1>Challenges</h1>
@@ -17,12 +24,10 @@
                         <p class="card-text">Category: {{ challenge.category }}</p>
                         <p class="card-text">Points: {{ challenge.point_value }}</p>
                         <p class="card-text">{{ challenge.description }}</p>
-                        <form method="POST" action="{{ url_for('main.submit_challenge_flag') }}">
-                            {{ form.hidden_tag() }}
-                            {{ form.challenge_id(value=challenge.id) }}
-                            {{ form.flag(class="form-control", placeholder="Enter flag") }}
-                            {{ form.submit(class="btn btn-primary mt-2") }}
-                        </form>
+                        <div class="flag-input-container">
+                            <input type="text" id="challenge-flag-{{ challenge.id }}" placeholder="Enter flag" class="flag-input">
+                            <button type="button" class="btn btn-primary" onclick="submitFlag('{{ challenge.id }}', 'challenge')">Submit</button>
+                        </div>
                     </div>
                 </div>
             </div>

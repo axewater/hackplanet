@@ -33,7 +33,7 @@ from urllib.parse import unquote
 
 
 from modules.forms import (
-    UserPasswordForm, UserDetailForm, EditProfileForm, NewsletterForm, WhitelistForm, EditUserForm, 
+    UserPasswordForm, UserDetailForm, EditProfileForm, NewsletterForm, WhitelistForm, EditUserForm, ChallengeForm,
     UserManagementForm, CsrfProtectForm, LoginForm, ResetPasswordRequestForm, RegistrationForm, 
     CreateUserForm, UserPreferencesForm, InviteForm, CsrfForm, LabForm, FlagSubmissionForm, ChallengeSubmissionForm
 )
@@ -974,6 +974,73 @@ def delete_lab(lab_id):
             'message': 'Lab not found'
         }), 404
 
+@bp.route('/admin/challenge_manager', methods=['GET'])
+@login_required
+@admin_required
+def challenge_manager():
+    logging.info("Entered challenge_manager route")
+    challenges = Challenge.query.all()
+    csrf_form = CsrfProtectForm()
+    return render_template('admin/challenge_manager.html', challenges=challenges, form=csrf_form)
+
+@bp.route('/admin/delete_challenge/<int:challenge_id>', methods=['POST'])
+@login_required
+@admin_required
+def delete_challenge(challenge_id):
+    challenge = Challenge.query.get(challenge_id)
+    if challenge:
+        db.session.delete(challenge)
+        db.session.commit()
+        return jsonify({'success': True})
+    else:
+        return jsonify({
+            'success': False,
+            'message': 'Challenge not found'
+        }), 404
+
+@bp.route('/admin/challenge_editor/<int:challenge_id>', methods=['GET', 'POST'])
+@bp.route('/admin/challenge_editor', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def challenge_editor(challenge_id=None):
+    form = ChallengeForm()
+    challenge = Challenge.query.get(challenge_id) if challenge_id else None
+
+    if form.validate_on_submit():
+        try:
+            if challenge:
+                challenge.name = form.name.data
+                challenge.description = form.description.data
+                challenge.flag_uuid = form.flag_uuid.data or str(uuid4())
+                challenge.html_link = form.html_link.data
+                challenge.point_value = form.point_value.data
+            else:
+                challenge = Challenge(
+                    name=form.name.data,
+                    description=form.description.data,
+                    flag_uuid=form.flag_uuid.data or str(uuid4()),
+                    html_link=form.html_link.data,
+                    point_value=form.point_value.data
+                )
+                db.session.add(challenge)
+            
+            db.session.commit()
+            flash('Challenge saved successfully.', 'success')
+            return redirect(url_for('main.challenge_manager'))
+        except Exception as e:
+            db.session.rollback()
+            logging.error(f"Error saving challenge: {str(e)}")
+            flash('An error occurred while saving the challenge. Please try again.', 'danger')
+
+    if challenge:
+        form.name.data = challenge.name
+        form.description.data = challenge.description
+        form.flag_uuid.data = challenge.flag_uuid
+        form.html_link.data = challenge.html_link
+        form.point_value.data = challenge.point_value
+
+    return render_template('admin/challenge_editor.html', form=form, challenge=challenge)
+
 
 
 @bp.route('/ctf/submit_flag_api', methods=['GET'])
@@ -1033,6 +1100,40 @@ def submit_flag_api():
         return jsonify({'error': 'An error occurred while processing the flag submission'}), 500
 
     return jsonify({'host_id': host_id, 'flag_type': flag_type, 'result': 'failed'})
+
+@bp.route('/ctf/submit_challenge_flag_api', methods=['GET'])
+@login_required
+def submit_challenge_flag_api():
+    flag = request.args.get('flag')
+    challenge_id = request.args.get('challenge_id')
+
+    if not flag or not challenge_id:
+        return jsonify({'error': 'Missing required parameters'}), 400
+
+    logging.info(f"Received challenge flag: {flag}, challenge_id: {challenge_id}")
+    try:
+        challenge = Challenge.query.get(challenge_id)
+        if not challenge:
+            return jsonify({'error': 'Challenge not found'}), 404
+
+        if challenge.flag_uuid == flag:
+            challenge_obtained = ChallengesObtained.query.filter_by(user_id=current_user.id, challenge_id=challenge.id).first()
+            if not challenge_obtained:
+                challenge_obtained = ChallengesObtained(user_id=current_user.id, challenge_id=challenge.id)
+                db.session.add(challenge_obtained)
+
+                current_user.score_total += challenge.point_value
+                db.session.commit()
+
+                return jsonify({'challenge_id': challenge_id, 'result': 'passed'})
+            else:
+                return jsonify({'error': 'You have already completed this challenge'}), 400
+        else:
+            return jsonify({'error': 'Invalid flag'}), 400
+    except Exception as e:
+        db.session.rollback()
+        logging.error(f"Error processing challenge flag submission: {str(e)}")
+        return jsonify({'error': 'An error occurred while processing the challenge flag submission'}), 500
 
 @bp.route('/ctf/hacking_labs')
 def hacking_labs():

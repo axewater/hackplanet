@@ -1,11 +1,16 @@
-function submitFlag(hostId, flagType) {
-    console.log('Host ID:', hostId);
+function submitFlag(id, flagType) {
+    console.log('ID:', id);
     console.log('Flag Type:', flagType);
     
-    var flag = document.getElementById(flagType + '-flag-' + hostId).value;
+    var flag = document.getElementById(flagType + '-flag-' + id).value;
     console.log('Flag:', flag);
 
-    const url = `/ctf/submit_flag_api?flag=${encodeURIComponent(flag)}&host_id=${hostId}&flag_type=${flagType}`;
+    let url;
+    if (flagType === 'challenge') {
+        url = `/ctf/submit_challenge_flag_api?flag=${encodeURIComponent(flag)}&challenge_id=${id}`;
+    } else {
+        url = `/ctf/submit_flag_api?flag=${encodeURIComponent(flag)}&host_id=${id}&flag_type=${flagType}`;
+    }
     console.log('Submitting flag:', url);
 
     fetch(url)
@@ -17,7 +22,7 @@ function submitFlag(hostId, flagType) {
         console.log('Response data:', data);
         if (data.error) {
             console.error('Error:', data.error);
-            showModal(data.error === 'Sorry you already submitted this flag' ? '😕' : '❌', data.error);
+            showModal(data.error.includes('already submitted') ? '😕' : '❌', data.error);
         } else {
             console.log('Flag submission result:', data.result);
             showModal('✅', 'Flag submission result: ' + data.result);

@@ -138,3 +138,11 @@ class ChallengeSubmissionForm(FlaskForm):
     flag = StringField('Flag', validators=[DataRequired()])
     challenge_id = HiddenField('Challenge ID', validators=[DataRequired()])
     submit = SubmitField('Submit Flag')
+
+class ChallengeForm(FlaskForm):
+    name = StringField('Challenge Name', validators=[DataRequired(), Length(max=128)])
+    description = TextAreaField('Description', validators=[Optional(), Length(max=256)])
+    flag_uuid = StringField('Flag UUID', validators=[Optional(), Length(max=36)])
+    html_link = StringField('HTML Link', validators=[Optional(), Length(max=256)])
+    point_value = IntegerField('Point Value', validators=[DataRequired(), NumberRange(min=1)])
+    submit = SubmitField('Save Challenge')
