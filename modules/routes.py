@@ -965,9 +965,17 @@ def lab_manager():
 def delete_lab(lab_id):
     lab = Lab.query.get(lab_id)
     if lab:
-        db.session.delete(lab)
-        db.session.commit()
-        return jsonify({'success': True})
+        try:
+            db.session.delete(lab)
+            db.session.commit()
+            return jsonify({'success': True})
+        except Exception as e:
+            db.session.rollback()
+            logging.error(f"Error deleting lab: {str(e)}")
+            return jsonify({
+                'success': False,
+                'message': 'An error occurred while deleting the lab'
+            }), 500
     else:
         return jsonify({
             'success': False,
