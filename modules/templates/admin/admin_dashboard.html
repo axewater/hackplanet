@@ -62,7 +62,12 @@
                     <i class="fas fa-cog dashboard-icon"></i>
                     Challenge Manager
                 </a>
-
+            </div>
+            <div class="col-3 d-flex align-items-stretch">
+                <a href="{{ url_for('main.host_manager') }}" class="btn btn-primary dashboard-button">
+                    <i class="fas fa-server dashboard-icon"></i>
+                    Host Manager
+                </a>
             </div>
             {% if enable_newsletter %}
             <div class="col-3 d-flex align-items-stretch">

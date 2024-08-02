@@ -286,9 +286,7 @@ font-size: large;
 
 }
 
-.help-image {
 
-}
 
 .content-textblock-help {
     display: flex;
@@ -555,9 +553,6 @@ form select {
     transition: font-size 0.3s ease;
 }
 
-.sidebar-link:hover {
-    
-}
 
 .toggle-sidebar {
     background: none;
@@ -573,7 +568,7 @@ form select {
 #content {
     transition: margin-left .5s;
     
-    margin-left: 180px;
+    margin-left: 200px;
 }
 
 #content.collapsed {

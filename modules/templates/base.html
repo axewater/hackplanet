@@ -72,6 +72,14 @@
                 <i class="fas fa-skull"></i>
                 <span class="link-text">HackPlanet</span>
             </a>
+
+            <a href="{{ url_for('main.user_progress') }}" class="sidebar-link">
+                <i class="fas fa-chart-simple"></i>
+                <span class="link-text">Progress</span>
+            </a>
+
+
+
             {% if show_help_button %}
                 <a href="{{ url_for('site.helpfaq') }}" class="sidebar-link"><i class="fas fa-question-circle"></i><span class="link-text">Help</span></a>
             {% endif %}

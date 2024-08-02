@@ -34,7 +34,7 @@ from urllib.parse import unquote
 
 from modules.forms import (
     UserPasswordForm, UserDetailForm, EditProfileForm, NewsletterForm, WhitelistForm, EditUserForm, ChallengeForm,
-    UserManagementForm, CsrfProtectForm, LoginForm, ResetPasswordRequestForm, RegistrationForm, 
+    UserManagementForm, CsrfProtectForm, LoginForm, ResetPasswordRequestForm, RegistrationForm, HostForm,
     CreateUserForm, UserPreferencesForm, InviteForm, CsrfForm, LabForm, FlagSubmissionForm, ChallengeSubmissionForm
 )
 
@@ -1147,3 +1147,75 @@ def hacking_labs():
     form = FlagSubmissionForm()
 
     return render_template('site/hacking_labs.html', labs=labs, is_admin=is_admin, form=form)
+
+@bp.route('/ctf/user_progress')
+@login_required
+def user_progress():
+    # Fetch completed challenges
+    completed_challenges = ChallengesObtained.query.filter_by(user_id=current_user.id).all()
+    
+    # Fetch obtained flags
+    obtained_flags = FlagsObtained.query.filter_by(user_id=current_user.id).all()
+    
+    # Calculate total score
+    total_score = current_user.score_total
+    
+    return render_template('site/user_progress.html', 
+                           completed_challenges=completed_challenges,
+                           obtained_flags=obtained_flags,
+                           total_score=total_score)
+
+@bp.route('/admin/host_manager', methods=['GET'])
+@login_required
+@admin_required
+def host_manager():
+    hosts = Host.query.all()
+    csrf_form = CsrfProtectForm()
+    return render_template('admin/host_manager.html', hosts=hosts, form=csrf_form)
+
+@bp.route('/admin/host_editor/<int:host_id>', methods=['GET', 'POST'])
+@bp.route('/admin/host_editor', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def host_editor(host_id=None):
+    form = HostForm()
+    form.lab_id.choices = [(lab.id, lab.name) for lab in Lab.query.all()]
+    host = Host.query.get(host_id) if host_id else None
+
+    if form.validate_on_submit():
+        try:
+            if host:
+                form.populate_obj(host)
+            else:
+                host = Host()
+                form.populate_obj(host)
+                db.session.add(host)
+            
+            db.session.commit()
+            flash('Host saved successfully.', 'success')
+            return redirect(url_for('main.host_manager'))
+        except Exception as e:
+            db.session.rollback()
+            logging.error(f"Error saving host: {str(e)}")
+            flash('An error occurred while saving the host. Please try again.', 'danger')
+
+    if host:
+        form = HostForm(obj=host)
+        form.lab_id.choices = [(lab.id, lab.name) for lab in Lab.query.all()]
+
+    return render_template('admin/host_editor.html', form=form, host=host)
+
+@bp.route('/admin/delete_host/<int:host_id>', methods=['POST'])
+@login_required
+@admin_required
+def delete_host(host_id):
+    host = Host.query.get(host_id)
+    if host:
+        db.session.delete(host)
+        db.session.commit()
+        return jsonify({'success': True})
+    else:
+        return jsonify({
+            'success': False,
+            'message': 'Host not found'
+        }), 404

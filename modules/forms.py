@@ -146,3 +146,16 @@ class ChallengeForm(FlaskForm):
     html_link = StringField('HTML Link', validators=[Optional(), Length(max=256)])
     point_value = IntegerField('Point Value', validators=[DataRequired(), NumberRange(min=1)])
     submit = SubmitField('Save Challenge')
+
+class HostForm(FlaskForm):
+    name = StringField('Host Name', validators=[DataRequired(), Length(max=128)])
+    os = StringField('Operating System', validators=[Optional(), Length(max=128)])
+    difficulty = IntegerField('Difficulty', validators=[DataRequired(), NumberRange(min=1, max=10)])
+    ip = StringField('IP Address', validators=[Optional(), Length(max=45)])
+    status = BooleanField('Active')
+    rating = IntegerField('Rating', validators=[Optional(), NumberRange(min=1, max=5)])
+    release_date = DateField('Release Date', validators=[Optional()])
+    hint = TextAreaField('Hint', validators=[Optional(), Length(max=1000)])
+    lab_id = SelectField('Lab', coerce=int, validators=[DataRequired()])
+    image_url = StringField('Image Filename', validators=[Optional(), Length(max=256)])
+    submit = SubmitField('Save Host')
