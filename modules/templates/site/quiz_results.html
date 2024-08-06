@@ -1,0 +1,16 @@
+<div class="container">
+    <div class="glass-panel">
+        <h1>Quiz Results: {{ quiz.title }}</h1>
+        <p>Your score: {{ user_progress.score }} / {{ quiz.questions|sum(attribute='points') }}</p>
+        {% if user_progress.score >= quiz.min_score %}
+        <div class="alert alert-success">
+            Congratulations! You have passed the quiz.
+        </div>
+        {% else %}
+        <div class="alert alert-danger">
+            Unfortunately, you did not meet the minimum score required to pass this quiz. Keep practicing and try again!
+        </div>
+        {% endif %}
+        <a href="{{ url_for('main.quizzes') }}" class="btn btn-primary">Back to Quizzes</a>
+    </div>
+</div>

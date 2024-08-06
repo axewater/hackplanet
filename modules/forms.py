@@ -159,3 +159,19 @@ class HostForm(FlaskForm):
     lab_id = SelectField('Lab', coerce=int, validators=[DataRequired()])
     image_url = StringField('Image Filename', validators=[Optional(), Length(max=256)])
     submit = SubmitField('Save Host')
+
+class QuizForm(FlaskForm):
+    title = StringField('Quiz Title', validators=[DataRequired(), Length(max=128)])
+    description = TextAreaField('Description', validators=[Optional(), Length(max=256)])
+    min_score = IntegerField('Minimum Score to Pass', validators=[DataRequired(), NumberRange(min=1)])
+    submit = SubmitField('Save Quiz')
+
+class QuestionForm(FlaskForm):
+    question_text = TextAreaField('Question', validators=[DataRequired(), Length(max=256)])
+    option_a = StringField('Option A', validators=[DataRequired(), Length(max=128)])
+    option_b = StringField('Option B', validators=[DataRequired(), Length(max=128)])
+    option_c = StringField('Option C', validators=[DataRequired(), Length(max=128)])
+    option_d = StringField('Option D', validators=[DataRequired(), Length(max=128)])
+    correct_answer = SelectField('Correct Answer', choices=[('A', 'A'), ('B', 'B'), ('C', 'C'), ('D', 'D')], validators=[DataRequired()])
+    points = IntegerField('Points', validators=[DataRequired(), NumberRange(min=1)])
+    submit = SubmitField('Save Question')

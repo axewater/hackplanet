@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+    <div class="glass-panel">
+        <h1>{{ 'Edit Question' if question else 'Create New Question' }} for Quiz: {{ quiz.title }}</h1>
+        <form method="POST">
+            {{ form.hidden_tag() }}
+            <div class="mb-3">
+                {{ form.question_text.label(class="form-label") }}
+                {{ form.question_text(class="form-control") }}
+            </div>
+            <div class="mb-3">
+                {{ form.option_a.label(class="form-label") }}
+                {{ form.option_a(class="form-control") }}
+            </div>
+            <div class="mb-3">
+                {{ form.option_b.label(class="form-label") }}
+                {{ form.option_b(class="form-control") }}
+            </div>
+            <div class="mb-3">
+                {{ form.option_c.label(class="form-label") }}
+                {{ form.option_c(class="form-control") }}
+            </div>
+            <div class="mb-3">
+                {{ form.option_d.label(class="form-label") }}
+                {{ form.option_d(class="form-control") }}
+            </div>
+            <div class="mb-3">
+                {{ form.correct_answer.label(class="form-label") }}
+                {{ form.correct_answer(class="form-select") }}
+            </div>
+            <div class="mb-3">
+                {{ form.points.label(class="form-label") }}
+                {{ form.points(class="form-control") }}
+            </div>
+            {{ form.submit(class="btn btn-primary") }}
+        </form>
+    </div>
+</div>
+{% endblock %}

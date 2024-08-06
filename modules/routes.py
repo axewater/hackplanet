@@ -35,11 +35,13 @@ from urllib.parse import unquote
 from modules.forms import (
     UserPasswordForm, UserDetailForm, EditProfileForm, NewsletterForm, WhitelistForm, EditUserForm, ChallengeForm,
     UserManagementForm, CsrfProtectForm, LoginForm, ResetPasswordRequestForm, RegistrationForm, HostForm,
-    CreateUserForm, UserPreferencesForm, InviteForm, CsrfForm, LabForm, FlagSubmissionForm, ChallengeSubmissionForm
+    CreateUserForm, UserPreferencesForm, InviteForm, CsrfForm, LabForm, FlagSubmissionForm, ChallengeSubmissionForm,
+    QuizForm, QuestionForm
 )
 
 from modules.models import (
-    User, Whitelist, UserPreference, GlobalSettings, InviteToken, Lab, Challenge, Host, Flag, UserProgress, FlagsObtained, ChallengesObtained
+    User, Whitelist, UserPreference, GlobalSettings, InviteToken, Lab, Challenge, Host, 
+    Flag, UserProgress, FlagsObtained, ChallengesObtained, Quiz, Question, UserQuizProgress
 )
 from modules.utilities import (
     admin_required, _authenticate_and_redirect, square_image, send_email, send_password_reset_email
@@ -886,13 +888,23 @@ def ctf_home():
 def leaderboard():
     # Fetch user scores from the database
     logging.info("Fetching user scores from the database...")
-    users = User.query.with_entities(User.name, User.score_total, User.avatarpath).order_by(User.score_total.desc()).all()
+    users = db.session.query(User, func.sum(UserQuizProgress.score).label('quiz_score')).outerjoin(UserQuizProgress).group_by(User.id).order_by((User.score_total + func.coalesce(func.sum(UserQuizProgress.score), 0)).desc()).all()
+    
+    # Prepare user data for the template
+    user_data = []
+    for user, quiz_score in users:
+        total_score = user.score_total + (quiz_score or 0)
+        user_data.append({
+            'name': user.name,
+            'score_total': total_score,
+            'avatarpath': user.avatarpath
+        })
     
     # Debug logging.info to verify fetched data
-    if users:
-        logging.info(f"Users: {users} avatarpath: {users[0].avatarpath}")
+    if user_data:
+        logging.info(f"Users: {user_data}")
 
-    return render_template('site/leaderboard.html', users=users)
+    return render_template('site/leaderboard.html', users=user_data)
 
 
 
@@ -1162,6 +1174,46 @@ def submit_challenge_flag_api():
         logging.error(f"Error processing challenge flag submission: {str(e)}")
         return jsonify({'error': 'An error occurred while processing the challenge flag submission'}), 500
 
+@bp.route('/ctf/quizzes')
+@login_required
+def quizzes():
+    quizzes = Quiz.query.all()
+    return render_template('site/quizzes.html', quizzes=quizzes)
+
+@bp.route('/ctf/take_quiz/<int:quiz_id>', methods=['GET', 'POST'])
+@login_required
+def take_quiz(quiz_id):
+    quiz = Quiz.query.get_or_404(quiz_id)
+    if request.method == 'POST':
+        score = 0
+        for question in quiz.questions:
+            answer = request.form.get(f'question_{question.id}')
+            if answer == question.correct_answer:
+                score += question.points
+        
+        user_progress = UserQuizProgress.query.filter_by(user_id=current_user.id, quiz_id=quiz_id).first()
+        if not user_progress:
+            user_progress = UserQuizProgress(user_id=current_user.id, quiz_id=quiz_id)
+        
+        user_progress.score = score
+        user_progress.completed = True
+        user_progress.completed_at = datetime.utcnow()
+        
+        db.session.add(user_progress)
+        db.session.commit()
+        
+        flash(f'Quiz completed! Your score: {score}', 'success')
+        return redirect(url_for('main.quiz_results', quiz_id=quiz_id))
+    
+    return render_template('site/take_quiz.html', quiz=quiz)
+
+@bp.route('/ctf/quiz_results/<int:quiz_id>')
+@login_required
+def quiz_results(quiz_id):
+    quiz = Quiz.query.get_or_404(quiz_id)
+    user_progress = UserQuizProgress.query.filter_by(user_id=current_user.id, quiz_id=quiz_id).first_or_404()
+    return render_template('site/quiz_results.html', quiz=quiz, user_progress=user_progress)
+
 @bp.route('/ctf/hacking_labs')
 def hacking_labs():
     # Fetch labs and their hosts from the database
@@ -1246,3 +1298,110 @@ def delete_host(host_id):
             'success': False,
             'message': 'Host not found'
         }), 404
+
+@bp.route('/admin/quiz_manager')
+@login_required
+@admin_required
+def quiz_manager():
+    quizzes = Quiz.query.all()
+    return render_template('admin/quiz_manager.html', quizzes=quizzes)
+
+@bp.route('/admin/quiz_editor', methods=['GET', 'POST'])
+@bp.route('/admin/quiz_editor/<int:quiz_id>', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def quiz_editor(quiz_id=None):
+    form = QuizForm()
+    quiz = Quiz.query.get(quiz_id) if quiz_id else None
+
+    if form.validate_on_submit():
+        if quiz:
+            quiz.title = form.title.data
+            quiz.description = form.description.data
+            quiz.min_score = form.min_score.data
+        else:
+            quiz = Quiz(title=form.title.data, description=form.description.data, min_score=form.min_score.data)
+            db.session.add(quiz)
+        db.session.commit()
+        flash('Quiz saved successfully.', 'success')
+        return redirect(url_for('main.quiz_manager'))
+
+    if quiz:
+        form.title.data = quiz.title
+        form.description.data = quiz.description
+        form.min_score.data = quiz.min_score
+
+    return render_template('admin/quiz_editor.html', form=form, quiz=quiz)
+
+@bp.route('/admin/delete_quiz/<int:quiz_id>', methods=['POST'])
+@login_required
+@admin_required
+def delete_quiz(quiz_id):
+    quiz = Quiz.query.get(quiz_id)
+    if quiz:
+        db.session.delete(quiz)
+        db.session.commit()
+        flash('Quiz deleted successfully.', 'success')
+    else:
+        flash('Quiz not found.', 'error')
+    return redirect(url_for('main.quiz_manager'))
+
+@bp.route('/admin/question_editor/<int:quiz_id>', methods=['GET', 'POST'])
+@bp.route('/admin/question_editor/<int:quiz_id>/<int:question_id>', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def question_editor(quiz_id, question_id=None):
+    form = QuestionForm()
+    quiz = Quiz.query.get_or_404(quiz_id)
+    question = Question.query.get(question_id) if question_id else None
+
+    if form.validate_on_submit():
+        if question:
+            question.question_text = form.question_text.data
+            question.option_a = form.option_a.data
+            question.option_b = form.option_b.data
+            question.option_c = form.option_c.data
+            question.option_d = form.option_d.data
+            question.correct_answer = form.correct_answer.data
+            question.points = form.points.data
+        else:
+            question = Question(
+                quiz_id=quiz_id,
+                question_text=form.question_text.data,
+                option_a=form.option_a.data,
+                option_b=form.option_b.data,
+                option_c=form.option_c.data,
+                option_d=form.option_d.data,
+                correct_answer=form.correct_answer.data,
+                points=form.points.data
+            )
+            db.session.add(question)
+        db.session.commit()
+        flash('Question saved successfully.', 'success')
+        return redirect(url_for('main.quiz_editor', quiz_id=quiz_id))
+
+    if question:
+        form.question_text.data = question.question_text
+        form.option_a.data = question.option_a
+        form.option_b.data = question.option_b
+        form.option_c.data = question.option_c
+        form.option_d.data = question.option_d
+        form.correct_answer.data = question.correct_answer
+        form.points.data = question.points
+
+    return render_template('admin/question_editor.html', form=form, quiz=quiz, question=question)
+
+@bp.route('/admin/delete_question/<int:question_id>', methods=['POST'])
+@login_required
+@admin_required
+def delete_question(question_id):
+    question = Question.query.get(question_id)
+    if question:
+        quiz_id = question.quiz_id
+        db.session.delete(question)
+        db.session.commit()
+        flash('Question deleted successfully.', 'success')
+        return redirect(url_for('main.quiz_editor', quiz_id=quiz_id))
+    else:
+        flash('Question not found.', 'error')
+        return redirect(url_for('main.quiz_manager'))

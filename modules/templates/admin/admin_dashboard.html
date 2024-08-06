@@ -69,6 +69,11 @@
                     Host Manager
                 </a>
             </div>
+
+            <div class="col-md-4 mb-4">
+                <a href="{{ url_for('main.quiz_manager') }}" class="btn btn-primary btn-lg btn-block">
+                    <i class="fas fa-question-circle"></i> Quiz Manager
+                </a>
             {% if enable_newsletter %}
             <div class="col-3 d-flex align-items-stretch">
                 <a href="{{ url_for('main.newsletter') }}" class="btn btn-dark dashboard-button">

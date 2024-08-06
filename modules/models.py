@@ -240,3 +240,43 @@ class ChallengesObtained(db.Model):
 
     def __repr__(self):
         return f"<ChallengesObtained id={self.id}, user_id={self.user_id}, challenge_id={self.challenge_id}, completed_at={self.completed_at}>"
+
+class Quiz(db.Model):
+    __tablename__ = 'quizzes'
+    id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(128), nullable=False)
+    description = db.Column(db.String(256))
+    min_score = db.Column(db.Integer, nullable=False)
+    questions = db.relationship('Question', backref='quiz', lazy=True, cascade="all, delete-orphan")
+
+    def __repr__(self):
+        return f"<Quiz id={self.id}, title={self.title}>"
+
+class Question(db.Model):
+    __tablename__ = 'questions'
+    id = db.Column(db.Integer, primary_key=True)
+    quiz_id = db.Column(db.Integer, db.ForeignKey('quizzes.id'), nullable=False)
+    question_text = db.Column(db.String(256), nullable=False)
+    option_a = db.Column(db.String(128), nullable=False)
+    option_b = db.Column(db.String(128), nullable=False)
+    option_c = db.Column(db.String(128), nullable=False)
+    option_d = db.Column(db.String(128), nullable=False)
+    correct_answer = db.Column(db.String(1), nullable=False)
+    points = db.Column(db.Integer, nullable=False)
+
+    def __repr__(self):
+        return f"<Question id={self.id}, quiz_id={self.quiz_id}>"
+
+class UserQuizProgress(db.Model):
+    __tablename__ = 'user_quiz_progress'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    quiz_id = db.Column(db.Integer, db.ForeignKey('quizzes.id'), nullable=False)
+    score = db.Column(db.Integer, nullable=False, default=0)
+    completed = db.Column(db.Boolean, default=False)
+    completed_at = db.Column(db.DateTime)
+    user = db.relationship('User', backref=db.backref('quiz_progress', lazy=True))
+    quiz = db.relationship('Quiz', backref=db.backref('user_progress', lazy=True))
+
+    def __repr__(self):
+        return f"<UserQuizProgress id={self.id}, user_id={self.user_id}, quiz_id={self.quiz_id}, score={self.score}>"

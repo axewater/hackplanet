@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+    <div class="glass-panel">
+        <h1>{{ quiz.title }}</h1>
+        <p>{{ quiz.description }}</p>
+        <form method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+            {% for question in quiz.questions %}
+            <div class="card mb-3">
+                <div class="card-body">
+                    <h5 class="card-title">{{ question.question_text }}</h5>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="question_{{ question.id }}" id="question_{{ question.id }}_a" value="A" required>
+                        <label class="form-check-label" for="question_{{ question.id }}_a">
+                            {{ question.option_a }}
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="question_{{ question.id }}" id="question_{{ question.id }}_b" value="B">
+                        <label class="form-check-label" for="question_{{ question.id }}_b">
+                            {{ question.option_b }}
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="question_{{ question.id }}" id="question_{{ question.id }}_c" value="C">
+                        <label class="form-check-label" for="question_{{ question.id }}_c">
+                            {{ question.option_c }}
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="question_{{ question.id }}" id="question_{{ question.id }}_d" value="D">
+                        <label class="form-check-label" for="question_{{ question.id }}_d">
+                            {{ question.option_d }}
+                        </label>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            <button type="submit" class="btn btn-primary">Submit Quiz</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
