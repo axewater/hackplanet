@@ -30,6 +30,11 @@
             {% endfor %}
         </tbody>
     </table>
+    
+    <!-- New button to navigate to the progress page -->
+    <div class="text-center mt-4">
+        <a href="{{ url_for('main.user_progress') }}" class="btn btn-primary btn-lg">View Your Progress</a>
+    </div>
 </div>
 </div>
 {% endblock %}
