@@ -1267,7 +1267,6 @@ def host_manager():
 def host_editor(host_id=None):
     form = HostForm()
     labs = Lab.query.all()
-    form.lab.choices = [(lab.id, lab.name) for lab in labs]
     host = Host.query.get(host_id) if host_id else None
 
     if request.method == 'POST':
@@ -1280,7 +1279,8 @@ def host_editor(host_id=None):
                     form.populate_obj(host)
                     db.session.add(host)
                 
-                host.lab_id = form.lab.data
+                host.lab_id = form.lab_id.data
+                logging.info(f"Debug: Lab ID being set: {host.lab_id}")
                 db.session.commit()
                 return jsonify({'success': True, 'message': 'Host saved successfully.'})
             except Exception as e:
@@ -1288,15 +1288,14 @@ def host_editor(host_id=None):
                 logging.error(f"Error saving host: {str(e)}")
                 return jsonify({'success': False, 'message': 'An error occurred while saving the host.', 'errors': form.errors}), 400
         else:
+            logging.error(f"Form validation failed: {form.errors}")
             return jsonify({'success': False, 'message': 'Validation failed.', 'errors': form.errors}), 400
 
     if host:
         form = HostForm(obj=host)
-        form.lab.choices = [(lab.id, lab.name) for lab in labs]
-        form.lab.data = host.lab_id
         form.lab_id.data = host.lab_id
-
-    return render_template('admin/host_editor.html', form=form, host=host)
+    
+    return render_template('admin/host_editor.html', form=form, host=host, labs=labs)
 
 @bp.route('/ctf/host_details/<int:host_id>')
 @login_required

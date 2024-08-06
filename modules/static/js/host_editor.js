@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (data.success) {
                 feedbackMessage.innerHTML = '<div class="alert alert-success">Host saved successfully!</div>';
                 setTimeout(() => {
-                    window.location.href = "{{ url_for('main.host_manager') }}";
+                    window.location.href = "/admin/host_manager";
                 }, 2000);
             } else {
                 let errorHtml = '<div class="alert alert-danger">';

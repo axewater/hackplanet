@@ -17,50 +17,26 @@
         <h1>{{ 'Edit Host' if host else 'Create New Host' }}</h1>
         <form id="host-form" method="POST" action="{{ url_for('main.host_editor', host_id=host.id if host else None) }}">
             {{ form.hidden_tag() }}
+            {% for field in form if field.name != 'csrf_token' and field.name != 'submit' and field.name != 'lab_id' %}
+                <div class="mb-3">
+                    {{ field.label(class="form-label") }}
+                    {% if field.type == 'BooleanField' %}
+                        {{ field(class="form-check-input") }}
+                    {% else %}
+                        {{ field(class="form-control") }}
+                    {% endif %}
+                    {% for error in field.errors %}
+                        <div class="invalid-feedback d-block">{{ error }}</div>
+                    {% endfor %}
+                </div>
+            {% endfor %}
             <div class="mb-3">
-                {{ form.name.label(class="form-label") }}
-                {{ form.name(class="form-control") }}
-            </div>
-            <div class="mb-3">
-                {{ form.os.label(class="form-label") }}
-                {{ form.os(class="form-control") }}
-            </div>
-            <div class="mb-3">
-                {{ form.difficulty.label(class="form-label") }}
-                {{ form.difficulty(class="form-control") }}
-            </div>
-            <div class="mb-3">
-                {{ form.ip.label(class="form-label") }}
-                {{ form.ip(class="form-control") }}
-            </div>
-            <div class="mb-3">
-                {{ form.status.label(class="form-check-label") }}
-                {{ form.status(class="form-check-input") }}
-            </div>
-            <div class="mb-3">
-                {{ form.rating.label(class="form-label") }}
-                {{ form.rating(class="form-control") }}
-            </div>
-            <div class="mb-3">
-                {{ form.release_date.label(class="form-label") }}
-                {{ form.release_date(class="form-control", type="date") }}
-            </div>
-            <div class="mb-3">
-                {{ form.hint.label(class="form-label") }}
-                {{ form.hint(class="form-control") }}
-            </div>
-            <div class="mb-3">
-                {{ form.lab.label(class="form-label") }}
-                {{ form.lab(class="form-select") }}
-            </div>
-            {{ form.lab_id() }}
-            <div class="mb-3">
-                {{ form.image_url.label(class="form-label") }}
-                {{ form.image_url(class="form-control") }}
-            </div>
-            <div class="mb-3">
-                {{ form.azure_vm_id.label(class="form-label") }}
-                {{ form.azure_vm_id(class="form-control") }}
+                <label for="lab_id" class="form-label">Lab</label>
+                <select name="lab_id" id="lab_id" class="form-control">
+                    {% for lab in labs %}
+                        <option value="{{ lab.id }}" {% if host and host.lab_id == lab.id %}selected{% endif %}>{{ lab.name }}</option>
+                    {% endfor %}
+                </select>
             </div>
             <button type="submit" class="btn btn-primary">Save Host</button>
         </form>

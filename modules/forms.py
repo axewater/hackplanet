@@ -156,7 +156,6 @@ class HostForm(FlaskForm):
     rating = IntegerField('Rating', validators=[Optional(), NumberRange(min=1, max=5)])
     release_date = DateField('Release Date', validators=[Optional()])
     hint = TextAreaField('Hint', validators=[Optional(), Length(max=1000)])
-    lab = SelectField('Lab', validators=[DataRequired()], coerce=int)
     lab_id = HiddenField('Lab ID')
     image_url = StringField('Image Filename', validators=[Optional(), Length(max=256)])
     azure_vm_id = StringField('Azure VM ID', validators=[Optional(), Length(max=256)])
