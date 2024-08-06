@@ -13,19 +13,21 @@
         <p>Hint: {{ host.hint }}</p>
         
         {% if host.azure_vm_id %}
-            <h2>Azure VM Status: {{ vm_status }}</h2>
-            <form action="{{ url_for('main.start_vm_route', host_id=host.id) }}" method="post" style="display: inline;">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                <button type="submit" class="btn btn-success" {% if vm_status == 'VM running' %}disabled{% endif %}>Start VM</button>
-            </form>
-            <form action="{{ url_for('main.stop_vm_route', host_id=host.id) }}" method="post" style="display: inline;">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                <button type="submit" class="btn btn-danger" {% if vm_status == 'VM deallocated' %}disabled{% endif %}>Stop VM</button>
-            </form>
-            <form action="{{ url_for('main.restart_vm_route', host_id=host.id) }}" method="post" style="display: inline;">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                <button type="submit" class="btn btn-warning" {% if vm_status == 'VM deallocated' %}disabled{% endif %}>Restart VM</button>
-            </form>
+            <h2>Azure VM Status: {{ vm_status if vm_status else 'Unable to retrieve status' }}</h2>
+            {% if vm_status %}
+                <form action="{{ url_for('main.start_vm_route', host_id=host.id) }}" method="post" style="display: inline;">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    <button type="submit" class="btn btn-success" {% if vm_status == 'VM running' %}disabled{% endif %}>Start VM</button>
+                </form>
+                <form action="{{ url_for('main.stop_vm_route', host_id=host.id) }}" method="post" style="display: inline;">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    <button type="submit" class="btn btn-danger" {% if vm_status == 'VM deallocated' %}disabled{% endif %}>Stop VM</button>
+                </form>
+                <form action="{{ url_for('main.restart_vm_route', host_id=host.id) }}" method="post" style="display: inline;">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                    <button type="submit" class="btn btn-warning" {% if vm_status == 'VM deallocated' %}disabled{% endif %}>Restart VM</button>
+                </form>
+            {% endif %}
         {% else %}
             <p>No Azure VM associated with this host.</p>
         {% endif %}

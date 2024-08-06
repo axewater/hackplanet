@@ -1301,7 +1301,12 @@ def host_editor(host_id=None):
 @login_required
 def host_details(host_id):
     host = Host.query.get_or_404(host_id)
-    vm_status = get_vm_status(host.azure_vm_id) if host.azure_vm_id else None
+    vm_status = None
+    if host.azure_vm_id:
+        try:
+            vm_status = get_vm_status(host.azure_vm_id)
+        except Exception as e:
+            flash(f"Error retrieving VM status: {str(e)}", 'error')
     return render_template('site/host_details.html', host=host, vm_status=vm_status)
 
 @bp.route('/ctf/start_vm/<int:host_id>', methods=['POST'])
