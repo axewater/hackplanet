@@ -1,6 +1,15 @@
 {% extends 'base.html' %}
 
 {% block content %}
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+<div>
+    {% for message in messages %}
+    <div class="alert alert-info" role="alert">{{ message }}</div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endwith %}
 <div class="container">
     <h1>{% if challenge %}Edit Challenge{% else %}Add New Challenge{% endif %}</h1>
     <form method="POST">

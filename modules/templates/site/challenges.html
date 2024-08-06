@@ -2,6 +2,15 @@
 {% extends 'base.html' %}
 
 {% block content %}
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+<div>
+    {% for message in messages %}
+    <div class="alert alert-info" role="alert">{{ message }}</div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endwith %}
 <script src="{{ url_for('static', filename='js/flag_submission.js') }}"></script>
 <div class="container">
     <div id="flagModal" class="modal">
