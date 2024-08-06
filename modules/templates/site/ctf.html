@@ -17,31 +17,33 @@
         <div class="labs_title">
             <h1>HackPlanet.EU Training Grounds</h1>
         </div>
+
         <div class="row">
-            <div class="col-md-6">
-                <a href="{{ url_for('main.leaderboard') }}" class="btn btn-green btn-block">
-                    <img src="{{ url_for('static', filename='/newstyle/leaderboard.png') }}" alt="Leaderboard" class="img-fluid">
-                    <h2>Leaderboard</h2>
-                </a>
-            </div>
             <div class="col-md-6">
                 <a href="{{ url_for('main.hacking_labs') }}" class="btn btn-green btn-block">
                     <img src="{{ url_for('static', filename='/newstyle/labs.png') }}" alt="Hacking Labs" class="img-fluid">
                     <h2>Hacking Labs</h2>
                 </a>
             </div>
-        </div>
-        <div class="row">
             <div class="col-md-6">
                 <a href="{{ url_for('main.challenges') }}" class="btn btn-green btn-block">
                     <img src="{{ url_for('static', filename='/newstyle/challenges.png') }}" alt="Challenges" class="img-fluid">
                     <h2>Challenges</h2>
                 </a>
             </div>
+        </div>
+        <div class="row">
+
             <div class="col-md-6">
                 <a href="{{ url_for('main.quizzes') }}" class="btn btn-green btn-block">
                     <img src="{{ url_for('static', filename='/newstyle/quiz.png') }}" alt="Quizzes" class="img-fluid">
                     <h2>Quizzes</h2>
+                </a>
+            </div>
+            <div class="col-md-6">
+                <a href="{{ url_for('main.leaderboard') }}" class="btn btn-green btn-block">
+                    <img src="{{ url_for('static', filename='/newstyle/leaderboard.png') }}" alt="Leaderboard" class="img-fluid">
+                    <h2>Leaderboard</h2>
                 </a>
             </div>
         </div>

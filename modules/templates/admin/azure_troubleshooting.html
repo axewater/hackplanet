@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+    <h1>Azure Integration Troubleshooting Guide</h1>
+    
+    <h2>Common Issues and Solutions</h2>
+    <ul>
+        <li>
+            <strong>Authentication Failures:</strong>
+            <ul>
+                <li>Ensure that the AZURE_SUBSCRIPTION_ID environment variable is set correctly.</li>
+                <li>Verify that the Azure CLI is installed and you're logged in (`az login`).</li>
+                <li>Check if the DefaultAzureCredential has the necessary permissions.</li>
+            </ul>
+        </li>
+        <li>
+            <strong>VM Status Retrieval Errors:</strong>
+            <ul>
+                <li>Confirm that the Azure VM ID is correct in the host details.</li>
+                <li>Verify that the VM exists and is accessible from your Azure subscription.</li>
+                <li>Check Azure service health for any ongoing issues.</li>
+            </ul>
+        </li>
+        <li>
+            <strong>VM Control (Start/Stop/Restart) Failures:</strong>
+            <ul>
+                <li>Ensure that the authenticated user has the necessary permissions to perform these actions.</li>
+                <li>Check if the VM is in a valid state for the requested operation.</li>
+                <li>Verify network connectivity to Azure services.</li>
+            </ul>
+        </li>
+    </ul>
+
+    <h2>Enabling Debug Mode</h2>
+    <p>To enable debug mode for Azure operations, set the AZURE_DEBUG environment variable to 'True':</p>
+    <pre><code>export AZURE_DEBUG=True</code></pre>
+    <p>This will provide more detailed logging information in the application logs and on the host details page.</p>
+
+    <h2>Interpreting Logs</h2>
+    <p>When debug mode is enabled, look for log entries prefixed with "Azure operation:" for detailed information about each Azure API call. These logs will include:</p>
+    <ul>
+        <li>The specific operation being performed (e.g., "get_vm_status")</li>
+        <li>Input parameters for the operation</li>
+        <li>Raw response data from Azure</li>
+        <li>Any errors or exceptions encountered</li>
+    </ul>
+
+    <h2>Additional Resources</h2>
+    <ul>
+        <li><a href="https://docs.microsoft.com/en-us/azure/developer/python/azure-sdk-overview" target="_blank">Azure SDK for Python Documentation</a></li>
+        <li><a href="https://docs.microsoft.com/en-us/azure/virtual-machines/troubleshooting/" target="_blank">Azure VM Troubleshooting Guide</a></li>
+        <li><a href="https://status.azure.com/" target="_blank">Azure Status Page</a></li>
+    </ul>
+</div>
+{% endblock %}

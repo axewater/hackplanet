@@ -1300,13 +1300,20 @@ def host_editor(host_id=None):
 @bp.route('/ctf/host_details/<int:host_id>')
 @login_required
 def host_details(host_id):
+    logging.info(f"Accessing host details for host_id: {host_id}")
     host = Host.query.get_or_404(host_id)
     vm_status = None
     if host.azure_vm_id:
+        logging.info(f"Attempting to retrieve VM status for Azure VM ID: {host.azure_vm_id}")
         try:
             vm_status = get_vm_status(host.azure_vm_id)
+            logging.info(f"Retrieved VM status: {vm_status}")
         except Exception as e:
+            logging.error(f"Error retrieving VM status: {str(e)}")
             flash(f"Error retrieving VM status: {str(e)}", 'error')
+            vm_status = "Error retrieving status"
+    else:
+        logging.info("No Azure VM ID associated with this host")
     return render_template('site/host_details.html', host=host, vm_status=vm_status)
 
 @bp.route('/ctf/start_vm/<int:host_id>', methods=['POST'])
