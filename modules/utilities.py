@@ -7,6 +7,17 @@ from flask_mail import Message as MailMessage
 from datetime import datetime
 from werkzeug.urls import url_parse
 from werkzeug.utils import secure_filename
+from modules.models import (
+    User, User, Whitelist
+)
+from modules import db, mail
+from sqlalchemy import func, String
+from sqlalchemy.exc import IntegrityError, OperationalError, SQLAlchemyError
+
+from PIL import Image as PILImage
+from PIL import ImageOps
+from datetime import datetime
+from wtforms.validators import ValidationError
 import logging, socket
 from smtplib import SMTPException, SMTPAuthenticationError, SMTPConnectError, SMTPDataError, SMTPHeloError, SMTPRecipientsRefused, SMTPSenderRefused
 from ssl import SSLError
@@ -22,17 +33,23 @@ def is_server_reachable(server, port):
     Check if the mail server is reachable.
     """
     try:
+        # Attempt to open a connection to the mail server
         with socket.create_connection((server, port), timeout=5) as connection:
             logging.info(f"Successfully connected to {server}:{port}")
             return True
     except Exception as e:
+        # Print or log the error if needed
+        print(f"Error connecting to mail server: {e}")
         logging.error(f"Error connecting to mail server {server}:{port}: {e}")
         return False
+    
 
 def send_email(to, subject, template):
     """
+    Send an email with error handling and pre-send check.
     Send an email with detailed error handling and logging of SMTP steps.
     """
+    # Mail server details from configuration
     mail_server = current_app.config['MAIL_SERVER']
     mail_port = current_app.config['MAIL_PORT']
     mail_username = current_app.config['MAIL_USERNAME']
@@ -42,30 +59,44 @@ def send_email(to, subject, template):
 
     logging.info(f"Attempting to send email to {to} with subject '{subject}'")
 
+    # Check if mail server is reachable
     if not is_server_reachable(mail_server, mail_port):
+        print(f"Mail server {mail_server}:{mail_port} is unreachable. Email not sent.")
+        flash(f"Mail server {mail_server}:{mail_port} is unreachable. Email not sent.")
         logging.error(f"Mail server {mail_server}:{mail_port} is unreachable. Email not sent.")
         flash(f"Unable to connect to the mail server. Please try again later or contact support.", "error")
         return
 
+    # Attempt to send email
     try:
+        # Send email
+        msg = MailMessage(
+            subject,
+            sender=current_app.config['MAIL_DEFAULT_SENDER'],
+            recipients=[to],
+            html=template
+        )
+        mail.send(msg)
+        print(f"Email sent to {to} with subject {subject}")
+        flash(f"Email sent to {to} with subject {subject}")
         logging.info(f"Establishing connection to SMTP server {mail_server}:{mail_port}")
         with smtplib.SMTP(mail_server, mail_port) as server:
             if mail_use_tls:
                 logging.info("Starting TLS connection")
                 server.starttls()
-            
+
             if mail_use_auth:
                 logging.info(f"Attempting SMTP authentication for user {mail_username}")
                 server.login(mail_username, mail_password)
             else:
                 logging.info("Skipping SMTP authentication as per configuration")
-            
+
             msg = MailMessage(subject, sender=current_app.config['MAIL_DEFAULT_SENDER'],
                               recipients=[to], html=template)
-            
+
             logging.info(f"Sending email to {to}")
             server.send_message(msg)
-            
+
             logging.info(f"Email sent successfully to {to}")
             flash(f"Email sent successfully to {to}", "success")
     except SMTPAuthenticationError:
@@ -87,6 +118,8 @@ def send_email(to, subject, template):
         logging.error(f"SSL/TLS error occurred while connecting to {mail_server}:{mail_port}", exc_info=True)
         flash("A secure connection error occurred. Please try again or contact support.", "error")
     except Exception as e:
+        # Handle specific errors if needed
+        print(f"Error sending email: {e}")
         logging.error(f"Unexpected error while sending email: {sanitize_log_data(str(e))}", exc_info=True)
         flash("An unexpected error occurred while sending the email. Please try again or contact support.", "error")
 
@@ -98,26 +131,17 @@ def send_password_reset_email(user_email, token):
         recipients=[user_email]
     )
     msg.body = '''Hello,
-
-You have requested to reset your password. If you did not make this request, please ignore this email. For security reasons, please ensure your email client supports HTML messages.
-
-Best regards,
-
-HackPlanet.EU Team
-'''
+        You have requested to reset your password. If you did not make this request, please ignore this email. For security reasons, please ensure your email client supports HTML messages.
+        Best regards,
+        HackPlanet.EU Team
+        '''
     msg.html = f'''<p>Hello,</p>
-
-<p>You have requested to reset your password. Click on the link below to set a new password:</p>
-
-<p><a href="{reset_url}">Password Reset Link</a></p>
-
-<p>If you did not request this, please ignore this email and your password will remain unchanged.</p>
-
-<p>Best regards,</p>
-
-<p>HackPlanet.EU Team</p>
-
-<p>P.S. If you encounter any issues, feel free to contact us at <a href="mailto:support@HackPlanet.EU">support@ctfplatform.com</a>, and we will assist you in regaining access to your account!</p>
+        <p>You have requested to reset your password. Click on the link below to set a new password:</p>
+        <p><a href="{reset_url}">Password Reset Link</a></p>
+        <p>If you did not request this, please ignore this email and your password will remain unchanged.</p>
+        <p>Best regards,</p>
+        <p>HackPlanet.EU Team</p>
+        <p>P.S. If you encounter any issues, feel free to contact us at <a href="mailto:support@HackPlanet.EU">support@ctfplatform.com</a>, and we will assist you in regaining access to your account!</p>
 '''
     send_email(user_email, 'Password Reset Request', msg.html)
 
@@ -129,32 +153,19 @@ def send_password_reset_email(user_email, token):
         recipients=[user_email]
     )
     msg.body = '''Hello,
-
-You have requested to reset your password. If you did not make this request, please ignore this email. For security reasons, please ensure your email client supports HTML messages.
-
-Best regards,
-
-HackPlanet.EU Team
-'''
+        You have requested to reset your password. If you did not make this request, please ignore this email. For security reasons, please ensure your email client supports HTML messages.
+        Best regards,
+        HackPlanet.EU Team
+        '''
     msg.html = f'''<p>Hello,</p>
-
-<p>You have requested to reset your password. Click on the link below to set a new password:</p>
-
-<p><a href="{reset_url}">Password Reset Link</a></p>
-
-<p>If you did not request this, please ignore this email and your password will remain unchanged.</p>
-
-<p>Best regards,</p>
-
-<p>HackPlanet.EU Team</p>
-
-<p>P.S. If you encounter any issues, feel free to contact us at <a href="mailto:support@HackPlanet.EU">support@ctfplatform.com</a>, and we will assist you in regaining access to your account!</p>
-'''
+        <p>You have requested to reset your password. Click on the link below to set a new password:</p>
+        <p><a href="{reset_url}">Password Reset Link</a></p>
+        <p>If you did not request this, please ignore this email and your password will remain unchanged.</p>
+        <p>Best regards,</p>
+        <p>HackPlanet.EU Team</p>
+        <p>P.S. If you encounter any issues, feel free to contact us at <a href="mailto:support@HackPlanet.EU">support@ctfplatform.com</a>, and we will assist you in regaining access to your account!</p>
+        '''
     mail.send(msg)
-
-
-
-
 def _authenticate_and_redirect(username, password):
     user = User.query.filter(func.lower(User.name) == func.lower(username)).first()
     
@@ -163,7 +174,6 @@ def _authenticate_and_redirect(username, password):
         if not user.password_hash.startswith('$argon2'):
             user.rehash_password(password)
             db.session.commit()
-
         user.lastlogin = datetime.utcnow()
         db.session.commit()
         login_user(user, remember=True)
@@ -175,7 +185,6 @@ def _authenticate_and_redirect(username, password):
     else:
         flash('Invalid username or password', 'error')
         return redirect(url_for('main.login'))
-
 def admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
@@ -184,14 +193,11 @@ def admin_required(f):
             return redirect(url_for('main.login'))
         return f(*args, **kwargs)
     return decorated_function
-
-
 def escape_special_characters(pattern):
     """Escape special characters in the pattern to prevent regex errors."""
     if not isinstance(pattern, str):
         pattern = str(pattern)  # Convert to string if not already
     return re.escape(pattern)
-
 def square_image(image, size):
     image.thumbnail((size, size))
     if image.size[0] != size or image.size[1] != size:
@@ -200,4 +206,3 @@ def square_image(image, size):
         new_image.paste(image, offset)
         image = new_image
     return image
-

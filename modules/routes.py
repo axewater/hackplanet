@@ -360,6 +360,25 @@ def invites():
 
     return render_template('/login/invites.html', form=form, invites=invites, invite_quota=current_user.invite_quota, remaining_invites=remaining_invites)
 
+@bp.route('/delete_invite/<int:invite_id>', methods=['POST'])
+@login_required
+def delete_invite(invite_id):
+    invite = InviteToken.query.filter_by(id=invite_id, creator_user_id=current_user.user_id, used=False).first()
+    if invite:
+        try:
+            db.session.delete(invite)
+            db.session.commit()
+            flash('Invite deleted successfully.', 'success')
+            return jsonify({'success': True, 'message': 'Invite deleted successfully.'})
+        except Exception as e:
+            db.session.rollback()
+            logging.error(f"Error deleting invite: {str(e)}")
+            return jsonify({'success': False, 'message': 'An error occurred while deleting the invite.'}), 500
+    else:
+        return jsonify({'success': False, 'message': 'Invalid invite or you do not have permission to delete it.'}), 404
+
+
+
 
 def send_invite_email(email, invite_url):
     subject = "You're Invited to Join HackPlanet.EU!"
