@@ -1266,29 +1266,35 @@ def host_manager():
 @admin_required
 def host_editor(host_id=None):
     form = HostForm()
-    form.lab_id.choices = [(lab.id, lab.name) for lab in Lab.query.all()]
+    labs = Lab.query.all()
+    form.lab.choices = [(lab.id, lab.name) for lab in labs]
     host = Host.query.get(host_id) if host_id else None
 
-    if form.validate_on_submit():
-        try:
-            if host:
-                form.populate_obj(host)
-            else:
-                host = Host()
-                form.populate_obj(host)
-                db.session.add(host)
-            
-            db.session.commit()
-            flash('Host saved successfully.', 'success')
-            return redirect(url_for('main.host_manager'))
-        except Exception as e:
-            db.session.rollback()
-            logging.error(f"Error saving host: {str(e)}")
-            flash('An error occurred while saving the host. Please try again.', 'danger')
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            try:
+                if host:
+                    form.populate_obj(host)
+                else:
+                    host = Host()
+                    form.populate_obj(host)
+                    db.session.add(host)
+                
+                host.lab_id = form.lab.data
+                db.session.commit()
+                return jsonify({'success': True, 'message': 'Host saved successfully.'})
+            except Exception as e:
+                db.session.rollback()
+                logging.error(f"Error saving host: {str(e)}")
+                return jsonify({'success': False, 'message': 'An error occurred while saving the host.', 'errors': form.errors}), 400
+        else:
+            return jsonify({'success': False, 'message': 'Validation failed.', 'errors': form.errors}), 400
 
     if host:
         form = HostForm(obj=host)
-        form.lab_id.choices = [(lab.id, lab.name) for lab in Lab.query.all()]
+        form.lab.choices = [(lab.id, lab.name) for lab in labs]
+        form.lab.data = host.lab_id
+        form.lab_id.data = host.lab_id
 
     return render_template('admin/host_editor.html', form=form, host=host)
 

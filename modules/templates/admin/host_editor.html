@@ -15,7 +15,7 @@
             <a href="{{ url_for('main.admin_dashboard') }}" class="btn btn-lg btn-primary">Back to Dashboard</a>
         </div>
         <h1>{{ 'Edit Host' if host else 'Create New Host' }}</h1>
-        <form method="POST" action="{{ url_for('main.host_editor', host_id=host.id if host else None) }}">
+        <form id="host-form" method="POST" action="{{ url_for('main.host_editor', host_id=host.id if host else None) }}">
             {{ form.hidden_tag() }}
             <div class="mb-3">
                 {{ form.name.label(class="form-label") }}
@@ -50,9 +50,10 @@
                 {{ form.hint(class="form-control") }}
             </div>
             <div class="mb-3">
-                {{ form.lab_id.label(class="form-label") }}
-                {{ form.lab_id(class="form-select") }}
+                {{ form.lab.label(class="form-label") }}
+                {{ form.lab(class="form-select") }}
             </div>
+            {{ form.lab_id() }}
             <div class="mb-3">
                 {{ form.image_url.label(class="form-label") }}
                 {{ form.image_url(class="form-control") }}
@@ -63,6 +64,8 @@
             </div>
             <button type="submit" class="btn btn-primary">Save Host</button>
         </form>
+        <div id="feedback-message"></div>
     </div>
 </div>
+<script src="{{ url_for('static', filename='js/host_editor.js') }}"></script>
 {% endblock %}
