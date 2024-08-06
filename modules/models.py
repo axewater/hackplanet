@@ -171,7 +171,7 @@ class Host(db.Model):
     hint = db.Column(db.String(1000), nullable=True)
     lab_id = db.Column(db.Integer, db.ForeignKey('labs.id'), nullable=False)
     image_url = db.Column(db.String(256), nullable=True)
-    
+    azure_vm_id = db.Column(db.String(256), nullable=True)
 
     def __repr__(self):
         return f"<Host id={self.id}, name={self.name}, difficulty={self.difficulty}>"

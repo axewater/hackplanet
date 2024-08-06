@@ -46,6 +46,7 @@ from modules.models import (
 from modules.utilities import (
     admin_required, _authenticate_and_redirect, square_image, send_email, send_password_reset_email
 )
+from modules.azure_utils import get_vm_status, start_vm, stop_vm, restart_vm
 
 
 bp = Blueprint('main', __name__)
@@ -1178,12 +1179,20 @@ def submit_challenge_flag_api():
 @login_required
 def quizzes():
     quizzes = Quiz.query.all()
-    return render_template('site/quizzes.html', quizzes=quizzes)
+    user_progress = UserQuizProgress.query.filter_by(user_id=current_user.id).all()
+    completed_quizzes = {progress.quiz_id: progress.score for progress in user_progress if progress.completed}
+    return render_template('site/quizzes.html', quizzes=quizzes, completed_quizzes=completed_quizzes)
 
 @bp.route('/ctf/take_quiz/<int:quiz_id>', methods=['GET', 'POST'])
 @login_required
 def take_quiz(quiz_id):
     quiz = Quiz.query.get_or_404(quiz_id)
+    user_progress = UserQuizProgress.query.filter_by(user_id=current_user.id, quiz_id=quiz_id).first()
+
+    if user_progress and user_progress.completed:
+        flash('You have already completed this quiz.', 'info')
+        return redirect(url_for('main.quiz_results', quiz_id=quiz_id))
+
     if request.method == 'POST':
         score = 0
         for question in quiz.questions:
@@ -1191,7 +1200,6 @@ def take_quiz(quiz_id):
             if answer == question.correct_answer:
                 score += question.points
         
-        user_progress = UserQuizProgress.query.filter_by(user_id=current_user.id, quiz_id=quiz_id).first()
         if not user_progress:
             user_progress = UserQuizProgress(user_id=current_user.id, quiz_id=quiz_id)
         
@@ -1283,6 +1291,56 @@ def host_editor(host_id=None):
         form.lab_id.choices = [(lab.id, lab.name) for lab in Lab.query.all()]
 
     return render_template('admin/host_editor.html', form=form, host=host)
+
+@bp.route('/ctf/host_details/<int:host_id>')
+@login_required
+def host_details(host_id):
+    host = Host.query.get_or_404(host_id)
+    vm_status = get_vm_status(host.azure_vm_id) if host.azure_vm_id else None
+    return render_template('site/host_details.html', host=host, vm_status=vm_status)
+
+@bp.route('/ctf/start_vm/<int:host_id>', methods=['POST'])
+@login_required
+def start_vm_route(host_id):
+    host = Host.query.get_or_404(host_id)
+    if host.azure_vm_id:
+        try:
+            start_vm(host.azure_vm_id)
+            flash('VM start initiated successfully.', 'success')
+        except Exception as e:
+            flash(f'Error starting VM: {str(e)}', 'error')
+    
+    else:
+        flash('No Azure VM ID associated with this host.', 'error')
+    return redirect(url_for('main.host_details', host_id=host_id))
+
+@bp.route('/ctf/stop_vm/<int:host_id>', methods=['POST'])
+@login_required
+def stop_vm_route(host_id):
+    host = Host.query.get_or_404(host_id)
+    if host.azure_vm_id:
+        try:
+            stop_vm(host.azure_vm_id)
+            flash('VM stop initiated successfully.', 'success')
+        except Exception as e:
+            flash(f'Error stopping VM: {str(e)}', 'error')
+    else:
+        flash('No Azure VM ID associated with this host.', 'error')
+    return redirect(url_for('main.host_details', host_id=host_id))
+
+@bp.route('/ctf/restart_vm/<int:host_id>', methods=['POST'])
+@login_required
+def restart_vm_route(host_id):
+    host = Host.query.get_or_404(host_id)
+    if host.azure_vm_id:
+        try:
+            restart_vm(host.azure_vm_id)
+            flash('VM restart initiated successfully.', 'success')
+        except Exception as e:
+            flash(f'Error restarting VM: {str(e)}', 'error')
+    else:
+        flash('No Azure VM ID associated with this host.', 'error')
+    return redirect(url_for('main.host_details', host_id=host_id))
 
 @bp.route('/admin/delete_host/<int:host_id>', methods=['POST'])
 @login_required

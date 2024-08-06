@@ -158,6 +158,7 @@ class HostForm(FlaskForm):
     hint = TextAreaField('Hint', validators=[Optional(), Length(max=1000)])
     lab_id = SelectField('Lab', coerce=int, validators=[DataRequired()])
     image_url = StringField('Image Filename', validators=[Optional(), Length(max=256)])
+    azure_vm_id = StringField('Azure VM ID', validators=[Optional(), Length(max=256)])
     submit = SubmitField('Save Host')
 
 class QuizForm(FlaskForm):

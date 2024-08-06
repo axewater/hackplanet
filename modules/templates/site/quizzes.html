@@ -19,7 +19,12 @@
                     <div class="card-body">
                         <h5 class="card-title">{{ quiz.title }}</h5>
                         <p class="card-text">{{ quiz.description }}</p>
-                        <a href="{{ url_for('main.take_quiz', quiz_id=quiz.id) }}" class="btn btn-primary">Take Quiz</a>
+                        {% if quiz.id in completed_quizzes %}
+                            <p class="text-success">Completed - Score: {{ completed_quizzes[quiz.id] }}</p>
+                            <a href="{{ url_for('main.quiz_results', quiz_id=quiz.id) }}" class="btn btn-secondary">View Results</a>
+                        {% else %}
+                            <a href="{{ url_for('main.take_quiz', quiz_id=quiz.id) }}" class="btn btn-primary">Take Quiz</a>
+                        {% endif %}
                     </div>
                 </div>
             </div>

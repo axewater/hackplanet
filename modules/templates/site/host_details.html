@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="glass-panel">
+        <h1>{{ host.name }} Details</h1>
+        <p>OS: {{ host.os }}</p>
+        <p>Difficulty: {{ host.difficulty }}</p>
+        <p>IP: {{ host.ip }}</p>
+        <p>Status: {{ 'Active' if host.status else 'Inactive' }}</p>
+        <p>Rating: {{ host.rating }}</p>
+        <p>Release Date: {{ host.release_date }}</p>
+        <p>Hint: {{ host.hint }}</p>
+        
+        {% if host.azure_vm_id %}
+            <h2>Azure VM Status: {{ vm_status }}</h2>
+            <form action="{{ url_for('main.start_vm_route', host_id=host.id) }}" method="post" style="display: inline;">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                <button type="submit" class="btn btn-success" {% if vm_status == 'VM running' %}disabled{% endif %}>Start VM</button>
+            </form>
+            <form action="{{ url_for('main.stop_vm_route', host_id=host.id) }}" method="post" style="display: inline;">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                <button type="submit" class="btn btn-danger" {% if vm_status == 'VM deallocated' %}disabled{% endif %}>Stop VM</button>
+            </form>
+            <form action="{{ url_for('main.restart_vm_route', host_id=host.id) }}" method="post" style="display: inline;">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                <button type="submit" class="btn btn-warning" {% if vm_status == 'VM deallocated' %}disabled{% endif %}>Restart VM</button>
+            </form>
+        {% else %}
+            <p>No Azure VM associated with this host.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

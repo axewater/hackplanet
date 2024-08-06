@@ -53,6 +53,7 @@
                 <p>Difficulty: {{ host.difficulty }} {% if host.difficulty == 1 %}😊{% elif host.difficulty == 2 %}🙂{% elif host.difficulty == 3 %}😐{% elif host.difficulty == 4 %}😕{% elif host.difficulty == 5 %}😟{% elif host.difficulty == 6 %}😦{% elif host.difficulty == 7 %}😧{% elif host.difficulty == 8 %}😨{% elif host.difficulty == 9 %}😰{% elif host.difficulty == 10 %}😱{% endif %}</p>
                 <p>Status: {{ 'Online' if host.status else 'Offline' }}</p>
                 <p>Rating: {% for _ in range(host.rating) %}★{% endfor %}{% for _ in range(5 - host.rating) %}☆{% endfor %}</p>
+                <a href="{{ url_for('main.host_details', host_id=host.id) }}" class="btn btn-info">Host Details</a>
                 {% if is_admin %}
                 <div class="flags">
                     <p style="font-size: 0.2em;">User Flag: {{ host.flags|selectattr('type', '==', 'user')|map(attribute='uuid')|first }}</p>
