@@ -1,6 +1,7 @@
 # modules/routes.py
 import sys,ast, uuid, json, random, requests, html, os, re, shutil, traceback, time, schedule, os, platform, tempfile, socket, logging
 from threading import Thread
+import subprocess
 from config import Config
 from flask import Flask, render_template, flash, redirect, url_for, request, Blueprint, jsonify, session, abort, current_app, send_from_directory
 from flask import copy_current_request_context, g
@@ -44,13 +45,14 @@ from modules.models import (
     Flag, UserProgress, FlagsObtained, ChallengesObtained, Quiz, Question, UserQuizProgress
 )
 from modules.utilities import (
-    admin_required, _authenticate_and_redirect, square_image, send_email, send_password_reset_email
+    admin_required, _authenticate_and_redirect, square_image, send_email, send_password_reset_email, 
 )
-from modules.azure_utils import get_vm_status, start_vm, stop_vm, restart_vm
+from modules.azure_utils import get_vm_status, check_azure_authentication
 
 
 bp = Blueprint('main', __name__)
 s = URLSafeTimedSerializer('YMecr3tK?IzzsSa@e!Zithpze') 
+AZ_CLI_PATH = r"C:\Program Files (x86)\Microsoft SDKs\Azure\CLI2\wbin\az.cmd"
 has_initialized_whitelist = False
 has_upgraded_admin = False
 has_initialized_setup = False
@@ -1301,63 +1303,60 @@ def host_editor(host_id=None):
 @login_required
 def host_details(host_id):
     logging.info(f"Accessing host details for host_id: {host_id}")
+    auth_status = check_azure_authentication()
+
     host = Host.query.get_or_404(host_id)
     vm_status = None
     if host.azure_vm_id:
-        logging.info(f"Attempting to retrieve VM status for Azure VM ID: {host.azure_vm_id}")
-        try:
-            vm_status = get_vm_status(host.azure_vm_id)
-            logging.info(f"Retrieved VM status: {vm_status}")
-        except Exception as e:
-            logging.error(f"Error retrieving VM status: {str(e)}")
-            flash(f"Error retrieving VM status: {str(e)}", 'error')
-            vm_status = "Error retrieving status"
+        logging.info(f"Azure VM ID associated with this host: {host.azure_vm_id}")
     else:
         logging.info("No Azure VM ID associated with this host")
-    return render_template('site/host_details.html', host=host, vm_status=vm_status)
+    return render_template('site/host_details.html', host=host, vm_status=vm_status, auth_status=auth_status)
 
-@bp.route('/ctf/start_vm/<int:host_id>', methods=['POST'])
-@login_required
-def start_vm_route(host_id):
-    host = Host.query.get_or_404(host_id)
-    if host.azure_vm_id:
-        try:
-            start_vm(host.azure_vm_id)
-            flash('VM start initiated successfully.', 'success')
-        except Exception as e:
-            flash(f'Error starting VM: {str(e)}', 'error')
-    
-    else:
-        flash('No Azure VM ID associated with this host.', 'error')
-    return redirect(url_for('main.host_details', host_id=host_id))
 
-@bp.route('/ctf/stop_vm/<int:host_id>', methods=['POST'])
+@bp.route('/manage_vm', methods=['POST'])
 @login_required
-def stop_vm_route(host_id):
-    host = Host.query.get_or_404(host_id)
-    if host.azure_vm_id:
-        try:
-            stop_vm(host.azure_vm_id)
-            flash('VM stop initiated successfully.', 'success')
-        except Exception as e:
-            flash(f'Error stopping VM: {str(e)}', 'error')
-    else:
-        flash('No Azure VM ID associated with this host.', 'error')
-    return redirect(url_for('main.host_details', host_id=host_id))
-
-@bp.route('/ctf/restart_vm/<int:host_id>', methods=['POST'])
-@login_required
-def restart_vm_route(host_id):
-    host = Host.query.get_or_404(host_id)
-    if host.azure_vm_id:
-        try:
-            restart_vm(host.azure_vm_id)
-            flash('VM restart initiated successfully.', 'success')
-        except Exception as e:
-            flash(f'Error restarting VM: {str(e)}', 'error')
-    else:
-        flash('No Azure VM ID associated with this host.', 'error')
-    return redirect(url_for('main.host_details', host_id=host_id))
+def manage_vm():
+    print(f"Received request to manage VM: {request.form}")
+    resource_group = request.form['resource_group']
+    vm_name = request.form['vm_name']
+    action = request.form['action']
+    subscription_id = Config.AZURE_SUBSCRIPTION_ID
+    vm_id = f"/subscriptions/{subscription_id}/resourceGroups/{resource_group}/providers/Microsoft.Compute/virtualMachines/{vm_name}"
+    try:
+        output = ""
+        if action == 'status':
+            print(f"Executing VM status command for {vm_id}")
+            result = subprocess.run([AZ_CLI_PATH, 'vm', 'get-instance-view', '--ids', vm_id, '--query', '{name:name, powerState:instanceView.statuses[1].displayStatus, osType:storageProfile.osDisk.osType}'], capture_output=True, text=True)
+            if result.returncode == 0:
+                vm_info = json.loads(result.stdout)
+                output = f"VM Name: {vm_info['name']}, Power State: {vm_info['powerState']}, OS Type: {vm_info['osType']}"
+            else:
+                raise Exception(f"Error fetching VM status: {result.stderr}")
+        elif action == 'start':
+            print(f"Executing VM start command for {vm_id}")
+            result = subprocess.run([AZ_CLI_PATH, 'vm', 'start', '--ids', vm_id], capture_output=True, text=True)
+        elif action == 'stop':
+            print(f"Executing VM stop command for {vm_id}")
+            result = subprocess.run([AZ_CLI_PATH, 'vm', 'stop', '--ids', vm_id], capture_output=True, text=True)
+        else:
+            print(f"Invalid action received: {action}")
+            raise ValueError("Invalid action")
+        
+        if result.returncode != 0:
+            if action == 'status':
+                raise Exception(f"Error fetching VM status: {result.stderr}")
+            else:
+                raise Exception(f"Error performing {action} on VM: {result.stderr}")
+        
+        if not output:
+            output = f"Successfully performed {action} on VM: {vm_id}"
+        print(output)
+        return jsonify({"status": "success", "message": output})
+    except Exception as e:
+        print(f"Detailed error while managing VM: {e}")
+        print(f"Error managing VM: {e}")
+        return jsonify({"status": "error", "message": str(e)}), 400
 
 @bp.route('/admin/delete_host/<int:host_id>', methods=['POST'])
 @login_required

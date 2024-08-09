@@ -3,6 +3,29 @@ from azure.mgmt.compute import ComputeManagementClient
 from azure.core.exceptions import AzureError
 from config import Config
 import logging
+from flask import Flask, render_template, request, flash, redirect, url_for, jsonify
+import subprocess
+import json
+import os
+
+AZ_CLI_PATH = r"C:\Program Files (x86)\Microsoft SDKs\Azure\CLI2\wbin\az.cmd"
+
+def check_azure_authentication():
+    try:
+        result = subprocess.run([AZ_CLI_PATH, 'account', 'show'], capture_output=True, text=True)
+        if result.returncode != 0:
+            raise Exception(result.stderr)
+        account_info = json.loads(result.stdout)
+        print("Successfully authenticated with Azure.")
+        return {
+            'status': 'Authenticated',
+            'details': account_info
+        }
+    except Exception as e:
+        print(f"Error checking Azure authentication: {e}")
+        print(f"Azure CLI command output: {result.stderr if 'result' in locals() else 'No output'}")
+        return {'status': 'Not Authenticated', 'details': str(e)}
+
 
 def get_azure_credentials():
     return DefaultAzureCredential()
@@ -47,20 +70,11 @@ def get_vm_status(vm_id):
         logging.error(f"Unexpected error retrieving VM status: {str(e)}")
         return f"Unexpected Error: {str(e)}"
 
-def start_vm(vm_id):
-    compute_client = get_compute_client()
-    resource_group_name, vm_name = vm_id.split('/')[-4], vm_id.split('/')[-1]
-    async_vm_start = compute_client.virtual_machines.begin_start(resource_group_name, vm_name)
-    async_vm_start.wait()
 
-def stop_vm(vm_id):
-    compute_client = get_compute_client()
-    resource_group_name, vm_name = vm_id.split('/')[-4], vm_id.split('/')[-1]
-    async_vm_stop = compute_client.virtual_machines.begin_power_off(resource_group_name, vm_name)
-    async_vm_stop.wait()
-
-def restart_vm(vm_id):
-    compute_client = get_compute_client()
-    resource_group_name, vm_name = vm_id.split('/')[-4], vm_id.split('/')[-1]
-    async_vm_restart = compute_client.virtual_machines.begin_restart(resource_group_name, vm_name)
-    async_vm_restart.wait()
+def check_azure_cli_installed():
+    try:
+        subprocess.run([AZ_CLI_PATH, '--version'], check=True, capture_output=True, text=True)
+        print("Azure CLI is installed.")
+    except subprocess.CalledProcessError as e:
+        print("Azure CLI is not installed or not found in PATH.")
+        raise RuntimeError("Azure CLI is not installed or not found in PATH.") from e
