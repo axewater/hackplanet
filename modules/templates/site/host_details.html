@@ -38,15 +38,13 @@
             </style>
         </head>
         <body>
-            <h1>Azure Authentication Status</h1>
+            <h1>Azure Status</h1>
             <p>Status: {{ auth_status.status }}</p>
             {% if auth_status.status == 'Authenticated' %}
-                <p>Account: {{ auth_status.details.name }}</p>
-                <p>Subscription ID: {{ auth_status.details.id }}</p>
             {% else %}
                 <p>Error: {{ auth_status.details }}</p>
             {% endif %}
-            <h1>Manage VM</h1>
+
             <form id="vm-form" method="post" action="{{ url_for('main.manage_vm') }}">
                 <input type="hidden" id="resource_group" name="resource_group" value="CTF">
                 <input type="hidden" id="vm_name" name="vm_name" value="{{ host.azure_vm_id.split('/')[-1] if host.azure_vm_id else '' }}">
@@ -55,7 +53,6 @@
                 <button type="button" id="start-btn" class="btn btn-success">Start VM</button>
                 <button type="button" id="stop-btn" class="btn btn-danger">Stop VM</button>
                 <button type="button" id="status-btn" class="btn btn-info">Check Status</button>
-                <button type="button" id="refresh-btn" class="btn btn-secondary">Refresh</button>
             </form>
             <div id="result"></div>
             <div id="loading" style="display: none;">Loading...</div>
