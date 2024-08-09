@@ -3,7 +3,16 @@ $(document).ready(function() {
         return $('input[name="csrf_token"]').val();
     }
 
+    function disableButtons() {
+        $('#start-btn, #stop-btn, #status-btn').prop('disabled', true);
+    }
+
+    function enableButtons() {
+        $('#start-btn, #stop-btn, #status-btn').prop('disabled', false);
+    }
+
     function performAction(action) {
+        disableButtons();
         $('#loading').show();
         $('#result').html('');
         $.ajax({
@@ -22,17 +31,19 @@ $(document).ready(function() {
                 $('#loading').hide();
                 if (response.status === "success") {
                     if (action === "status") {
-                        $('#result').html("<h2>VM Status:</h2><p>" + response.message + "</p>");
+                        $('#status-result').text(response.message);
                     } else {
                         $('#result').html("<p>" + response.message + "</p>");
                     }
                 } else {
                     $('#result').html("<p>Error: " + response.message + "</p>");
                 }
+                enableButtons();
             },
             error: function(xhr, status, error) {
                 $('#loading').hide();
                 $('#result').html("<p>Error: " + error + "</p>");
+                enableButtons();
             }
         });
     }
