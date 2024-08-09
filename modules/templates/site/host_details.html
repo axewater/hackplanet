@@ -1,62 +1,95 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="container">
-    <div class="glass-panel">
-        <h1>{{ host.name }} Details</h1>
-        <p>OS: {{ host.os }}</p>
-        <p>Difficulty: {{ host.difficulty }}</p>
-        <p>IP: {{ host.ip }}</p>
-        <p>Status: {{ 'Active' if host.status else 'Inactive' }}</p>
-        <p>Rating: {{ host.rating }}</p>
-        <p>Release Date: {{ host.release_date }}</p>
-        <p>Hint: {{ host.hint }}</p>
-        <head>
-            <meta charset="utf-8">
-            <title>Azure VM Manager</title>
-            <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-            <style>
-                body {
-                    font-family: Arial, sans-serif;
-                    max-width: 800px;
-                    margin: 0 auto;
-                    padding: 20px;
-                }
-                h1, h2 {
-                    color: #0078D4;
-                }
-                form {
-                    margin-bottom: 20px;
-                }
-                label, input, select, button {
-                    margin: 5px 0;
-                    display: block;
-                }
-                #result {
-                    margin-top: 20px;
-                }
-            </style>
-        </head>
-        <body>
-            <h1>Azure Status</h1>
-            <p>Status: {{ auth_status.status }}</p>
-            {% if auth_status.status == 'Authenticated' %}
-            {% else %}
-                <p>Error: {{ auth_status.details }}</p>
-            {% endif %}
+<div class="container mt-4">
+    <div class="card glass-panel">
+        <div class="card-header bg-primary text-white">
+            <h1 class="mb-0">{{ host.name }} Details</h1>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <table class="table table-striped">
+                        <tbody>
+                            <tr>
+                                <th>OS</th>
+                                <td>{{ host.os }}</td>
+                            </tr>
+                            <tr>
+                                <th>Difficulty</th>
+                                <td>{{ host.difficulty }}</td>
+                            </tr>
+                            <tr>
+                                <th>IP</th>
+                                <td>{{ host.ip }}</td>
+                            </tr>
+                            <tr>
+                                <th>Status</th>
+                                <td>{{ 'Active' if host.status else 'Inactive' }}</td>
+                            </tr>
+                            <tr>
+                                <th>Rating</th>
+                                <td>{{ host.rating }}</td>
+                            </tr>
+                            <tr>
+                                <th>Release Date</th>
+                                <td>{{ host.release_date }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="mb-0">Hint</h5>
+                        </div>
+                        <div class="card-body">
+                            <p>{{ host.hint }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-4">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h2 class="mb-0">Azure VM Management</h2>
+                    </div>
+                    <div class="card-body">
+                        <p>Status: {{ auth_status.status }}</p>
+                        {% if auth_status.status != 'Authenticated' %}
+                            <div class="alert alert-warning">
+                                <p>Error: {{ auth_status.details }}</p>
+                            </div>
+                        {% endif %}
 
-            <form id="vm-form" method="post" action="{{ url_for('main.manage_vm') }}">
-                <input type="hidden" id="resource_group" name="resource_group" value="CTF">
-                <input type="hidden" id="vm_name" name="vm_name" value="{{ host.azure_vm_id.split('/')[-1] if host.azure_vm_id else '' }}">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                
-                <button type="button" id="start-btn" class="btn btn-success">Start VM</button>
-                <button type="button" id="stop-btn" class="btn btn-danger">Stop VM</button>
-                <button type="button" id="status-btn" class="btn btn-info">Check Status</button>
-            </form>
-            <div id="result"></div>
-            <div id="loading" style="display: none;">Loading...</div>
-            <script src="{{ url_for('static', filename='js/host_details.js') }}"></script>
-        </body>
-        </html>
-        {% endblock %}
+                        <form id="vm-form" method="post" action="{{ url_for('main.manage_vm') }}" class="mt-3">
+                            <input type="hidden" id="resource_group" name="resource_group" value="CTF">
+                            <input type="hidden" id="vm_name" name="vm_name" value="{{ host.azure_vm_id.split('/')[-1] if host.azure_vm_id else '' }}">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            
+                            <div class="btn-group" role="group">
+                                <button type="button" id="start-btn" class="btn btn-success">Start VM</button>
+                                <button type="button" id="stop-btn" class="btn btn-danger">Stop VM</button>
+                                <button type="button" id="status-btn" class="btn btn-info">Check Status</button>
+                            </div>
+                        </form>
+                        <div id="result" class="mt-3 card">
+                            <div class="card-body">
+                                <h5 class="card-title">VM Status</h5>
+                                <p class="card-text" id="status-result">No status information available.</p>
+                            </div>
+                        </div>
+                        <div id="loading" class="spinner-border text-primary mt-3" role="status" style="display: none;">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="{{ url_for('static', filename='js/host_details.js') }}"></script>
+{% endblock %}
