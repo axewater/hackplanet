@@ -1331,14 +1331,30 @@ def manage_vm():
             if result.returncode == 0:
                 vm_info = json.loads(result.stdout)
                 output = f"VM Name: {vm_info['name']}, Power State: {vm_info['powerState']}, OS Type: {vm_info['osType']}"
+                
+                # Update the database with the VM status
+                host = Host.query.filter_by(azure_vm_id=vm_id).first()
+                if host:
+                    host.status = vm_info['powerState'].lower() == 'vm running'
+                    db.session.commit()
             else:
                 raise Exception(f"Error fetching VM status: {result.stderr}")
         elif action == 'start':
             print(f"Executing VM start command for {vm_id}")
             result = subprocess.run([AZ_CLI_PATH, 'vm', 'start', '--ids', vm_id], capture_output=True, text=True)
+            if result.returncode == 0:
+                host = Host.query.filter_by(azure_vm_id=vm_id).first()
+                if host:
+                    host.status = True
+                    db.session.commit()
         elif action == 'stop':
             print(f"Executing VM stop command for {vm_id}")
             result = subprocess.run([AZ_CLI_PATH, 'vm', 'stop', '--ids', vm_id], capture_output=True, text=True)
+            if result.returncode == 0:
+                host = Host.query.filter_by(azure_vm_id=vm_id).first()
+                if host:
+                    host.status = False
+                    db.session.commit()
         else:
             print(f"Invalid action received: {action}")
             raise ValueError("Invalid action")

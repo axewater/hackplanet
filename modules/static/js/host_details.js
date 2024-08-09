@@ -11,11 +11,16 @@ $(document).ready(function() {
         $('#start-btn, #stop-btn, #status-btn').prop('disabled', false);
     }
 
+    function updateStatusDisplay(status) {
+        $('#status-display').text(status ? 'Online' : 'Offline');
+        $('#status-display').removeClass('text-success text-danger');
+        $('#status-display').addClass(status ? 'text-success' : 'text-danger');
+    }
+
     function performAction(action) {
         disableButtons();
         $('#loading').show();
         $('#result').html('');
-        $('#status-result').text('Processing...');
         $.ajax({
             url: "/manage_vm",
             type: "POST",
@@ -33,8 +38,11 @@ $(document).ready(function() {
                 if (response.status === "success") {
                     if (action === "status") {
                         $('#status-result').text(response.message);
+                        var isRunning = response.message.toLowerCase().includes('vm running');
+                        updateStatusDisplay(isRunning);
                     } else {
                         $('#result').html("<p>" + response.message + "</p>");
+                        updateStatusDisplay(action === 'start');
                     }
                 } else {
                     $('#result').html("<p>Error: " + response.message + "</p>");
