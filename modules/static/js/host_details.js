@@ -15,6 +15,7 @@ $(document).ready(function() {
         disableButtons();
         $('#loading').show();
         $('#result').html('');
+        $('#status-result').text('Processing...');
         $.ajax({
             url: "/manage_vm",
             type: "POST",
