@@ -12,7 +12,8 @@ $(document).ready(function() {
     }
 
     function updateStatusDisplay(status) {
-        $('#status-display').text(status ? 'Online' : 'Offline');
+        var statusText = status ? 'Online' : 'Offline';
+        $('#status-display').text(statusText);
         $('#status-display').removeClass('text-success text-danger');
         $('#status-display').addClass(status ? 'text-success' : 'text-danger');
     }
