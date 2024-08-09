@@ -1232,6 +1232,11 @@ def hacking_labs():
     # Check if the user is an admin
     is_admin = current_user.role == 'admin'
 
+    # Fetch the latest status for each host
+    for lab in labs:
+        for host in lab.hosts:
+            host.status = Host.query.get(host.id).status
+
     # Instantiate the FlagSubmissionForm
     form = FlagSubmissionForm()
 
