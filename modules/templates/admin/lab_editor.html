@@ -11,62 +11,27 @@
 {% endwith %}
 <div class="container">
     <div class="glass-panel">
-            <!-- Back to Dashboard Button -->
-    <div class="container mt-3">
-        <a href="{{ url_for('main.admin_dashboard') }}" class="btn btn-lg btn-primary">Back to Dashboard</a>
-      </div>
+        <div class="container mt-3">
+            <a href="{{ url_for('main.admin_dashboard') }}" class="btn btn-lg btn-primary">Back to Dashboard</a>
+        </div>
         <h1>{{ 'Edit Lab' if lab else 'Create New Lab' }}</h1>
-        {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            {% for category, message in messages %}
-                <div class="alert alert-{{ category }}" role="alert">
-                    {{ message }}
+        <div id="feedback-message"></div>
+        <form id="lab-form" method="POST" action="{{ url_for('main.lab_editor', lab_id=lab.id if lab else None) }}">
+            {{ form.hidden_tag() }}
+            {% for field in form if field.name != 'csrf_token' and field.name != 'submit' %}
+                <div class="mb-3">
+                    {{ field.label(class="form-label") }}
+                    {% if field.name == 'image' %}
+                        {{ field(class="form-control", placeholder="Enter image filename or URL") }}
+                    {% else %}
+                        {{ field(class="form-control") }}
+                    {% endif %}
+                    <div class="invalid-feedback" id="{{ field.name }}-error"></div>
                 </div>
             {% endfor %}
-        {% endif %}
-        {% endwith %}
-        <form method="POST" action="{{ url_for('main.lab_editor', lab_id=lab.id if lab else None) }}">
-            {{ form.hidden_tag() }}
-            <div class="mb-3">
-                {{ form.name.label(class="form-label") }}
-                {{ form.name(class="form-control") }}
-                {% for error in form.name.errors %}
-                    <small class="error-message">{{ error }}</small>
-                {% endfor %}
-            </div>
-            <div class="mb-3">
-                {{ form.image.label(class="form-label") }}
-                {{ form.image(class="form-control") }}
-                {% for error in form.image.errors %}
-                    <small class="error-message">{{ error }}</small>
-                {% endfor %}
-            </div>
-            <div class="mb-3">
-                {{ form.description.label(class="form-label") }}
-                {{ form.description(class="form-control") }}
-                {% for error in form.description.errors %}
-                    <small class="error-message">{{ error }}</small>
-                {% endfor %}
-            </div>
-            <div class="mb-3">
-                {{ form.vpn_server.label(class="form-label") }}
-                {{ form.vpn_server(class="form-control") }}
-                {% for error in form.vpn_server.errors %}
-                    <small class="error-message">{{ error }}</small>
-                {% endfor %}
-            </div>
-            <div class="mb-3">
-                {{ form.vpn_file.label(class="form-label") }}
-                {{ form.vpn_file(class="form-control") }}
-                {% for error in form.vpn_file.errors %}
-                    <small class="error-message">{{ error }}</small>
-                {% endfor %}
-            </div>
             <button type="submit" class="btn btn-primary">Save Lab</button>
         </form>
     </div>
 </div>
 <script src="{{ url_for('static', filename='js/lab_editor.js') }}"></script>
-
-
 {% endblock %}

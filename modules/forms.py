@@ -12,7 +12,7 @@ from urllib.parse import urlparse
 
 class LabForm(FlaskForm):
     name = StringField('Lab Name', validators=[DataRequired(), Length(max=128)])
-    image = StringField('Image URL', validators=[Optional(), URL(), Length(max=256)])
+    image = StringField('Image', validators=[Optional(), Length(max=256)])
     description = TextAreaField('Description', validators=[Optional(), Length(max=5000)])
     vpn_server = StringField('VPN Server', validators=[Optional(), Length(max=256)])
     vpn_file = StringField('VPN File', validators=[Optional(), Length(max=256)])

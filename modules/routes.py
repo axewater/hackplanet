@@ -74,13 +74,13 @@ def initial_setup():
             default_whitelist = Whitelist(email=default_email)
             db.session.add(default_whitelist)
             db.session.commit()
-            logging.info("Default email added to Whitelist.")
+            print("Default email added to Whitelist.")
     except IntegrityError:
         db.session.rollback()
-        logging.info('Default email already exists in Whitelist.')
+        print('Default email already exists in Whitelist.')
     except SQLAlchemyError as e:
         db.session.rollback()
-        logging.info(f'error adding default email to Whitelist: {e}')
+        print(f'error adding default email to Whitelist: {e}')
 
     # Upgrade first user to admin
     try:
@@ -89,17 +89,17 @@ def initial_setup():
             user.role = 'admin'
             user.is_email_verified = True
             db.session.commit()
-            logging.info(f"User '{user.name}' (ID: 1) upgraded to admin.")
+            print(f"User '{user.name}' (ID: 1) upgraded to admin.")
         elif not user:
-            logging.info("No user with ID 1 found in the database.")
+            print("No user with ID 1 found in the database.")
         else:
-            logging.info("User with ID 1 already has admin role.")
+            print("User with ID 1 already has admin role.")
     except IntegrityError:
         db.session.rollback()
-        logging.info('error while trying to upgrade user to admin.')
+        print('error while trying to upgrade user to admin.')
     except SQLAlchemyError as e:
         db.session.rollback()
-        logging.info(f'error upgrading user to admin: {e}')
+        print(f'error upgrading user to admin: {e}')
 
 @bp.context_processor
 @cache.cached(timeout=500, key_prefix='global_settings')
@@ -138,7 +138,7 @@ def utility_processor():
 @bp.route('/restricted')
 @login_required
 def restricted():
-    logging.info("Route: /restricted")
+    print("Route: /restricted")
     return render_template('site/restricted_area.html', title='Restricted Area')
 
 @bp.route('/login', methods=['GET', 'POST'])
@@ -146,7 +146,7 @@ def login():
     if current_user.is_authenticated:
         return redirect(url_for('main.restricted'))
 
-    logging.info("Route: /login")
+    print("Route: /login")
     form = LoginForm()
     if request.method == 'POST' and form.validate_on_submit():
         username = form.username.data
@@ -160,7 +160,7 @@ def login():
 
             if not user.state:
                 flash('Your account has been banned.', 'error')
-                logging.info(f"Error: Attempted login to disabled account - User: {username}")
+                print(f"Error: Attempted login to disabled account - User: {username}")
                 return redirect(url_for('main.login'))
 
             return _authenticate_and_redirect(username, password)
@@ -175,15 +175,15 @@ def login():
 def register():
     if current_user.is_authenticated:
         return redirect(url_for('main.login'))
-    logging.info("Route: /register")
+    print("Route: /register")
 
     # Attempt to get the invite token from the query parameters
     invite_token_from_url = request.args.get('token')
-    logging.info(f"Invite token from URL: {invite_token_from_url}")
+    print(f"Invite token from URL: {invite_token_from_url}")
     invite = None
     if invite_token_from_url:
         invite = InviteToken.query.filter_by(token=invite_token_from_url, used=False).first()
-        logging.info(f"Invite found: {invite}")
+        print(f"Invite found: {invite}")
         if invite and invite.expires_at >= datetime.utcnow():
             # The invite is valid; skip the whitelist check later
             pass
@@ -197,7 +197,7 @@ def register():
             email_address = form.email.data.lower()
             existing_user_email = User.query.filter(func.lower(User.email) == email_address).first()
             if existing_user_email:
-                logging.info(f"/register: Email already in use - {email_address}")
+                print(f"/register: Email already in use - {email_address}")
                 flash('This email is already in use. Please use a different email or log in.')
                 return redirect(url_for('main.register'))
                     # Proceed with the whitelist check only if no valid invite token is provided
@@ -209,14 +209,14 @@ def register():
 
             existing_user = User.query.filter_by(name=form.username.data).first()
             if existing_user is not None:
-                logging.info(f"/register: User already exists - {form.username.data}")
+                print(f"/register: User already exists - {form.username.data}")
                 flash('User already exists. Please Log in.')
                 return redirect(url_for('main.register'))
 
             user_uuid = str(uuid4())
             existing_uuid = User.query.filter_by(user_id=user_uuid).first()
             if existing_uuid is not None:
-                logging.info("/register: UUID collision detected.")
+                print("/register: UUID collision detected.")
                 flash('An error occurred while registering. Please try again.')
                 return redirect(url_for('main.register'))
 
@@ -234,14 +234,14 @@ def register():
             user.set_password(form.password.data)
             db.session.add(user)
             db.session.commit()
-            logging.info(f"Invite Token from URL: {invite_token_from_url}")
+            print(f"Invite Token from URL: {invite_token_from_url}")
 
             if invite:
-                logging.info(f"Found valid invite: {invite.token}, expires at: {invite.expires_at}, used: {invite.used}")
+                print(f"Found valid invite: {invite.token}, expires at: {invite.expires_at}, used: {invite.used}")
                 invite.used = True
                 db.session.commit()
             else:
-                logging.info("No valid invite found or invite expired/used.")
+                print("No valid invite found or invite expired/used.")
             # Verification email
             verification_token = user.email_verification_token
             confirm_url = url_for('main.confirm_email', token=verification_token, _external=True)
@@ -254,7 +254,7 @@ def register():
             return redirect(url_for('site.index'))
         except IntegrityError as e:
             db.session.rollback()
-            logging.info(f"IntegrityError occurred: {e}")
+            print(f"IntegrityError occurred: {e}")
             flash('error while registering. Please try again.')
 
     return render_template('login/registration.html', title='Register', form=form)
@@ -408,7 +408,7 @@ def create_user():
                 created=datetime.utcnow()
             )
             user.set_password(form.password.data)
-            logging.info(f"Debug: User created: {user}")
+            print(f"Debug: User created: {user}")
             db.session.add(user)
             db.session.commit()
 
@@ -429,20 +429,20 @@ def user_created():
 @bp.route('/api/current_user_role', methods=['GET'])
 @login_required
 def get_current_user_role():
-    # logging.info(f"Route: /api/current_user_role - {current_user.role}")
+    # print(f"Route: /api/current_user_role - {current_user.role}")
     return jsonify({'role': current_user.role}), 200
 
 @bp.route('/api/check_username', methods=['POST'])
 @login_required
 def check_username():
-    # logging.info(F"Route: /api/check_username - {current_user.name} - {current_user.role}")
+    # print(F"Route: /api/check_username - {current_user.name} - {current_user.role}")
     data = request.get_json()
     username = data.get('username')
 
     if not username:
-        logging.info(f"Check username: Missing username")
+        print(f"Check username: Missing username")
         return jsonify({"error": "Missing username parameter"}), 400
-    logging.info(f"Checking username: {username}")
+    print(f"Checking username: {username}")
     existing_user = User.query.filter(func.lower(User.name) == func.lower(username)).first()
     return jsonify({"exists": existing_user is not None})
 
@@ -451,12 +451,12 @@ def check_username():
 def delete_avatar(avatar_path):
     
     full_avatar_path = os.path.join(current_app.static_folder, avatar_path)
-    logging.info(f"Route: /delete_avatar {full_avatar_path}")
+    print(f"Route: /delete_avatar {full_avatar_path}")
 
     if os.path.exists(full_avatar_path):
         os.remove(full_avatar_path)
         flash(f'Avatar image {full_avatar_path} deleted successfully!')
-        logging.info(f"Avatar image {full_avatar_path} deleted successfully!")
+        print(f"Avatar image {full_avatar_path} deleted successfully!")
     else:
         flash(f'Avatar image {full_avatar_path} not found.')
 
@@ -465,7 +465,7 @@ def delete_avatar(avatar_path):
 @bp.route('/settings_account', methods=['GET', 'POST'])
 @login_required
 def account():
-    logging.info("Route: /settings_account")
+    print("Route: /settings_account")
 
     user = User.query.filter_by(id=current_user.id).first()
     form = UserDetailForm(about=str(user.about))
@@ -480,7 +480,7 @@ def account():
             flash('Account details updated successfully!', 'success')
         except Exception as e:
             db.session.rollback()
-            logging.info(f"Error updating account details: {e}")
+            print(f"Error updating account details: {e}")
             flash('Failed to update account details. Please try again.', 'error')
 
         return redirect(url_for('main.account'))
@@ -490,7 +490,7 @@ def account():
 @bp.route('/settings_profile_edit', methods=['GET', 'POST'])
 @login_required
 def settings_profile_edit():
-    logging.info("Route: Settings profile edit")
+    print("Route: Settings profile edit")
     form = EditProfileForm()
 
     if form.validate_on_submit():
@@ -503,7 +503,7 @@ def settings_profile_edit():
                     # Safe check to avoid creating 'static' directly
                     os.makedirs(upload_folder, exist_ok=True)
                 except Exception as e:
-                    logging.info(f"Error creating upload directory: {e}")
+                    print(f"Error creating upload directory: {e}")
                     flash("Error processing request. Please try again.", 'error')
                     return redirect(url_for('main.settings_profile_edit'))
 
@@ -536,7 +536,7 @@ def settings_profile_edit():
                     if old_thumbnailpath:  # Check if old_thumbnailpath was defined
                         os.remove(os.path.join(upload_folder, os.path.basename(old_thumbnailpath)))
                 except Exception as e:
-                    logging.info(f"Error deleting old avatar: {e}")
+                    print(f"Error deleting old avatar: {e}")
                     flash("Error deleting old avatar. Please try again.", 'error')
 
             current_user.avatarpath = 'library/avatars_users/' + uuid_filename
@@ -549,16 +549,16 @@ def settings_profile_edit():
             flash('Profile updated successfully!', 'success')
         except Exception as e:
             db.session.rollback()
-            logging.info(f"Error updating profile: {e}")
+            print(f"Error updating profile: {e}")
             flash('Failed to update profile. Please try again.', 'error')
 
         return redirect(url_for('main.settings_profile_edit'))
 
-    logging.info("Form validation failed" if request.method == 'POST' else "Settings profile Form rendering")
+    print("Form validation failed" if request.method == 'POST' else "Settings profile Form rendering")
 
     for field, errors in form.errors.items():
         for error in errors:
-            logging.info(f"Error in field '{getattr(form, field).label.text}': {error}")
+            print(f"Error in field '{getattr(form, field).label.text}': {error}")
             flash(f"Error in field '{getattr(form, field).label.text}': {error}", 'error')
 
     return render_template('settings/settings_profile_edit.html', form=form, avatarpath=current_user.avatarpath)
@@ -566,27 +566,27 @@ def settings_profile_edit():
 @bp.route('/settings_profile_view', methods=['GET'])
 @login_required
 def settings_profile_view():
-    logging.info("Route: Settings profile view")
+    print("Route: Settings profile view")
     return render_template('settings/settings_profile_view.html')
 
 @bp.route('/settings_password', methods=['GET', 'POST'])
 @login_required
 def account_pw():
     form = UserPasswordForm()
-    # logging.info("Request method:", request.method)  # Debug line
+    # print("Request method:", request.method)  # Debug line
     user = User.query.get(current_user.id)
 
     if form.validate_on_submit():
         try:
-            # logging.info("Form data:", form.data)  # Debug line
+            # print("Form data:", form.data)  # Debug line
             user.set_password(form.password.data)
             db.session.commit()
             flash('Password changed successfully!', 'success')
-            logging.info('Password changed successfully for user ID:', current_user.id)
+            print('Password changed successfully for user ID:', current_user.id)
             return redirect(url_for('main.account_pw'))
         except Exception as e:
             db.session.rollback()
-            logging.info('An error occurred while changing the password:', str(e))
+            print('An error occurred while changing the password:', str(e))
             flash('An error occurred. Please try again.', 'error')
 
     return render_template('settings/settings_password.html', title='Change Password', form=form, user=user)
@@ -595,8 +595,8 @@ def account_pw():
 @login_required
 @admin_required
 def settings_panel():
-    # logging.info("Request method:", request.method)  # Debug line
-    logging.info("Route: /settings_panel")
+    # print("Request method:", request.method)  # Debug line
+    print("Route: /settings_panel")
     form = UserPreferencesForm()
     if request.method == 'POST' and form.validate_on_submit():
         # Ensure preferences exist
@@ -635,21 +635,21 @@ def newsletter():
 
     if not enable_newsletter:
         flash('Newsletter feature is disabled.', 'warning')
-        logging.info("ADMIN NEWSLETTER: Newsletter feature is disabled.")
+        print("ADMIN NEWSLETTER: Newsletter feature is disabled.")
         return redirect(url_for('main.admin_dashboard'))
-    logging.info("ADMIN NEWSLETTER: Request method:", request.method)
+    print("ADMIN NEWSLETTER: Request method:", request.method)
     form = NewsletterForm()
     users = User.query.all()
     if form.validate_on_submit():
         recipients = form.recipients.data.split(',')
-        logging.info(f"ADMIN NEWSLETTER: Recipient list : {recipients}")
+        print(f"ADMIN NEWSLETTER: Recipient list : {recipients}")
         
         msg = MailMessage(form.subject.data, sender=current_app.config['MAIL_DEFAULT_SENDER'])
         msg.body = form.content.data
         
         msg.recipients = recipients
         try:
-            logging.info(f"ADMIN NEWSLETTER: Newsletter sent")
+            print(f"ADMIN NEWSLETTER: Newsletter sent")
             mail.send(msg)
             flash('Newsletter sent successfully!', 'success')
         except Exception as e:
@@ -683,11 +683,11 @@ def whitelist():
 @login_required
 @admin_required
 def usermanager():
-    logging.info("ADMIN USRMGR: username: Request method:", request.method)
+    print("ADMIN USRMGR: username: Request method:", request.method)
     form = UserManagementForm()
     users_query = User.query.order_by(User.name).all()
     form.user_id.choices = [(user.id, user.name) for user in users_query]
-    logging.info(f"ADMIN USRMGR: User list : {users_query}")
+    print(f"ADMIN USRMGR: User list : {users_query}")
     # Pre-populate the form when the page loads or re-populate upon validation failure
     if request.method == 'GET' or not form.validate_on_submit():
         # You could also use a default user here or based on some criteria
@@ -704,7 +704,7 @@ def usermanager():
 
     else:
         # This block handles the form submission for both updating and deleting users
-        logging.info(f"ADMIN USRMGR: Form data: {form.data}")
+        print(f"ADMIN USRMGR: Form data: {form.data}")
         user_id = form.user_id.data
         user = User.query.get(user_id)
         if not user:
@@ -720,7 +720,7 @@ def usermanager():
                 user.state = form.state.data if form.state.data is not None else user.state
                 user.is_email_verified = form.is_email_verified.data
                 user.about = form.about.data
-                logging.info(f"ADMIN USRMGR: User updated: {user} about field : {user.about}")
+                print(f"ADMIN USRMGR: User updated: {user} about field : {user.about}")
                 db.session.commit()
                 flash('User updated successfully!', 'success')
             except Exception as e:
@@ -756,7 +756,7 @@ def get_user(user_id):
         }
         return jsonify(user_data)
     else:
-        logging.info(f"User not found with id: {user_id}")
+        print(f"User not found with id: {user_id}")
         return jsonify({'error': 'User not found'}), 404
 
 
@@ -791,7 +791,7 @@ def manage_settings():
 @login_required
 @admin_required
 def admin_status_page():
-    logging.info("Route: /admin/status_page")
+    print("Route: /admin/status_page")
     settings_record = GlobalSettings.query.first()
     enable_server_status = settings_record.settings.get('enableServerStatusFeature', False) if settings_record else False
 
@@ -808,7 +808,7 @@ def admin_status_page():
         ip_address = socket.gethostbyname(hostname)
     except Exception as e:
         ip_address = 'Unavailable'
-        logging.info(f"Error retrieving IP address: {e}")
+        print(f"Error retrieving IP address: {e}")
     
     system_info = {
         'OS': platform.system(),
@@ -890,7 +890,7 @@ def ctf_home():
 @bp.route('/ctf/leaderboard')
 def leaderboard():
     # Fetch user scores from the database
-    logging.info("Fetching user scores from the database...")
+    print("Fetching user scores from the database...")
     users = db.session.query(User, func.sum(UserQuizProgress.score).label('quiz_score')).outerjoin(UserQuizProgress).group_by(User.id).order_by((User.score_total + func.coalesce(func.sum(UserQuizProgress.score), 0)).desc()).all()
     
     # Prepare user data for the template
@@ -903,9 +903,9 @@ def leaderboard():
             'avatarpath': user.avatarpath
         })
     
-    # Debug logging.info to verify fetched data
+    # Debug print to verify fetched data
     if user_data:
-        logging.info(f"Users: {user_data}")
+        print(f"Users: {user_data}")
 
     return render_template('site/leaderboard.html', users=user_data)
 
@@ -954,47 +954,49 @@ def lab_editor(lab_id=None):
     form = LabForm()
     lab = Lab.query.get(lab_id) if lab_id else None
 
-    if form.validate_on_submit():
-        try:
-            if lab:
-                lab.name = form.name.data
-                lab.image = form.image.data
-                lab.description = form.description.data
-                lab.vpn_server = form.vpn_server.data
-                lab.vpn_file = form.vpn_file.data
-            else:
-                lab = Lab(
-                    name=form.name.data,
-                    image=form.image.data,
-                    description=form.description.data,
-                    vpn_server=form.vpn_server.data,
-                    vpn_file=form.vpn_file.data,
-                    date_created=datetime.utcnow()
-                )
-                db.session.add(lab)
-            
-            db.session.commit()
-            flash('Lab saved successfully.', 'success')
-            return redirect(url_for('main.lab_manager'))
-        except Exception as e:
-            db.session.rollback()
-            logging.info(f"Error saving lab: {str(e)}")
-            flash('An error occurred while saving the lab. Please try again.', 'danger')
+    if request.method == 'GET':
+        if lab:
+            form = LabForm(obj=lab)
+        return render_template('admin/lab_editor.html', form=form, lab=lab)
 
-    if lab:
-        form.name.data = lab.name
-        form.image.data = lab.image
-        form.description.data = lab.description
-        form.vpn_server.data = lab.vpn_server
-        form.vpn_file.data = lab.vpn_file
-
-    return render_template('admin/lab_editor.html', form=form, lab=lab)
+    if request.method == 'POST':
+        data = request.get_json()
+        print(f"Received JSON data: {data}")
+        
+        form = LabForm(data=data)
+        if form.validate():
+            try:
+                if lab:
+                    form.populate_obj(lab)
+                    print(f"Updating existing lab: {lab.id}")
+                else:
+                    lab = Lab(
+                        name=form.name.data,
+                        image=form.image.data,
+                        description=form.description.data,
+                        vpn_server=form.vpn_server.data,
+                        vpn_file=form.vpn_file.data,
+                        date_created=datetime.utcnow()
+                    )
+                    db.session.add(lab)
+                    print("Creating new lab")
+                
+                db.session.commit()
+                print(f"Lab saved successfully: {lab.id}")
+                return jsonify({'success': True, 'message': 'Lab saved successfully.'})
+            except Exception as e:
+                db.session.rollback()
+                logging.error(f"Error saving lab: {str(e)}")
+                return jsonify({'success': False, 'message': 'An error occurred while saving the lab.', 'error': str(e)}), 500
+        else:
+            print(f"Form validation errors: {form.errors}")
+            return jsonify({'success': False, 'message': 'Form validation failed.', 'errors': form.errors}), 400
 
 @bp.route('/admin/lab_manager', methods=['GET'])
 @login_required
 @admin_required
 def lab_manager():
-    logging.info("Entered lab_manager route")
+    print("Entered lab_manager route")
     labs = Lab.query.all()
     csrf_form = CsrfProtectForm()
     return render_template('admin/lab_manager.html', labs=labs, form=csrf_form)
@@ -1003,30 +1005,55 @@ def lab_manager():
 @login_required
 @admin_required
 def delete_lab(lab_id):
-    lab = Lab.query.get(lab_id)
-    if lab:
-        try:
-            db.session.delete(lab)
-            db.session.commit()
-            return jsonify({'success': True})
-        except Exception as e:
-            db.session.rollback()
-            logging.error(f"Error deleting lab: {str(e)}")
+    try:
+        lab = Lab.query.get(lab_id)
+        if lab:
+            current_app.logger.info(f"Deleting lab: {lab.name}")
+            try:
+                # Delete associated hosts first
+                hosts_deleted = Host.query.filter_by(lab_id=lab_id).delete()
+                db.session.delete(lab)
+                db.session.commit()
+                current_app.logger.info(f"Lab and {hosts_deleted} associated hosts deleted successfully")
+                return jsonify({'success': True, 'message': f'Lab and {hosts_deleted} associated hosts deleted successfully'})
+            except Exception as e:
+                db.session.rollback()
+                current_app.logger.error(f"Error deleting lab: {str(e)}", exc_info=True)
+                return jsonify({
+                    'success': False,
+                    'message': f'An error occurred while deleting the lab: {str(e)}'
+                }), 500
+        else:
+            current_app.logger.warning(f"Lab not found: {lab_id}")
             return jsonify({
                 'success': False,
-                'message': 'An error occurred while deleting the lab'
-            }), 500
-    else:
+                'message': 'Lab not found'
+            }), 404
+    except Exception as e:
+        current_app.logger.error(f"Unexpected error in delete_lab: {str(e)}", exc_info=True)
         return jsonify({
             'success': False,
-            'message': 'Lab not found'
-        }), 404
+            'message': f'An unexpected error occurred: {str(e)}'
+        }), 500
+
+@bp.route('/admin/get_lab/<int:lab_id>', methods=['GET'])
+@login_required
+@admin_required
+def get_lab(lab_id):
+    lab = Lab.query.get_or_404(lab_id)
+    return jsonify({
+        'name': lab.name,
+        'image': lab.image,
+        'description': lab.description,
+        'vpn_server': lab.vpn_server,
+        'vpn_file': lab.vpn_file
+    })
 
 @bp.route('/admin/challenge_manager', methods=['GET'])
 @login_required
 @admin_required
 def challenge_manager():
-    logging.info("Entered challenge_manager route")
+    print("Entered challenge_manager route")
     challenges = Challenge.query.all()
     csrf_form = CsrfProtectForm()
     return render_template('admin/challenge_manager.html', challenges=challenges, form=csrf_form)
@@ -1100,7 +1127,7 @@ def submit_flag_api():
     if not flag or not flag_type or not host_id:
         return jsonify({'error': 'Missing required parameters'}), 400
 
-    logging.info(f"Received flag: {flag}, host_id: {host_id}, flag_type: {flag_type}")
+    print(f"Received flag: {flag}, host_id: {host_id}, flag_type: {flag_type}")
     try:
         flag_record = Flag.query.filter_by(host_id=host_id, type=flag_type).first()
     except Exception as e:
@@ -1158,7 +1185,7 @@ def submit_challenge_flag_api():
     if not flag or not challenge_id:
         return jsonify({'error': 'Missing required parameters'}), 400
 
-    logging.info(f"Received challenge flag: {flag}, challenge_id: {challenge_id}")
+    print(f"Received challenge flag: {flag}, challenge_id: {challenge_id}")
     try:
         challenge = Challenge.query.get(challenge_id)
         if not challenge:
@@ -1234,7 +1261,7 @@ def quiz_results(quiz_id):
 def hacking_labs():
     # Fetch labs and their hosts from the database
     labs = Lab.query.options(joinedload(Lab.hosts).joinedload(Host.flags)).all()
-    logging.info(f"Labs: {labs} host: {labs[0].hosts} flags: {labs[0].hosts[0].flags}")
+    print(f"Labs: {labs} host: {labs[0].hosts} flags: {labs[0].hosts[0].flags}")
     # Check if the user is an admin
     is_admin = current_user.role == 'admin'
 
@@ -1293,8 +1320,8 @@ def host_editor(host_id=None):
                     db.session.add(host)
                 
                 host.lab_id = form.lab_id.data
-                logging.info(f"Debug: Lab ID being set: {host.lab_id}")
-                logging.info(f"Debug: Full form data: {form.data}")
+                print(f"Debug: Lab ID being set: {host.lab_id}")
+                print(f"Debug: Full form data: {form.data}")
                 db.session.commit()
                 return jsonify({'success': True, 'message': 'Host saved successfully.'})
             except Exception as e:
@@ -1316,15 +1343,15 @@ def host_editor(host_id=None):
 @bp.route('/ctf/host_details/<int:host_id>')
 @login_required
 def host_details(host_id):
-    logging.info(f"Accessing host details for host_id: {host_id}")
+    print(f"Accessing host details for host_id: {host_id}")
     auth_status = check_azure_authentication()
 
     host = Host.query.get_or_404(host_id)
     vm_status = None
     if host.azure_vm_id:
-        logging.info(f"Azure VM ID associated with this host: {host.azure_vm_id}")
+        print(f"Azure VM ID associated with this host: {host.azure_vm_id}")
     else:
-        logging.info("No Azure VM ID associated with this host")
+        print("No Azure VM ID associated with this host")
     return render_template('site/host_details.html', host=host, vm_status=vm_status, auth_status=auth_status)
 
 

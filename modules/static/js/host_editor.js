@@ -28,12 +28,12 @@ document.addEventListener('DOMContentLoaded', function() {
     form.addEventListener('submit', function(e) {
         e.preventDefault();
 
-        const formData = new FormData(form);
-        const csrfToken = document.querySelector('input[name="csrf_token"]').value;
-
         // Log form values when submitting
         console.log('Submitting form with values:');
         logFormData();
+
+        const formData = new FormData(form);
+        const csrfToken = document.querySelector('input[name="csrf_token"]').value;
 
         fetch(form.action, {
             method: 'POST',
