@@ -960,11 +960,15 @@ def lab_editor(lab_id=None):
                 lab.name = form.name.data
                 lab.image = form.image.data
                 lab.description = form.description.data
+                lab.vpn_server = form.vpn_server.data
+                lab.vpn_file = form.vpn_file.data
             else:
                 lab = Lab(
                     name=form.name.data,
                     image=form.image.data,
                     description=form.description.data,
+                    vpn_server=form.vpn_server.data,
+                    vpn_file=form.vpn_file.data,
                     date_created=datetime.utcnow()
                 )
                 db.session.add(lab)
@@ -981,6 +985,8 @@ def lab_editor(lab_id=None):
         form.name.data = lab.name
         form.image.data = lab.image
         form.description.data = lab.description
+        form.vpn_server.data = lab.vpn_server
+        form.vpn_file.data = lab.vpn_file
 
     return render_template('admin/lab_editor.html', form=form, lab=lab)
 
