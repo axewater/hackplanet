@@ -1355,65 +1355,6 @@ def host_details(host_id):
     return render_template('site/host_details.html', host=host, vm_status=vm_status, auth_status=auth_status)
 
 
-@bp.route('/manage_vm', methods=['POST'])
-@login_required
-def manage_vm():
-    print(f"Received request to manage VM: {request.form}")
-    resource_group = request.form['resource_group']
-    vm_name = request.form['vm_name']
-    action = request.form['action']
-    subscription_id = Config.AZURE_SUBSCRIPTION_ID
-    vm_id = f"/subscriptions/{subscription_id}/resourceGroups/{resource_group}/providers/Microsoft.Compute/virtualMachines/{vm_name}"
-    try:
-        output = ""
-        if action == 'status':
-            print(f"Executing VM status command for {vm_id}")
-            result = subprocess.run([AZ_CLI_PATH, 'vm', 'get-instance-view', '--ids', vm_id, '--query', '{name:name, powerState:instanceView.statuses[1].displayStatus, osType:storageProfile.osDisk.osType}'], capture_output=True, text=True)
-            if result.returncode == 0:
-                vm_info = json.loads(result.stdout)
-                output = f"VM Name: {vm_info['name']}, Power State: {vm_info['powerState']}, OS Type: {vm_info['osType']}"
-                
-                # Update the database with the VM status
-                host = Host.query.filter_by(azure_vm_id=vm_id).first()
-                if host:
-                    host.status = vm_info['powerState'].lower() == 'vm running'
-                    db.session.commit()
-            else:
-                raise Exception(f"Error fetching VM status: {result.stderr}")
-        elif action == 'start':
-            print(f"Executing VM start command for {vm_id}")
-            result = subprocess.run([AZ_CLI_PATH, 'vm', 'start', '--ids', vm_id], capture_output=True, text=True)
-            if result.returncode == 0:
-                host = Host.query.filter_by(azure_vm_id=vm_id).first()
-                if host:
-                    host.status = True
-                    db.session.commit()
-        elif action == 'stop':
-            print(f"Executing VM stop command for {vm_id}")
-            result = subprocess.run([AZ_CLI_PATH, 'vm', 'stop', '--ids', vm_id], capture_output=True, text=True)
-            if result.returncode == 0:
-                host = Host.query.filter_by(azure_vm_id=vm_id).first()
-                if host:
-                    host.status = False
-                    db.session.commit()
-        else:
-            print(f"Invalid action received: {action}")
-            raise ValueError("Invalid action")
-        
-        if result.returncode != 0:
-            if action == 'status':
-                raise Exception(f"Error fetching VM status: {result.stderr}")
-            else:
-                raise Exception(f"Error performing {action} on VM: {result.stderr}")
-        
-        if not output:
-            output = f"Successfully performed {action} on VM: {vm_id}"
-        print(output)
-        return jsonify({"status": "success", "message": output})
-    except Exception as e:
-        print(f"Detailed error while managing VM: {e}")
-        print(f"Error managing VM: {e}")
-        return jsonify({"status": "error", "message": str(e)}), 400
 
 @bp.route('/admin/delete_host/<int:host_id>', methods=['POST'])
 @login_required
@@ -1542,3 +1483,64 @@ def delete_question(question_id):
     else:
         flash('Question not found.', 'error')
         return redirect(url_for('main.quiz_manager'))
+    
+    
+@bp.route('/manage_vm', methods=['POST'])
+@login_required
+def manage_vm():
+    print(f"Received request to manage VM: {request.form}")
+    resource_group = request.form['resource_group']
+    vm_name = request.form['vm_name']
+    action = request.form['action']
+    subscription_id = Config.AZURE_SUBSCRIPTION_ID
+    vm_id = f"/subscriptions/{subscription_id}/resourceGroups/{resource_group}/providers/Microsoft.Compute/virtualMachines/{vm_name}"
+    try:
+        output = ""
+        if action == 'status':
+            print(f"Executing VM status command for {vm_id}")
+            result = subprocess.run([AZ_CLI_PATH, 'vm', 'get-instance-view', '--ids', vm_id, '--query', '{name:name, powerState:instanceView.statuses[1].displayStatus, osType:storageProfile.osDisk.osType}'], capture_output=True, text=True)
+            if result.returncode == 0:
+                vm_info = json.loads(result.stdout)
+                output = f"VM Name: {vm_info['name']}, Power State: {vm_info['powerState']}, OS Type: {vm_info['osType']}"
+                
+                # Update the database with the VM status
+                host = Host.query.filter_by(azure_vm_id=vm_id).first()
+                if host:
+                    host.status = vm_info['powerState'].lower() == 'vm running'
+                    db.session.commit()
+            else:
+                raise Exception(f"Error fetching VM status: {result.stderr}")
+        elif action == 'start':
+            print(f"Executing VM start command for {vm_id}")
+            result = subprocess.run([AZ_CLI_PATH, 'vm', 'start', '--ids', vm_id], capture_output=True, text=True)
+            if result.returncode == 0:
+                host = Host.query.filter_by(azure_vm_id=vm_id).first()
+                if host:
+                    host.status = True
+                    db.session.commit()
+        elif action == 'stop':
+            print(f"Executing VM stop command for {vm_id}")
+            result = subprocess.run([AZ_CLI_PATH, 'vm', 'stop', '--ids', vm_id], capture_output=True, text=True)
+            if result.returncode == 0:
+                host = Host.query.filter_by(azure_vm_id=vm_id).first()
+                if host:
+                    host.status = False
+                    db.session.commit()
+        else:
+            print(f"Invalid action received: {action}")
+            raise ValueError("Invalid action")
+        
+        if result.returncode != 0:
+            if action == 'status':
+                raise Exception(f"Error fetching VM status: {result.stderr}")
+            else:
+                raise Exception(f"Error performing {action} on VM: {result.stderr}")
+        
+        if not output:
+            output = f"Successfully performed {action} on VM: {vm_id}"
+        print(output)
+        return jsonify({"status": "success", "message": output})
+    except Exception as e:
+        print(f"Detailed error while managing VM: {e}")
+        print(f"Error managing VM: {e}")
+        return jsonify({"status": "error", "message": str(e)}), 400

@@ -150,6 +150,7 @@ class Lab(db.Model):
     hosts = relationship('Host', backref='lab', lazy=True)
     vpn_file = db.Column(db.String(256), nullable=True)
     vpn_server = db.Column(db.String(256), nullable=True)  # New field for VPN server
+    vpn_status = db.Column(db.Boolean, default=False)  # New field for VPN status
 
     def __repr__(self):
         return f"<Lab id={self.id}, name={self.name}, date_created={self.date_created}>"
