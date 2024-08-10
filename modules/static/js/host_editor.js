@@ -1,12 +1,39 @@
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('host-form');
     const feedbackMessage = document.getElementById('feedback-message');
+    const labIdSelect = document.getElementById('lab_id');
+
+    // Add event listener for lab_id changes
+    labIdSelect.addEventListener('change', function() {
+        console.log('Lab ID changed:', this.value);
+        // Add this line to update a hidden input field with the selected lab_id
+        document.getElementById('selected_lab_id').value = this.value;
+    });
+
+    // Add this function to log all form data
+    function logFormData() {
+        const formData = new FormData(form);
+        console.log('Current form values:');
+        for (let [key, value] of formData.entries()) {
+            console.log(key + ':', value);
+        }
+    }
+
+    // Log form data when the page loads
+    logFormData();
+
+    // Log form data when any input changes
+    form.addEventListener('change', logFormData);
 
     form.addEventListener('submit', function(e) {
         e.preventDefault();
 
         const formData = new FormData(form);
         const csrfToken = document.querySelector('input[name="csrf_token"]').value;
+
+        // Log form values when submitting
+        console.log('Submitting form with values:');
+        logFormData();
 
         fetch(form.action, {
             method: 'POST',

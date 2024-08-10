@@ -1288,6 +1288,7 @@ def host_editor(host_id=None):
                 
                 host.lab_id = form.lab_id.data
                 logging.info(f"Debug: Lab ID being set: {host.lab_id}")
+                logging.info(f"Debug: Full form data: {form.data}")
                 db.session.commit()
                 return jsonify({'success': True, 'message': 'Host saved successfully.'})
             except Exception as e:
@@ -1301,6 +1302,8 @@ def host_editor(host_id=None):
     if host:
         form = HostForm(obj=host)
         form.lab_id.data = host.lab_id
+    else:
+        form.lab_id.data = labs[0].id if labs else None  # Set a default lab if available
     
     return render_template('admin/host_editor.html', form=form, host=host, labs=labs)
 
