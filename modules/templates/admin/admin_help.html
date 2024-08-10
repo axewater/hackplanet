@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+    <div class="glass-panel">
+        <h1>Administrator Help</h1>
+        
+        <h2>Initial Setup</h2>
+        <ol>
+            <li>Ensure all environment variables are set correctly in your configuration file or deployment environment.</li>
+            <li>Run database migrations to set up the required tables.</li>
+            <li>Create an admin user account if not already done.</li>
+            <li>Configure email settings for user registration and password reset functionality.</li>
+        </ol>
+
+        <h2>Admin Dashboard Overview</h2>
+        <ul>
+            <li><strong>Server Settings:</strong> Configure global application settings.</li>
+            <li><strong>Server Info:</strong> View system information and current configuration.</li>
+            <li><strong>User Manager:</strong> Manage user accounts, roles, and permissions.</li>
+            <li><strong>Whitelist:</strong> Manage email addresses allowed to register.</li>
+            <li><strong>Invite System:</strong> Control user invitations.</li>
+            <li><strong>Lab Manager:</strong> Create and manage hacking labs.</li>
+            <li><strong>Host Manager:</strong> Manage individual hosts within labs.</li>
+            <li><strong>Challenge Manager:</strong> Create and manage hacking challenges.</li>
+            <li><strong>Quiz Manager:</strong> Create and manage quizzes.</li>
+        </ul>
+
+        <h2>Setting Up a New Lab</h2>
+        <ol>
+            <li>Go to the Lab Manager.</li>
+            <li>Click "Add New Lab".</li>
+            <li>Fill in the lab details including name, description, and any associated files.</li>
+            <li>Save the lab.</li>
+            <li>Use the Host Manager to add hosts to the lab.</li>
+        </ol>
+
+        <h2>Creating a New Challenge</h2>
+        <ol>
+            <li>Navigate to the Challenge Manager.</li>
+            <li>Click "Add New Challenge".</li>
+            <li>Enter the challenge details, including name, description, and flag.</li>
+            <li>Set the point value for the challenge.</li>
+            <li>Save the challenge.</li>
+        </ol>
+
+        <h2>Setting Up a Quiz</h2>
+        <ol>
+            <li>Go to the Quiz Manager.</li>
+            <li>Click "Add New Quiz".</li>
+            <li>Enter the quiz title and description.</li>
+            <li>Set the minimum passing score.</li>
+            <li>After saving the quiz, add questions using the "Add Question" button.</li>
+            <li>For each question, provide the question text, options, correct answer, and point value.</li>
+        </ol>
+
+        <p>For more detailed information or troubleshooting, please refer to the full documentation or contact the system administrator.</p>
+    </div>
+</div>
+{% endblock %}

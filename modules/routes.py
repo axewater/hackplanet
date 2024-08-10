@@ -1464,6 +1464,12 @@ def quiz_editor(quiz_id=None):
 
     return render_template('admin/quiz_editor.html', form=form, quiz=quiz)
 
+@bp.route('/admin/help')
+@login_required
+@admin_required
+def admin_help():
+    return render_template('admin/admin_help.html')
+
 @bp.route('/admin/delete_quiz/<int:quiz_id>', methods=['POST'])
 @login_required
 @admin_required
