@@ -983,7 +983,7 @@ def lab_editor(lab_id=None):
                 
                 db.session.commit()
                 print(f"Lab saved successfully: {lab.id}")
-                return jsonify({'success': True, 'message': 'Lab saved successfully.'})
+                return jsonify({'success': True, 'message': 'Lab saved successfully.', 'lab_id': lab.id})
             except Exception as e:
                 db.session.rollback()
                 logging.error(f"Error saving lab: {str(e)}")

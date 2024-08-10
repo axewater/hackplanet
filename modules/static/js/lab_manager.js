@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', function() {
     deleteButtons.forEach(button => {
         button.addEventListener('click', function() {
             const labId = this.dataset.labId;
-            if (confirm('Are you sure you want to delete this lab?')) {
+            if (confirm('Are you sure? Deleting this lab will also delete ALL the hosts associated with it!')) {
                 const csrfToken = document.querySelector('input[name="csrf_token"]').value;
                 fetch(`/admin/delete_lab/${labId}`, {
                     method: 'POST',
