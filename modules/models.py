@@ -171,7 +171,7 @@ class Host(db.Model):
     difficulty = db.Column(db.Integer, nullable=False)
     ip = db.Column(db.String(45), nullable=True)
     status = db.Column(db.Boolean, default=True)
-    flags = relationship('Flag', backref='host', lazy=True)
+    flags = relationship('Flag', backref='host', lazy=True, cascade="all, delete-orphan")
     rating = db.Column(db.Integer, nullable=True)
     release_date = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     hint = db.Column(db.String(1000), nullable=True)
@@ -205,7 +205,7 @@ class Flag(db.Model):
     type = db.Column(db.String(128), nullable=False)
     uuid = db.Column(db.String(36), unique=True, nullable=False, default=str(uuid4()))
     point_value = db.Column(db.Integer, nullable=False)
-    host_id = db.Column(db.Integer, db.ForeignKey('hosts.id'), nullable=False)
+    host_id = db.Column(db.Integer, db.ForeignKey('hosts.id', ondelete='CASCADE'), nullable=False)
 
     def __repr__(self):
         return f"<Flag id={self.id}, type={self.type}, uuid={self.uuid}, point_value={self.point_value}>"

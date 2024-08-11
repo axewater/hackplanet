@@ -22,25 +22,21 @@
             <tr>
               <th scope="col">User</th>
               <th scope="col">Current Invites</th>
-              <th scope="col">Add Invites</th>
+              <th scope="col">Manage Invites</th>
             </tr>
           </thead>
           <tbody>
             {% for user in users %}
             <tr>
               <td>{{ user.name }}</td>
-              <td>{{ user.invite_quota }}</td>
+              <td id="invite-quota-{{ user.user_id }}">{{ user.invite_quota }}</td>
               <td>
-                <form action="{{ url_for('main.manage_invites') }}" method="POST" class="d-flex gap-2">
-             
-                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-
-                  <input type="hidden" name="user_id" value="{{ user.user_id }}">
-                  <div class="flex-grow-1">
-                    <input type="number" name="invites_number" min="1" value="1" class="form-control">
-                  </div>
-                  <button type="submit" class="btn btn-primary">Add</button>
-                </form>
+                <div class="d-flex gap-2 align-items-center">
+                  <button class="btn btn-danger btn-sm" onclick="changeInvites('{{ user.user_id }}', -1)">-</button>
+                  <span id="invite-change-{{ user.user_id }}">0</span>
+                  <button class="btn btn-success btn-sm" onclick="changeInvites('{{ user.user_id }}', 1)">+</button>
+                  <button class="btn btn-primary btn-sm" onclick="saveInvites('{{ user.user_id }}')">Save</button>
+                </div>
               </td>
             </tr>
             {% endfor %}
@@ -48,4 +44,42 @@
         </table>
     </div>
 </div>
+
+<script>
+let inviteChanges = {};
+
+function changeInvites(userId, change) {
+    if (!inviteChanges[userId]) {
+        inviteChanges[userId] = 0;
+    }
+    inviteChanges[userId] += change;
+    document.getElementById(`invite-change-${userId}`).textContent = inviteChanges[userId];
+}
+
+function saveInvites(userId) {
+    const change = inviteChanges[userId] || 0;
+    fetch("{{ url_for('main.update_invites') }}", {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify({ user_id: userId, invite_change: change })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            document.getElementById(`invite-quota-${userId}`).textContent = data.new_quota;
+            inviteChanges[userId] = 0;
+            document.getElementById(`invite-change-${userId}`).textContent = '0';
+        } else {
+            alert('Failed to update invites: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while updating invites.');
+    });
+}
+</script>
 {% endblock %}

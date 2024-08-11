@@ -859,6 +859,24 @@ def manage_invites():
     users = User.query.all()
     return render_template('admin/manage_invites.html', users=users)
 
+@bp.route('/admin/update_invites', methods=['POST'])
+@login_required
+@admin_required
+def update_invites():
+    data = request.json
+    user_id = data.get('user_id')
+    invite_change = data.get('invite_change')
+
+    user = User.query.filter_by(user_id=user_id).first()
+    if not user:
+        return jsonify({'success': False, 'message': 'User not found'}), 404
+
+    new_quota = max(0, user.invite_quota + invite_change)
+    user.invite_quota = new_quota
+    db.session.commit()
+
+    return jsonify({'success': True, 'new_quota': new_quota})
+
 @bp.route('/admin/dashboard')
 @login_required
 @admin_required
@@ -1014,9 +1032,15 @@ def lab_editor(lab_id=None):
 @admin_required
 def lab_manager():
     print("Entered lab_manager route")
-    labs = Lab.query.all()
+    labs = Lab.query.options(joinedload(Lab.hosts).joinedload(Host.flags)).all()
     csrf_form = CsrfProtectForm()
-    return render_template('admin/lab_manager.html', labs=labs, form=csrf_form)
+    
+    labs_without_flags = []
+    for lab in labs:
+        if not any(host.flags for host in lab.hosts):
+            labs_without_flags.append(lab)
+    
+    return render_template('admin/lab_manager.html', labs=labs, form=csrf_form, labs_without_flags=labs_without_flags)
 
 @bp.route('/admin/delete_lab/<int:lab_id>', methods=['POST'])
 @login_required

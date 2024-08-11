@@ -18,6 +18,18 @@
             </a>
         </div>
         <h1>Lab Manager</h1>
+        
+        {% if labs_without_flags %}
+        <div class="alert alert-warning" role="alert">
+            <strong>Warning:</strong> The following labs have no flags defined:
+            <ul>
+                {% for lab in labs_without_flags %}
+                <li>{{ lab.name }} - <a href="{{ url_for('main.flag_manager') }}">Define flags</a></li>
+                {% endfor %}
+            </ul>
+            Users won't be able to start using these labs until flags are defined.
+        </div>
+        {% endif %}
         <table class="table">
             <thead>
                 <tr>
@@ -48,8 +60,18 @@
                 {% endfor %}
             </tbody>
         </table>
+
+<div class="text-center mt-4">
+    <a href="{{ url_for('main.host_manager') }}" class="btn btn-success btn-lg">Host Manager</a>
+    <a href="{{ url_for('main.flag_manager') }}" class="btn btn-primary btn-lg">Flag Manager</a>
+
+    
+</div>
+
     </div>
 </div>
 {{ form.csrf_token }}
 <script src="{{ url_for('static', filename='js/lab_manager.js') }}"></script>
+
+
 {% endblock %}
