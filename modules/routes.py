@@ -1118,7 +1118,6 @@ def submit_challenge_flag():
         else:
             flash('Incorrect flag. Try again.', 'error')
     return redirect(url_for('main.challenges'))
-
 @bp.route('/admin/lab_editor/<int:lab_id>', methods=['GET', 'POST'])
 @bp.route('/admin/lab_editor', methods=['GET', 'POST'])
 @login_required
@@ -1154,6 +1153,10 @@ def lab_editor(lab_id=None):
                     db.session.add(lab)
                     print("Creating new lab")
                 
+                # Update the image field with the selected filename
+                if form.image.data:
+                    lab.image = form.image.data
+
                 db.session.commit()
                 print(f"Lab saved successfully: {lab.id}")
                 return jsonify({'success': True, 'message': 'Lab saved successfully.', 'lab_id': lab.id})
@@ -1483,8 +1486,6 @@ def user_progress():
                            obtained_flags=obtained_flags,
                            total_score=total_score)
 
-
-
 @bp.route('/admin/host_manager', methods=['GET'])
 @login_required
 @admin_required
@@ -1513,6 +1514,11 @@ def host_editor(host_id=None):
                     db.session.add(host)
                 
                 host.lab_id = form.lab_id.data
+                
+                # Update the image_url field with the selected filename
+                if form.image_url.data:
+                    host.image_url = form.image_url.data
+
                 print(f"Debug: Lab ID being set: {host.lab_id}")
                 print(f"Debug: Full form data: {form.data}")
                 db.session.commit()
@@ -1531,7 +1537,15 @@ def host_editor(host_id=None):
     else:
         form.lab_id.data = labs[0].id if labs else None  # Set a default lab if available
     
+    # Populate the image choices
+    form.image_url.choices = [('', 'Select an image')] + [(f, f) for f in get_image_choices()]
+    
     return render_template('admin/host_editor.html', form=form, host=host, labs=labs)
+
+def get_image_choices():
+    image_folder = os.path.join(current_app.config['UPLOAD_FOLDER'], 'images', 'hosts')
+    image_files = [f for f in os.listdir(image_folder) if f.lower().endswith(('.png', '.jpg', '.jpeg', '.gif'))]
+    return image_files
 
 @bp.route('/ctf/host_details/<int:host_id>')
 @login_required

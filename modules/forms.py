@@ -1,22 +1,32 @@
 # forms.py
-import re
+import re, os
 from flask_wtf import FlaskForm
 from wtforms import StringField, IntegerField, SelectField, BooleanField, SubmitField, PasswordField, TextAreaField, RadioField, FloatField, DateTimeField, ValidationError, HiddenField
 from flask_wtf.file import FileField, FileAllowed, FileRequired
 from wtforms.validators import DataRequired, Length, Optional, NumberRange, Regexp, URL,Email, EqualTo
 from wtforms.widgets import TextInput
 from wtforms_sqlalchemy.fields import QuerySelectMultipleField
+from flask import current_app
 from wtforms.widgets import ListWidget, CheckboxInput, TextArea
 from wtforms.fields import URLField, DateField
 from urllib.parse import urlparse
 
 class LabForm(FlaskForm):
     name = StringField('Lab Name', validators=[DataRequired(), Length(max=128)])
-    image = StringField('Image', validators=[Optional(), Length(max=256)])
+    image = SelectField('Image', validators=[Optional()], choices=[])
     description = TextAreaField('Description', validators=[Optional(), Length(max=5000)])
     vpn_server = StringField('VPN Server', validators=[Optional(), Length(max=256)])
     vpn_file = StringField('VPN File', validators=[Optional(), Length(max=256)])
     submit = SubmitField('Save Lab')
+
+    def __init__(self, *args, **kwargs):
+        super(LabForm, self).__init__(*args, **kwargs)
+        self.image.choices = self.get_image_choices()
+
+    def get_image_choices(self):
+        image_folder = os.path.join(current_app.config['UPLOAD_FOLDER'], 'images', 'labs')
+        image_files = [f for f in os.listdir(image_folder) if f.lower().endswith(('.png', '.jpg', '.jpeg', '.gif'))]
+        return [('', 'Select an image')] + [(f, f) for f in image_files]
     
 class LoginForm(FlaskForm):
     username = StringField('Username', validators=[DataRequired()])
@@ -159,7 +169,7 @@ class HostForm(FlaskForm):
     release_date = DateField('Release Date', validators=[Optional()])
     hint = TextAreaField('Hint', validators=[Optional(), Length(max=1000)])
     lab_id = HiddenField('Lab ID')
-    image_url = StringField('Image Filename', validators=[Optional(), Length(max=256)])
+    image_url = SelectField('Image', validators=[Optional()], choices=[])
     azure_vm_id = StringField('Azure VM ID', validators=[Optional(), Length(max=256)])
     submit = SubmitField('Save Host')
 

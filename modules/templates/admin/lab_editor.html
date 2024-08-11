@@ -26,7 +26,7 @@
                 <div class="mb-3">
                     {{ field.label(class="form-label") }}
                     {% if field.name == 'image' %}
-                        {{ field(class="form-control", placeholder="Enter image filename or URL") }}
+                        {{ field(class="form-select") }}
                     {% else %}
                         {{ field(class="form-control") }}
                     {% endif %}
