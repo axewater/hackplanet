@@ -53,7 +53,7 @@
 
                             <h3>{{ host.name | upper }} </h3>
                             <div class="host-image-container">
-                                <img src="{{ '/static/library/images/' + host.image_url }}" alt="{{ host.name }}" class="host-image">
+                                <img src="{{ '/static/library/images/hosts/' + host.image_url }}" alt="{{ host.name }}" class="host-image">
                             </div>
                             <p>IP Address: {{ host.ip }}</p>
                             <p>Difficulty: {{ host.difficulty }} {% if host.difficulty == 1 %}😊{% elif host.difficulty == 2 %}🙂{% elif host.difficulty == 3 %}😐{% elif host.difficulty == 4 %}😕{% elif host.difficulty == 5 %}😟{% elif host.difficulty == 6 %}😦{% elif host.difficulty == 7 %}😧{% elif host.difficulty == 8 %}😨{% elif host.difficulty == 9 %}😰{% elif host.difficulty == 10 %}😱{% endif %}</p>

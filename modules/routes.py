@@ -886,11 +886,11 @@ def admin_dashboard():
     pass
     return render_template('admin/admin_dashboard.html')
 
-@bp.route('/admin/media_manager')
+@bp.route('/admin/file_manager')
 @login_required
 @admin_required
-def media_manager():
-    return render_template('admin/media_manager.html')
+def file_manager():
+    return render_template('admin/file_manager.html')
 
 @bp.route('/admin/media/list')
 @login_required
