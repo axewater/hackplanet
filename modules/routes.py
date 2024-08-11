@@ -1097,27 +1097,8 @@ def challenges():
     form = ChallengeSubmissionForm()
     return render_template('site/challenges.html', challenges=challenges, form=form)
 
-@bp.route('/ctf/submit_challenge_flag', methods=['POST'])
-@login_required
-def submit_challenge_flag():
-    form = ChallengeSubmissionForm()
-    if form.validate_on_submit():
-        challenge = Challenge.query.get(form.challenge_id.data)
-        if challenge and challenge.flag_uuid == form.flag.data:
-            # Check if the user has already completed this challenge
-            if not ChallengesObtained.query.filter_by(user_id=current_user.id, challenge_id=challenge.id).first():
-                # Add points to user's score
-                current_user.score_total += challenge.point_value
-                # Mark challenge as completed
-                completed_challenge = ChallengesObtained(user_id=current_user.id, challenge_id=challenge.id)
-                db.session.add(completed_challenge)
-                db.session.commit()
-                flash('Congratulations! You solved the challenge.', 'success')
-            else:
-                flash('You have already completed this challenge.', 'info')
-        else:
-            flash('Incorrect flag. Try again.', 'error')
-    return redirect(url_for('main.challenges'))
+
+
 @bp.route('/admin/lab_editor/<int:lab_id>', methods=['GET', 'POST'])
 @bp.route('/admin/lab_editor', methods=['GET', 'POST'])
 @login_required
@@ -1377,13 +1358,51 @@ def submit_flag():
             current_user.score_total += flag.point_value
             db.session.commit()
 
-            return jsonify({'success': True, 'message': 'Flag submitted successfully!'}), 200
+            return jsonify({'success': True, 'message': 'Flag submitted successfully!', 'new_score': current_user.score_total}), 200
         else:
             return jsonify({'success': False, 'message': 'Incorrect flag'}), 400
 
     except Exception as e:
         db.session.rollback()
         print(f"Error submitting flag: {str(e)}")
+        return jsonify({'success': False, 'message': 'An error occurred while submitting the flag'}), 500
+
+@bp.route('/submit_challenge_flag', methods=['POST'])
+@login_required
+def submit_challenge_flag():
+    data = request.json
+    challenge_id = data.get('challenge_id')
+    submitted_flag = data.get('flag')
+
+    if not all([challenge_id, submitted_flag]):
+        return jsonify({'success': False, 'message': 'Missing required parameters'}), 400
+
+    try:
+        challenge = Challenge.query.get(challenge_id)
+        if not challenge:
+            return jsonify({'success': False, 'message': 'Invalid challenge'}), 400
+
+        if challenge.flag_uuid == submitted_flag:
+            # Check if the user has already completed this challenge
+            existing_challenge = ChallengesObtained.query.filter_by(user_id=current_user.id, challenge_id=challenge.id).first()
+            if existing_challenge:
+                return jsonify({'success': False, 'message': 'You have already completed this challenge'}), 400
+
+            # Create a new ChallengesObtained record
+            new_challenge_obtained = ChallengesObtained(user_id=current_user.id, challenge_id=challenge.id)
+            db.session.add(new_challenge_obtained)
+
+            # Update user's score
+            current_user.score_total += challenge.point_value
+            db.session.commit()
+
+            return jsonify({'success': True, 'message': 'Challenge completed successfully!', 'new_score': current_user.score_total}), 200
+        else:
+            return jsonify({'success': False, 'message': 'Incorrect flag'}), 400
+
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error submitting challenge flag: {str(e)}")
         return jsonify({'success': False, 'message': 'An error occurred while submitting the flag'}), 500
 
 @bp.route('/ctf/hacking_labs')

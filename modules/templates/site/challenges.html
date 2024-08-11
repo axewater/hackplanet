@@ -11,14 +11,8 @@
 </div>
 {% endif %}
 {% endwith %}
-<script src="{{ url_for('static', filename='js/flag_submission.js') }}"></script>
+<script src="{{ url_for('static', filename='js/challenge_flag_submission.js') }}"></script>
 <div class="container">
-    <div id="flagModal" class="modal">
-        <div class="modal-content">
-            <span id="modalEmoticon" class="modal-emoticon"></span>
-            <p id="modalMessage"></p>
-        </div>
-    </div>
     <div class="glass-panel">
         <div class="labs_title">
             <h1>Challenges</h1>
@@ -38,9 +32,13 @@
                         <p class="card-text">Category: {{ challenge.category }}</p>
                         <p class="card-text">Points: {{ challenge.point_value }}</p>
                         <p class="card-text">{{ challenge.description }}</p>
-                        <div class="flag-input-container">
-                            <input type="text" id="challenge-flag-{{ challenge.id }}" placeholder="Enter flag" class="flag-input">
-                            <button type="button" class="btn btn-primary" onclick="submitFlag('{{ challenge.id }}', 'challenge')">Submit</button>
+                        <form id="flag-submission-form" data-challenge-id="{{ challenge.id }}">
+                            <div class="flag-input-container">
+                                <input type="text" id="flag-input" placeholder="Enter flag" class="flag-input">
+                                <button type="submit" class="btn btn-primary">Submit</button>
+                            </div>
+                        </form>
+                        <div id="result-message" style="display: none;"></div>
                         </div>
                     </div>
                 </div>
