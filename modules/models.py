@@ -152,6 +152,10 @@ class Lab(db.Model):
     vpn_server = db.Column(db.String(256), nullable=True)  # New field for VPN server
     vpn_status = db.Column(db.Boolean, default=False)  # New field for VPN status
 
+    @property
+    def host_count(self):
+        return len(self.hosts)
+
     def __repr__(self):
         return f"<Lab id={self.id}, name={self.name}, date_created={self.date_created}>"
 

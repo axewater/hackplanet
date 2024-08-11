@@ -24,6 +24,7 @@
                     <th>Name</th>
                     <th>Image</th>
                     <th>Description</th>
+                    <th>Hosts</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -33,6 +34,11 @@
                     <td>{{ lab.name }}</td>
                     <td>{{ lab.image }}</td>
                     <td>{{ lab.description }}</td>
+                    <td>
+                        <span class="badge {% if lab.host_count == 0 %}bg-danger{% else %}bg-primary{% endif %}">
+                            {{ lab.host_count }}
+                        </span>
+                    </td>
                     <td>
                         <button class="btn btn-primary edit-lab" data-lab-id="{{ lab.id }}">Edit</button>
                         <button class="btn btn-danger delete-lab" data-lab-id="{{ lab.id }}">Delete</button>
