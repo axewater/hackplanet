@@ -1,8 +1,6 @@
-<!-- /modules/templates/site/hacking_labs.html -->
 {% extends 'base.html' %}
 
 {% block content %}
-<link rel="stylesheet" href="/static/css/custom.css">
 {% with messages = get_flashed_messages() %}
 {% if messages %}
 <div>
@@ -12,82 +10,53 @@
 </div>
 {% endif %}
 {% endwith %}
-<script src="{{ url_for('static', filename='js/flag_submission.js') }}"></script>
+
 <div class="container">
-                    <!-- Modal -->
-                    <div id="flagModal" class="modal">
-                        <div class="modal-content">
-                            <span id="modalEmoticon" class="modal-emoticon"></span>
-                            <p id="modalMessage"></p>
-                        </div>
-                    </div>
     <div class="glass-panel">
         <div class="labs_title">
-            <h1>HACKPLANET.EU LABS</h1>
+            <h1>HackPlanet.EU Training Grounds</h1>
         </div>
 
-    {% for lab in labs %}
-    <div class="lab">
-
-        <div class="labschip">
-
-            <h2>{{ lab.name }}</h2>
-            {% if lab.image %}
-            <img src="{{ url_for('static', filename='library/images/labs/' + lab.image) }}" alt="{{ lab.name }}" class="lab-image">
-            {% endif %}
-            {% if lab.vpn_file %}
-            <a href="{{ '/static/library/labs/' + lab.vpn_file }}" class="download-button btn btn-primary">Download Lab Access</a>
-            {% endif %}
-            <p>{{ lab.description }}</p>
-        </div>
-
-        <div class="hosts">
-
-            {% for host in lab.hosts %}
-            <div class="host">
-
-                <h3>{{ host.name }} {{ host.id }}</h3>
-                <div class="host-image-container">
-                    <img src="{{ '/static/library/images/' + host.image_url }}" alt="{{ host.name }}" class="host-image">
-                </div>
-                <p>IP Address: {{ host.ip }}</p>
-                <p>Difficulty: {{ host.difficulty }} {% if host.difficulty == 1 %}😊{% elif host.difficulty == 2 %}🙂{% elif host.difficulty == 3 %}😐{% elif host.difficulty == 4 %}😕{% elif host.difficulty == 5 %}😟{% elif host.difficulty == 6 %}😦{% elif host.difficulty == 7 %}😧{% elif host.difficulty == 8 %}😨{% elif host.difficulty == 9 %}😰{% elif host.difficulty == 10 %}😱{% endif %}</p>
-                <p>Status: <span class="status-indicator {{ 'online' if host.status else 'offline' }}">{{ 'Online' if host.status else 'Offline' }}</span></p>
-                <p>Rating: {% for _ in range(host.rating) %}★{% endfor %}{% for _ in range(5 - host.rating) %}☆{% endfor %}</p>
-
+        {% if no_labs %}
+            <div class="alert alert-warning" role="alert">
+                There are no labs defined. Please ask your administrator to define new labs.
                 {% if is_admin %}
-                <div class="flags">
-                    <p style="font-size: 0.2em;">User Flag: {{ host.flags|selectattr('type', '==', 'user')|map(attribute='uuid')|first }}</p>
-                    <p style="font-size: 0.2em;">Root Flag: {{ host.flags|selectattr('type', '==', 'root')|map(attribute='uuid')|first }}</p>
-                </div>
+                    <a href="{{ url_for('main.lab_manager') }}" class="btn btn-primary">Go to Lab Manager</a>
                 {% endif %}
-
-                <div class="host-inputarea">
-                    {% if host.name != 'kalismurf' %}
-                    <div class="flag-input-container">
-                        <input type="text" id="user-flag-{{ host.id }}" placeholder="Enter User Flag" class="flag-input">
-                        <button type="button" class="btn btn-success" onclick="submitFlag('{{ host.id }}', 'user')">Submit</button>
-                    </div>
-                    <div class="flag-input-container">
-                        <input type="text" id="root-flag-{{ host.id }}" placeholder="Enter Root Flag" class="flag-input">
-                        <button type="button" class="btn btn-danger" onclick="submitFlag('{{ host.id }}', 'root')">Submit</button>
-                    </div>
-                    {% else %}
-                    <div class="kalismurf-credentials">
-                        <p>username : kali</p>
-                        <p>password : KaliLinux2024!</p>
-                    </div>
+            </div>
+        {% else %}
+            {% for lab in labs %}
+            <div class="lab">
+                <div class="labschip">
+                    <h2>{{ lab.name }}</h2>
+                    {% if lab.image %}
+                    <img src="{{ url_for('static', filename='library/images/labs/' + lab.image) }}" alt="{{ lab.name }}" class="lab-image">
                     {% endif %}
-                    
-                    <a href="{{ url_for('main.host_details', host_id=host.id) }}" class="btn btn-info" style="margin-top: 10px;">Host Details</a>                </div>
+                    {% if lab.vpn_file %}
+                    <a href="{{ '/static/library/labs/' + lab.vpn_file }}" class="download-button btn btn-primary">Download Lab Access</a>
+                    {% endif %}
+                    <p>{{ lab.description }}</p>
+                </div>
+
+                <div class="hosts">
+                    {% if lab in labs_without_hosts %}
+                        <div class="alert alert-warning" role="alert">
+                            There are no hosts defined for this lab.
+                            {% if is_admin %}
+                                <a href="{{ url_for('main.host_editor') }}" class="btn btn-primary">Add Host</a>
+                            {% endif %}
+                        </div>
+                    {% else %}
+                        {% for host in lab.hosts %}
+                        <div class="host">
+                            <!-- Host details here -->
+                        </div>
+                        {% endfor %}
+                    {% endif %}
+                </div>
             </div>
             {% endfor %}
-        </div>
- 
+        {% endif %}
     </div>
-    {% endfor %}
 </div>
-
-
-
 {% endblock %}

@@ -1261,19 +1261,31 @@ def quiz_results(quiz_id):
 def hacking_labs():
     # Fetch labs and their hosts from the database
     labs = Lab.query.options(joinedload(Lab.hosts).joinedload(Host.flags)).all()
-    print(f"Labs: {labs} host: {labs[0].hosts} flags: {labs[0].hosts[0].flags}")
+    
     # Check if the user is an admin
-    is_admin = current_user.role == 'admin'
+    is_admin = current_user.is_authenticated and current_user.role == 'admin'
 
-    # Fetch the latest status for each host
+    # Initialize flags
+    no_labs = len(labs) == 0
+    labs_without_hosts = []
+
     for lab in labs:
-        for host in lab.hosts:
-            host.status = Host.query.get(host.id).status
+        if len(lab.hosts) == 0:
+            labs_without_hosts.append(lab)
+        else:
+            # Fetch the latest status for each host
+            for host in lab.hosts:
+                host.status = Host.query.get(host.id).status
 
     # Instantiate the FlagSubmissionForm
     form = FlagSubmissionForm()
 
-    return render_template('site/hacking_labs.html', labs=labs, is_admin=is_admin, form=form)
+    return render_template('site/hacking_labs.html', 
+                           labs=labs, 
+                           is_admin=is_admin, 
+                           form=form, 
+                           no_labs=no_labs, 
+                           labs_without_hosts=labs_without_hosts)
 
 @bp.route('/ctf/user_progress')
 @login_required
