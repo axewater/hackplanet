@@ -50,13 +50,13 @@
             <div class="col-4 d-flex align-items-stretch">
                 <a href="{{ url_for('main.whitelist') }}" class="btn btn-dark dashboard-button">
                     <i class="fas fa-user-shield dashboard-icon"></i>
-                    Whitelist
+                    Whitelist manager
                 </a>
             </div>
             <div class="col-4 d-flex align-items-stretch">
                 <a href="{{ url_for('main.manage_invites') }}" class="btn btn-green dashboard-button">
                     <i class="fas fa-envelope-open-text dashboard-icon"></i>
-                    Invite System
+                    Invite Manager
                 </a>
             </div>
 
@@ -85,7 +85,12 @@
                     Quiz Manager
                 </a>
             </div>
-
+            <div class="col-3 d-flex align-items-stretch">
+                <a href="{{ url_for('main.flag_manager') }}" class="btn btn-primary dashboard-button">
+                    <i class="fas fa-flag dashboard-icon"></i>
+                    Flag Manager
+                </a>
+            </div>
             {% if enable_newsletter %}
             <div class="col-12 d-flex align-items-stretch">
                 <a href="{{ url_for('main.newsletter') }}" class="btn btn-dark dashboard-button">

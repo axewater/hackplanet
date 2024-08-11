@@ -178,3 +178,16 @@ class QuestionForm(FlaskForm):
     correct_answer = SelectField('Correct Answer', choices=[('A', 'A'), ('B', 'B'), ('C', 'C'), ('D', 'D')], validators=[DataRequired()])
     points = IntegerField('Points', validators=[DataRequired(), NumberRange(min=1)])
     submit = SubmitField('Save Question')
+    
+from modules.models import Host
+
+class FlagForm(FlaskForm):
+    type = StringField('Flag Type', validators=[DataRequired(), Length(max=128)])
+    uuid = StringField('Flag UUID', validators=[DataRequired(), Length(max=36)])
+    point_value = IntegerField('Point Value', validators=[DataRequired(), NumberRange(min=1)])
+    host_id = SelectField('Host', coerce=int, validators=[DataRequired()])
+    submit = SubmitField('Save Flag')
+
+    def __init__(self, *args, **kwargs):
+        super(FlagForm, self).__init__(*args, **kwargs)
+        self.host_id.choices = [(h.id, h.name) for h in Host.query.all()]

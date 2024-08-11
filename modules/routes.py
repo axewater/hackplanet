@@ -37,7 +37,7 @@ from modules.forms import (
     UserPasswordForm, UserDetailForm, EditProfileForm, NewsletterForm, WhitelistForm, EditUserForm, ChallengeForm,
     UserManagementForm, CsrfProtectForm, LoginForm, ResetPasswordRequestForm, RegistrationForm, HostForm,
     CreateUserForm, UserPreferencesForm, InviteForm, CsrfForm, LabForm, FlagSubmissionForm, ChallengeSubmissionForm,
-    QuizForm, QuestionForm
+    QuizForm, QuestionForm, FlagForm
 )
 
 from modules.models import (
@@ -51,6 +51,8 @@ from modules.azure_utils import get_vm_status, check_azure_authentication
 
 
 bp = Blueprint('main', __name__)
+
+
 s = URLSafeTimedSerializer('YMecr3tK?IzzsSa@e!Zithpze') 
 AZ_CLI_PATH = r"C:\Program Files (x86)\Microsoft SDKs\Azure\CLI2\wbin\az.cmd"
 has_initialized_whitelist = False
@@ -1625,3 +1627,56 @@ def vpn_management(lab_id):
     vpn_server_name = lab.vpn_server  # Use the lab's vpn_server field
     
     return render_template('site/vpn_management.html', lab=lab, vpn_server_name=vpn_server_name)
+
+@bp.route('/admin/flag_manager')
+@login_required
+@admin_required
+def flag_manager():
+    flags = Flag.query.all()
+    return render_template('admin/flag_manager.html', flags=flags)
+
+@bp.route('/admin/edit_flag/<int:flag_id>', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def edit_flag(flag_id):
+    flag = Flag.query.get_or_404(flag_id)
+    form = FlagForm(obj=flag)
+    
+    if request.method == 'GET':
+        form.host_id.data = flag.host_id
+    
+    if form.validate_on_submit():
+        form.populate_obj(flag)
+        db.session.commit()
+        flash('Flag updated successfully', 'success')
+        return redirect(url_for('main.flag_manager'))
+    
+    return render_template('admin/flag_editor.html', form=form, flag=flag)
+
+@bp.route('/admin/delete_flag/<int:flag_id>', methods=['POST'])
+@login_required
+@admin_required
+def delete_flag(flag_id):
+    flag = Flag.query.get_or_404(flag_id)
+    db.session.delete(flag)
+    db.session.commit()
+    flash('Flag deleted successfully', 'success')
+    return redirect(url_for('main.flag_manager'))
+
+@bp.route('/admin/add_flag', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def add_flag():
+    form = FlagForm()
+    if form.validate_on_submit():
+        new_flag = Flag(
+            type=form.type.data,
+            uuid=form.uuid.data,
+            point_value=form.point_value.data,
+            host_id=form.host_id.data
+        )
+        db.session.add(new_flag)
+        db.session.commit()
+        flash('New flag added successfully', 'success')
+        return redirect(url_for('main.flag_manager'))
+    return render_template('admin/flag_editor.html', form=form)
