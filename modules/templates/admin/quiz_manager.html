@@ -16,6 +16,7 @@
         <table class="table">
             <thead>
                 <tr>
+                    <th>Image</th>
                     <th>Title</th>
                     <th>Description</th>
                     <th>Minimum Score</th>
@@ -26,6 +27,13 @@
             <tbody>
                 {% for quiz in quizzes %}
                 <tr>
+                    <td>
+                        {% if quiz.image %}
+                            <img src="{{ url_for('static', filename='library/images/quizes/' + quiz.image) }}" alt="{{ quiz.title }}" class="quiz-thumbnail" style="width: 50px; height: 50px; object-fit: cover;">
+                        {% else %}
+                            <img src="{{ url_for('static', filename='library/images/quizes/default_quiz_image.jpg') }}" alt="Default Quiz Image" class="quiz-thumbnail" style="width: 50px; height: 50px; object-fit: cover;">
+                        {% endif %}
+                    </td>
                     <td>{{ quiz.title }}</td>
                     <td>{{ quiz.description }}</td>
                     <td>{{ quiz.min_score }}</td>

@@ -1582,6 +1582,11 @@ def delete_host(host_id):
 @admin_required
 def quiz_manager():
     quizzes = Quiz.query.all()
+    for quiz in quizzes:
+        if quiz.image:
+            quiz.image_path = url_for('static', filename=f'library/images/quizes/{quiz.image}')
+        else:
+            quiz.image_path = url_for('static', filename='library/images/quizes/default_quiz_image.jpg')
     return render_template('admin/quiz_manager.html', quizzes=quizzes)
 
 @bp.route('/admin/quiz_editor', methods=['GET', 'POST'])
@@ -1597,8 +1602,9 @@ def quiz_editor(quiz_id=None):
             quiz.title = form.title.data
             quiz.description = form.description.data
             quiz.min_score = form.min_score.data
+            quiz.image = form.image.data
         else:
-            quiz = Quiz(title=form.title.data, description=form.description.data, min_score=form.min_score.data)
+            quiz = Quiz(title=form.title.data, description=form.description.data, min_score=form.min_score.data, image=form.image.data)
             db.session.add(quiz)
         db.session.commit()
         flash('Quiz saved successfully.', 'success')
@@ -1608,6 +1614,7 @@ def quiz_editor(quiz_id=None):
         form.title.data = quiz.title
         form.description.data = quiz.description
         form.min_score.data = quiz.min_score
+        form.image.data = quiz.image
 
     return render_template('admin/quiz_editor.html', form=form, quiz=quiz)
 

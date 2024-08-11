@@ -257,6 +257,7 @@ class Quiz(db.Model):
     title = db.Column(db.String(128), nullable=False)
     description = db.Column(db.String(256))
     min_score = db.Column(db.Integer, nullable=False)
+    image = db.Column(db.String(256), nullable=True)
     questions = db.relationship('Question', backref='quiz', lazy=True, cascade="all, delete-orphan")
 
     def __repr__(self):

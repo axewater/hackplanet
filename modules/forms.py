@@ -199,7 +199,17 @@ class QuizForm(FlaskForm):
     title = StringField('Quiz Title', validators=[DataRequired(), Length(max=128)])
     description = TextAreaField('Description', validators=[Optional(), Length(max=256)])
     min_score = IntegerField('Minimum Score to Pass', validators=[DataRequired(), NumberRange(min=1)])
+    image = SelectField('Image', validators=[Optional()], choices=[])
     submit = SubmitField('Save Quiz')
+
+    def __init__(self, *args, **kwargs):
+        super(QuizForm, self).__init__(*args, **kwargs)
+        self.image.choices = self.get_image_choices()
+
+    def get_image_choices(self):
+        image_folder = os.path.join(current_app.config['UPLOAD_FOLDER'], 'images', 'quizes')
+        image_files = [f for f in os.listdir(image_folder) if f.lower().endswith(('.png', '.jpg', '.jpeg', '.gif'))]
+        return [('', 'Select an image')] + [(f, f) for f in image_files]
 
 class QuestionForm(FlaskForm):
     question_text = TextAreaField('Question', validators=[DataRequired(), Length(max=256)])
