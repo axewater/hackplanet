@@ -7,10 +7,26 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(data => {
                 const fileList = document.getElementById('fileList');
                 fileList.innerHTML = '';
+                
+                // Sort the files: folders first, then files, both in alphabetical order
+                data.files.sort((a, b) => {
+                    if (a.is_dir && !b.is_dir) return -1;
+                    if (!a.is_dir && b.is_dir) return 1;
+                    return a.name.localeCompare(b.name);
+                });
+                
                 data.files.forEach(file => {
                     const row = document.createElement('tr');
+                    let fileContent = file.is_dir ? '<i class="fas fa-folder"></i> ' : '';
+                    
+                    if (!file.is_dir && file.type.startsWith('image/')) {
+                        fileContent += `<img src="/admin/media/thumbnail?path=${encodeURIComponent(file.path)}" class="img-thumbnail" style="max-width: 50px; max-height: 50px;" /> `;
+                    }
+                    
+                    fileContent += `<a href="#" class="file-link" data-path="${file.path}">${file.name}</a>`;
+                    
                     row.innerHTML = `
-                        <td>${file.is_dir ? '<i class="fas fa-folder"></i> ' : ''}<a href="#" class="file-link" data-path="${file.path}">${file.name}</a></td>
+                        <td>${fileContent}</td>
                         <td>${file.type}</td>
                         <td>${file.size}</td>
                         <td>
@@ -21,7 +37,40 @@ document.addEventListener('DOMContentLoaded', function() {
                     fileList.appendChild(row);
                 });
                 updateBreadcrumb(path);
+                updateUploadButton(path);
             });
+    }
+
+    function showFullImage(path) {
+        const modal = new bootstrap.Modal(document.getElementById('imageViewerModal'));
+        const modalImage = document.getElementById('fullSizeImage');
+        modalImage.src = `/admin/media/download?path=${encodeURIComponent(path)}`;
+        modal.show();
+    }
+
+    function updateUploadButton(path) {
+        const uploadBtn = document.getElementById('uploadBtn');
+        uploadBtn.disabled = path === '/';
+    }
+
+    function showFullImage(path) {
+        const modal = document.createElement('div');
+        modal.className = 'modal fade';
+        modal.innerHTML = `
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Full Image</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <img src="/admin/media/download?path=${encodeURIComponent(path)}" class="img-fluid" />
+                    </div>
+                </div>
+            </div>
+        `;
+        document.body.appendChild(modal);
+        new bootstrap.Modal(modal).show();
     }
 
     function updateBreadcrumb(path) {
@@ -50,7 +99,12 @@ document.addEventListener('DOMContentLoaded', function() {
             if (e.target.closest('td').querySelector('.fa-folder')) {
                 currentPath = path;
                 loadFileList(path);
+            } else if (e.target.closest('td').querySelector('img')) {
+                showFullImage(path);
             }
+        } else if (e.target.tagName === 'IMG' && !e.target.closest('td').querySelector('.fa-folder')) {
+            const path = e.target.closest('tr').querySelector('.file-link').getAttribute('data-path');
+            showFullImage(path);
         } else if (e.target.classList.contains('download-btn')) {
             const path = e.target.closest('tr').querySelector('.file-link').getAttribute('data-path');
             window.location.href = `/admin/media/download?path=${encodeURIComponent(path)}`;

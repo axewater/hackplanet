@@ -33,7 +33,7 @@
                     <img src="{{ url_for('static', filename='library/images/labs/' + lab.image) }}" alt="{{ lab.name }}" class="lab-image">
                     {% endif %}
                     {% if lab.vpn_file %}
-                    <a href="{{ '/static/library/labs/' + lab.vpn_file }}" class="download-button btn btn-primary">Download Lab Access</a>
+                    <a href="{{ '/static/library/labfiles/' + lab.vpn_file }}" class="download-button btn btn-primary">Download Lab Access</a>
                     <a href="{{ url_for('main.vpn_management', lab_id=lab.id) }}" class="btn btn-secondary">VPN Management</a>
                     {% endif %}
                     <p>{{ lab.description }}</p>

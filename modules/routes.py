@@ -3,7 +3,7 @@ import sys,ast, uuid, json, random, requests, html, os, re, shutil, traceback, t
 from threading import Thread
 import subprocess, mimetypes
 from config import Config
-from flask import Flask, render_template, flash, redirect, url_for, request, Blueprint, jsonify, session, abort, current_app, send_from_directory
+from flask import Flask, render_template, flash, redirect, url_for, request, Blueprint, jsonify, session, abort, current_app, send_from_directory, send_file
 from flask import copy_current_request_context, g
 from flask_login import current_user, login_user, logout_user, login_required
 from flask_wtf import FlaskForm
@@ -14,6 +14,8 @@ from sqlalchemy.orm import joinedload
 from sqlalchemy import func, Integer, Text, case
 from werkzeug.urls import url_parse
 from werkzeug.utils import secure_filename
+from PIL import Image
+from io import BytesIO
 
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -928,9 +930,12 @@ def media_upload():
     if file.filename == '':
         return jsonify({'success': False, 'message': 'No selected file'}), 400
     
+    path = request.form.get('path', '/')
+    if path == '/':
+        return jsonify({'success': False, 'message': 'Cannot upload to root directory'}), 400
+    
     if file:
         filename = secure_filename(file.filename)
-        path = request.form.get('path', '/')
         full_path = os.path.join(current_app.config['UPLOAD_FOLDER'], path.lstrip('/'))
         
         if not os.path.exists(full_path):
@@ -942,6 +947,27 @@ def media_upload():
         return jsonify({'success': True, 'message': 'File uploaded successfully'})
     
     return jsonify({'success': False, 'message': 'File upload failed'}), 400
+
+@bp.route('/admin/media/thumbnail')
+@login_required
+@admin_required
+def media_thumbnail():
+    path = request.args.get('path', '')
+    full_path = os.path.join(current_app.config['UPLOAD_FOLDER'], path.lstrip('/'))
+    
+    if not os.path.exists(full_path) or not os.path.isfile(full_path):
+        abort(404)
+    
+    try:
+        with Image.open(full_path) as img:
+            img.thumbnail((100, 100))
+            img_io = BytesIO()
+            img.save(img_io, 'JPEG')
+            img_io.seek(0)
+            return send_file(img_io, mimetype='image/jpeg')
+    except Exception as e:
+        current_app.logger.error(f"Error generating thumbnail: {str(e)}")
+        abort(500)
 
 @bp.route('/admin/media/download')
 @login_required
