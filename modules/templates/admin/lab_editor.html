@@ -13,6 +13,7 @@
     <div class="glass-panel">
         <div class="container mt-3">
             <a href="{{ url_for('main.admin_dashboard') }}" class="btn btn-lg btn-primary">Back to Dashboard</a>
+            <a href="{{ url_for('main.lab_manager') }}" class="btn btn-lg btn-secondary">Back to Lab Manager</a>
         </div>
         <h1>{{ 'Edit Lab' if lab else 'Create New Lab' }}</h1>
         <div id="feedback-message"></div>
@@ -32,7 +33,7 @@
                     <div class="invalid-feedback" id="{{ field.name }}-error"></div>
                 </div>
             {% endfor %}
-            <button type="submit" class="btn btn-primary">Save Lab</button>
+            <button type="submit" class="btn btn-primary">{{ 'Update Lab' if lab else 'Create Lab' }}</button>
         </form>
     </div>
 </div>

@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const editButtons = document.querySelectorAll('.edit-lab');
     const deleteButtons = document.querySelectorAll('.delete-lab');
     const addHostButtons = document.querySelectorAll('.btn-success');
+    const createNewLabButton = document.querySelector('.btn-success.float-end');
 
     editButtons.forEach(button => {
         button.addEventListener('click', function() {
@@ -51,4 +52,11 @@ document.addEventListener('DOMContentLoaded', function() {
             window.location.href = `/admin/host_editor?lab_id=${labId}`;
         });
     });
+
+    if (createNewLabButton) {
+        createNewLabButton.addEventListener('click', function(event) {
+            event.preventDefault();
+            window.location.href = '/admin/lab_editor';
+        });
+    }
 });
