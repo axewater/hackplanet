@@ -1304,6 +1304,11 @@ def user_progress():
                            obtained_flags=obtained_flags,
                            total_score=total_score)
 
+@bp.route('/ctf/vpn_management')
+@login_required
+def vpn_management():
+    return render_template('site/vpn_management.html')
+
 @bp.route('/admin/host_manager', methods=['GET'])
 @login_required
 @admin_required
@@ -1554,5 +1559,49 @@ def manage_vm():
         return jsonify({"status": "success", "message": output})
     except Exception as e:
         print(f"Detailed error while managing VM: {e}")
-        print(f"Error managing VM: {e}")
+        print(f"Errormanaging VM: {e}")
+        return jsonify({"status": "error", "message": str(e)}), 400
+
+@bp.route('/manage_vpn', methods=['POST'])
+@login_required
+def manage_vpn():
+    print(f"Received request to manage VPN: {request.json}")
+    action = request.json['action']
+    vpn_server_name = 'vpnserver'  # Fixed name for the VPN server
+    subscription_id = Config.AZURE_SUBSCRIPTION_ID
+    resource_group = Config.AZURE_RESOURCE_GROUP
+    vm_id = f"/subscriptions/{subscription_id}/resourceGroups/{resource_group}/providers/Microsoft.Compute/virtualMachines/{vpn_server_name}"
+    
+    try:
+        output = ""
+        if action == 'status':
+            print(f"Executing VPN status command for {vm_id}")
+            result = subprocess.run([AZ_CLI_PATH, 'vm', 'get-instance-view', '--ids', vm_id, '--query', '{name:name, powerState:instanceView.statuses[1].displayStatus}'], capture_output=True, text=True)
+            if result.returncode == 0:
+                vm_info = json.loads(result.stdout)
+                output = f"VPN Server: {vm_info['name']}, Power State: {vm_info['powerState']}"
+            else:
+                raise Exception(f"Error fetching VPN status: {result.stderr}")
+        elif action == 'start':
+            print(f"Executing VPN start command for {vm_id}")
+            result = subprocess.run([AZ_CLI_PATH, 'vm', 'start', '--ids', vm_id], capture_output=True, text=True)
+            if result.returncode == 0:
+                output = "VPN server started successfully"
+            else:
+                raise Exception(f"Error starting VPN: {result.stderr}")
+        elif action == 'stop':
+            print(f"Executing VPN stop command for {vm_id}")
+            result = subprocess.run([AZ_CLI_PATH, 'vm', 'stop', '--ids', vm_id], capture_output=True, text=True)
+            if result.returncode == 0:
+                output = "VPN server stopped successfully"
+            else:
+                raise Exception(f"Error stopping VPN: {result.stderr}")
+        else:
+            print(f"Invalid action received: {action}")
+            raise ValueError("Invalid action")
+        
+        print(output)
+        return jsonify({"status": "success", "message": output})
+    except Exception as e:
+        print(f"Detailed error while managing VPN: {e}")
         return jsonify({"status": "error", "message": str(e)}), 400

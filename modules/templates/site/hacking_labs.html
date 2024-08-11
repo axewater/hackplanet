@@ -34,6 +34,7 @@
                     {% endif %}
                     {% if lab.vpn_file %}
                     <a href="{{ '/static/library/labs/' + lab.vpn_file }}" class="download-button btn btn-primary">Download Lab Access</a>
+                    <a href="{{ url_for('main.vpn_management') }}" class="btn btn-secondary">VPN Management</a>
                     {% endif %}
                     <p>{{ lab.description }}</p>
                 </div>
