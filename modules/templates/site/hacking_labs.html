@@ -34,7 +34,7 @@
                     {% endif %}
                     {% if lab.vpn_file %}
                     <a href="{{ '/static/library/labs/' + lab.vpn_file }}" class="download-button btn btn-primary">Download Lab Access</a>
-                    <a href="{{ url_for('main.vpn_management') }}" class="btn btn-secondary">VPN Management</a>
+                    <a href="{{ url_for('main.vpn_management', lab_id=lab.id) }}" class="btn btn-secondary">VPN Management</a>
                     {% endif %}
                     <p>{{ lab.description }}</p>
                 </div>
@@ -51,7 +51,7 @@
                         {% for host in lab.hosts %}
                         <div class="host">
 
-                            <h3>{{ host.name }} {{ host.id }}</h3>
+                            <h3>{{ host.name | upper }} </h3>
                             <div class="host-image-container">
                                 <img src="{{ '/static/library/images/' + host.image_url }}" alt="{{ host.name }}" class="host-image">
                             </div>

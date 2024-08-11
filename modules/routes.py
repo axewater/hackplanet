@@ -1304,10 +1304,7 @@ def user_progress():
                            obtained_flags=obtained_flags,
                            total_score=total_score)
 
-@bp.route('/ctf/vpn_management')
-@login_required
-def vpn_management():
-    return render_template('site/vpn_management.html')
+
 
 @bp.route('/admin/host_manager', methods=['GET'])
 @login_required
@@ -1567,7 +1564,9 @@ def manage_vm():
 def manage_vpn():
     print(f"Received request to manage VPN: {request.json}")
     action = request.json['action']
-    vpn_server_name = 'vpnserver'  # Fixed name for the VPN server
+    lab_id = request.json['lab_id']
+    lab = Lab.query.get_or_404(lab_id)
+    vpn_server_name = lab.vpn_server  # Use the lab's vpn_server field
     subscription_id = Config.AZURE_SUBSCRIPTION_ID
     resource_group = Config.AZURE_RESOURCE_GROUP
     vm_id = f"/subscriptions/{subscription_id}/resourceGroups/{resource_group}/providers/Microsoft.Compute/virtualMachines/{vpn_server_name}"
@@ -1605,3 +1604,12 @@ def manage_vpn():
     except Exception as e:
         print(f"Detailed error while managing VPN: {e}")
         return jsonify({"status": "error", "message": str(e)}), 400
+    
+    
+@bp.route('/ctf/vpn_management/<int:lab_id>')
+@login_required
+def vpn_management(lab_id):
+    lab = Lab.query.get_or_404(lab_id)
+    vpn_server_name = lab.vpn_server  # Use the lab's vpn_server field
+    
+    return render_template('site/vpn_management.html', lab=lab, vpn_server_name=vpn_server_name)

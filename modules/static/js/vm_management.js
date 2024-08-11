@@ -34,7 +34,9 @@ function performAction(action) {
             'X-CSRFToken': getCsrfToken()
         },
         body: JSON.stringify({
-            action: action
+            action: action,
+            lab_id: labId,
+            vpn_server_name: vpnServerName
         })
     })
     .then(response => response.json())

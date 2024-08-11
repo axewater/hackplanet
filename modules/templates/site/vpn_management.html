@@ -3,11 +3,12 @@
 {% block content %}
 <div class="container">
     <div class="glass-panel">
-        <h1>VPN Management</h1>
+        <h1>VPN Management - {{ lab.name }}</h1>
+        <a href="{{ url_for('main.hacking_labs') }}" class="btn btn-secondary">Back to Hacking Labs</a>
         <div class="vpn-controls">
+            <button id="status-btn" class="btn btn-info" onclick="performAction('status')">Check Status</button>
             <button id="start-btn" class="btn btn-success" onclick="performAction('start')">Start VPN</button>
             <button id="stop-btn" class="btn btn-danger" onclick="performAction('stop')">Stop VPN</button>
-            <button id="status-btn" class="btn btn-info" onclick="performAction('status')">Check Status</button>
         </div>
         <div id="status-display" class="mt-3">
             Status: <span id="vpn-status">Unknown</span>
@@ -21,5 +22,9 @@
     </div>
 </div>
 
+<script>
+    const labId = {{ lab.id }};
+    const vpnServerName = "{{ vpn_server_name }}";
+</script>
 <script src="{{ url_for('static', filename='js/vm_management.js') }}"></script>
 {% endblock %}
