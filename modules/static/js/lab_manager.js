@@ -1,6 +1,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     const editButtons = document.querySelectorAll('.edit-lab');
     const deleteButtons = document.querySelectorAll('.delete-lab');
+    const addHostButtons = document.querySelectorAll('.btn-success');
 
     editButtons.forEach(button => {
         button.addEventListener('click', function() {
@@ -40,6 +41,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     alert('An error occurred while deleting the lab: ' + error.message);
                 });
             }
+        });
+    });
+
+    addHostButtons.forEach(button => {
+        button.addEventListener('click', function(event) {
+            event.preventDefault();
+            const labId = this.getAttribute('href').split('=')[1];
+            window.location.href = `/admin/host_editor?lab_id=${labId}`;
         });
     });
 });
