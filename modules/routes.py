@@ -1,7 +1,7 @@
 # modules/routes.py
-import sys,ast, uuid, json, random, requests, html, os, re, shutil, traceback, time, schedule, os, platform, tempfile, socket, logging
+import sys,ast, uuid, json, random, requests, html, os, re, shutil, traceback, time, schedule, os, platform, tempfile, socket, logging, requests
 from threading import Thread
-import subprocess
+import subprocess, mimetypes
 from config import Config
 from flask import Flask, render_template, flash, redirect, url_for, request, Blueprint, jsonify, session, abort, current_app, send_from_directory
 from flask import copy_current_request_context, g
@@ -883,6 +883,118 @@ def update_invites():
 def admin_dashboard():
     pass
     return render_template('admin/admin_dashboard.html')
+
+@bp.route('/admin/media_manager')
+@login_required
+@admin_required
+def media_manager():
+    return render_template('admin/media_manager.html')
+
+@bp.route('/admin/media/list')
+@login_required
+@admin_required
+def media_list():
+    path = request.args.get('path', '/')
+    full_path = os.path.join(current_app.config['UPLOAD_FOLDER'], path.lstrip('/'))
+    
+    if not os.path.exists(full_path) or not os.path.isdir(full_path):
+        return jsonify({'error': 'Invalid path'}), 400
+
+    files = []
+    for item in os.listdir(full_path):
+        item_path = os.path.join(full_path, item)
+        is_dir = os.path.isdir(item_path)
+        if is_dir or os.path.isfile(item_path):
+            file_type = 'Folder' if is_dir else mimetypes.guess_type(item)[0] or 'Unknown'
+            size = '' if is_dir else f"{os.path.getsize(item_path) / 1024:.2f} KB"
+            files.append({
+                'name': item,
+                'path': os.path.join(path, item),
+                'type': file_type,
+                'size': size,
+                'is_dir': is_dir
+            })
+
+    return jsonify({'files': files})
+
+@bp.route('/admin/media/upload', methods=['POST'])
+@login_required
+@admin_required
+def media_upload():
+    if 'file' not in request.files:
+        return jsonify({'success': False, 'message': 'No file part'}), 400
+    
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({'success': False, 'message': 'No selected file'}), 400
+    
+    if file:
+        filename = secure_filename(file.filename)
+        path = request.form.get('path', '/')
+        full_path = os.path.join(current_app.config['UPLOAD_FOLDER'], path.lstrip('/'))
+        
+        if not os.path.exists(full_path):
+            return jsonify({'success': False, 'message': 'Invalid path'}), 400
+        
+        file_path = os.path.join(full_path, filename)
+        file.save(file_path)
+        
+        return jsonify({'success': True, 'message': 'File uploaded successfully'})
+    
+    return jsonify({'success': False, 'message': 'File upload failed'}), 400
+
+@bp.route('/admin/media/download')
+@login_required
+@admin_required
+def media_download():
+    path = request.args.get('path', '')
+    full_path = os.path.join(current_app.config['UPLOAD_FOLDER'], path.lstrip('/'))
+    
+    if not os.path.exists(full_path) or not os.path.isfile(full_path):
+        abort(404)
+    
+    return send_from_directory(os.path.dirname(full_path), os.path.basename(full_path), as_attachment=True)
+
+@bp.route('/admin/media/delete', methods=['POST'])
+@login_required
+@admin_required
+def media_delete():
+    data = request.json
+    path = data.get('path', '')
+    full_path = os.path.join(current_app.config['UPLOAD_FOLDER'], path.lstrip('/'))    
+    if not os.path.exists(full_path):
+        return jsonify({'success': False, 'message': 'File or folder not found'}), 404
+    
+    try:
+        if os.path.isdir(full_path):
+            os.rmdir(full_path)
+        else:
+            os.remove(full_path)
+        return jsonify({'success': True, 'message': 'Item deleted successfully'})
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+@bp.route('/admin/media/create_folder', methods=['POST'])
+@login_required
+@admin_required
+def media_create_folder():
+    data = request.json
+    path = data.get('path', '/')
+    name = data.get('name', '')
+    
+    if not name:
+        return jsonify({'success': False, 'message': 'Folder name is required'}), 400
+    
+    full_path = os.path.join(current_app.config['UPLOAD_FOLDER'], path.lstrip('/'), name)
+    
+    if os.path.exists(full_path):
+        return jsonify({'success': False, 'message': 'Folder already exists'}), 400
+    
+    try:
+        os.makedirs(full_path)
+        return jsonify({'success': True, 'message': 'Folder created successfully'})
+    except Exception as e:
+        return jsonify({'success': False, 'message': str(e)}), 500
 
 
 

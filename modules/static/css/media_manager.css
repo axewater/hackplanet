@@ -1,0 +1,15 @@
+/* Add this new CSS rule for the modal */
+.modal {
+    z-index: 999;
+}
+
+/* Optionally, add this rule for the modal backdrop */
+.modal-backdrop {
+    z-index: 998;
+}
+
+.admin-header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+}
