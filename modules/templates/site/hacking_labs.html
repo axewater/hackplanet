@@ -49,7 +49,40 @@
                     {% else %}
                         {% for host in lab.hosts %}
                         <div class="host">
-                            <!-- Host details here -->
+
+                            <h3>{{ host.name }} {{ host.id }}</h3>
+                            <div class="host-image-container">
+                                <img src="{{ '/static/library/images/' + host.image_url }}" alt="{{ host.name }}" class="host-image">
+                            </div>
+                            <p>IP Address: {{ host.ip }}</p>
+                            <p>Difficulty: {{ host.difficulty }} {% if host.difficulty == 1 %}😊{% elif host.difficulty == 2 %}🙂{% elif host.difficulty == 3 %}😐{% elif host.difficulty == 4 %}😕{% elif host.difficulty == 5 %}😟{% elif host.difficulty == 6 %}😦{% elif host.difficulty == 7 %}😧{% elif host.difficulty == 8 %}😨{% elif host.difficulty == 9 %}😰{% elif host.difficulty == 10 %}😱{% endif %}</p>
+                            <p>Status: {{ 'Online' if host.status else 'Offline' }}</p>
+                            <p>Rating: {% for _ in range(host.rating) %}★{% endfor %}{% for _ in range(5 - host.rating) %}☆{% endfor %}</p>
+                            <a href="{{ url_for('main.host_details', host_id=host.id) }}" class="btn btn-info">Host Details</a>
+                            {% if is_admin %}
+                            <div class="flags">
+                                <p style="font-size: 0.2em;">User Flag: {{ host.flags|selectattr('type', '==', 'user')|map(attribute='uuid')|first }}</p>
+                                <p style="font-size: 0.2em;">Root Flag: {{ host.flags|selectattr('type', '==', 'root')|map(attribute='uuid')|first }}</p>
+                            </div>
+                            {% endif %}
+            
+                            <div class="host-inputarea">
+                                {% if host.name != 'kalismurf' %}
+                                <div class="flag-input-container">
+                                    <input type="text" id="user-flag-{{ host.id }}" placeholder="Enter User Flag" class="flag-input">
+                                    <button type="button" class="btn btn-success" onclick="submitFlag('{{ host.id }}', 'user')">Submit</button>
+                                </div>
+                                <div class="flag-input-container">
+                                    <input type="text" id="root-flag-{{ host.id }}" placeholder="Enter Root Flag" class="flag-input">
+                                    <button type="button" class="btn btn-danger" onclick="submitFlag('{{ host.id }}', 'root')">Submit</button>
+                                </div>
+                                {% else %}
+                                <div class="kalismurf-credentials">
+                                    <p>username : kali</p>
+                                    <p>password : KaliLinux2024!</p>
+                                </div>
+                                {% endif %}
+                            </div>
                         </div>
                         {% endfor %}
                     {% endif %}
