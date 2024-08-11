@@ -1697,10 +1697,21 @@ def edit_flag(flag_id):
 @admin_required
 def delete_flag(flag_id):
     flag = Flag.query.get_or_404(flag_id)
-    db.session.delete(flag)
-    db.session.commit()
-    flash('Flag deleted successfully', 'success')
-    return redirect(url_for('main.flag_manager'))
+    try:
+        db.session.delete(flag)
+        db.session.commit()
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return jsonify({'success': True, 'message': 'Flag deleted successfully'})
+        else:
+            flash('Flag deleted successfully', 'success')
+            return redirect(url_for('main.flag_manager'))
+    except Exception as e:
+        db.session.rollback()
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return jsonify({'success': False, 'message': str(e)}), 500
+        else:
+            flash(f'Error deleting flag: {str(e)}', 'error')
+            return redirect(url_for('main.flag_manager'))
 
 @bp.route('/admin/add_flag', methods=['GET', 'POST'])
 @login_required
