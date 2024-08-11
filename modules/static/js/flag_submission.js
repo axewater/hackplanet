@@ -5,7 +5,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const flag = flagInput.value.trim();
 
         if (!flag) {
-            alert('Please enter a flag.');
+            showModal('Error', 'Please enter a flag.');
             return;
         }
 
@@ -24,20 +24,33 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
-                alert('Flag submitted successfully!');
+                showModal('🎉 Success', 'Flag submitted successfully! 🚩');
                 flagInput.value = '';
             } else {
-                alert(data.message || 'Failed to submit flag. Please try again.');
+                showModal('⚠️ Error', data.message || 'Failed to submit flag. Please try again. 🔄');
             }
         })
         .catch(error => {
             console.error('Error:', error);
-            alert('An error occurred. Please try again.');
+            showModal('Error', 'An error occurred. Please try again.');
         });
     };
 
     // Function to get CSRF token
     function getCsrfToken() {
         return document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+    }
+
+    // Function to show modal
+    function showModal(title, message) {
+        const modal = document.getElementById('flagModal');
+        const modalTitle = document.getElementById('flagModalLabel');
+        const modalBody = document.getElementById('flagModalBody');
+        
+        modalTitle.textContent = title;
+        modalBody.textContent = message;
+        
+        const bootstrapModal = new bootstrap.Modal(modal);
+        bootstrapModal.show();
     }
 });

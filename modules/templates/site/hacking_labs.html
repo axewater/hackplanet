@@ -10,6 +10,7 @@
 </div>
 {% endif %}
 {% endwith %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/file_manager.css') }}">
 
 <div class="container">
 
@@ -98,5 +99,23 @@
         {% endif %}
     </div>
 </div>
+
+<!-- Flag Submission Modal -->
+<div class="modal fade" id="flagModal" tabindex="-1" aria-labelledby="flagModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="flagModalLabel"></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="flagModalBody">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="{{ url_for('static', filename='js/flag_submission.js') }}"></script>
 {% endblock %}
