@@ -13,7 +13,7 @@
     <div class="container mt-3">
         <a href="{{ url_for('main.admin_dashboard') }}" class="btn btn-lg btn-primary">Back to Dashboard</a>
     </div>
-    <h2>Manage HackPlanet.EU Settings</h2>
+    <h2>Manage HackPlanet.EU Server Settings</h2>
     
     <div id="settingsSavedNotification" class="alert alert-success" role="alert" style="display: none;">
         Settings saved successfully, Admin!
@@ -23,7 +23,7 @@
             <div class="form-check">
                 <input class="form-check-input" type="checkbox" id="showSystemLogo">
                 <label class="form-check-label" for="showSystemLogo">
-                    Show System Logo?
+                    Show System Logo
                 </label>
             </div>
             <div class="form-check">
@@ -33,39 +33,15 @@
                 </label>
             </div>
             <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="advancedFiltersEnabled">
-                <label class="form-check-label" for="advancedFiltersEnabled">
-                    Advanced Filters Enabled?
-                </label>
-            </div>
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="allowUsersToInviteOthers">
-                <label class="form-check-label" for="allowUsersToInviteOthers">
-                    Allow Users to Invite Others?
-                </label>
-            </div>
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="enableWebLinksOnDetailsPage">
-                <label class="form-check-label" for="enableWebLinksOnDetailsPage">
-                    Enable (Show) Weblinks on Details Page
-                </label>
-            </div>
-            <div class="form-check">
                 <input class="form-check-input" type="checkbox" id="enableServerStatusFeature">
                 <label class="form-check-label" for="enableServerStatusFeature">
-                    Enable/Disable Server Status Feature
+                    Enable Server Status Feature
                 </label>
             </div>
             <div class="form-check">
                 <input class="form-check-input" type="checkbox" id="enableNewsletterFeature">
                 <label class="form-check-label" for="enableNewsletterFeature">
-                    Enable/Disable Newsletter Feature
-                </label>
-            </div>
-            <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="storeImagesInGamesFolder">
-                <label class="form-check-label" for="storeImagesInGamesFolder">
-                    Store Images in Games Folder Under .swimages Subfolder
+                    Enable Newsletter Feature
                 </label>
             </div>
             <button type="submit" class="btn btn-primary mt-3">Save Settings</button>
@@ -98,12 +74,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const settings = {
             showSystemLogo: document.getElementById('showSystemLogo').checked,
             showHelpButton: document.getElementById('showHelpButton').checked,
-            advancedFiltersEnabled: document.getElementById('advancedFiltersEnabled').checked,
-            allowUsersToInviteOthers: document.getElementById('allowUsersToInviteOthers').checked,
-            enableWebLinksOnDetailsPage: document.getElementById('enableWebLinksOnDetailsPage').checked,
             enableServerStatusFeature: document.getElementById('enableServerStatusFeature').checked,
-            enableNewsletterFeature: document.getElementById('enableNewsletterFeature').checked,
-            storeImagesInGamesFolder: document.getElementById('storeImagesInGamesFolder').checked
+            enableNewsletterFeature: document.getElementById('enableNewsletterFeature').checked
         };
         console.log("Settings to be saved:", settings);
 
@@ -124,7 +96,10 @@ document.addEventListener('DOMContentLoaded', function() {
         })
         .then(data => {
             console.log("Response data:", data);
-            alert('Settings updated successfully');
+            document.getElementById('settingsSavedNotification').style.display = 'block';
+            setTimeout(() => {
+                document.getElementById('settingsSavedNotification').style.display = 'none';
+            }, 3000);
         })
         .catch(error => {
             console.error('Fetch operation error:', error);
@@ -136,12 +111,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
 <style>
 .settingsform-admin {
-    background-color: #000; /* Or any color you prefer */
+    background-color: #000;
     padding: 20px;
     border-radius: 15px;
 }
 .settingsform-admin .form-check-label {
-    color: #fff; /* Ensuring labels are readable against the dark background */
+    color: #fff;
 }
 </style>
 {% endblock %}

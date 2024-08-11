@@ -107,19 +107,23 @@ def send_email(to, subject, template):
         print(f"Error sending email: {e}")
         logging.error(f"Unexpected error while sending email: {sanitize_log_data(str(e))}", exc_info=True)
         flash("An unexpected error occurred while sending the email. Please try again or contact support.", "error")
-
 def send_password_reset_email(user_email, token):
+    """
+    Send a password reset email to the user with a link to reset their password.
+    """
     reset_url = url_for('main.reset_password', token=token, _external=True)
-    msg = MailMessage(
+
+    # Create email message using Flask-Mail
+    msg = Message(
         'Password Reset Request',
-        sender='noreply@ctfplatform.com', 
+        sender=current_app.config['MAIL_DEFAULT_SENDER'], 
         recipients=[user_email]
     )
     msg.body = '''Hello,
         You have requested to reset your password. If you did not make this request, please ignore this email. For security reasons, please ensure your email client supports HTML messages.
         Best regards,
         HackPlanet.EU Team
-        '''
+    '''
     msg.html = f'''<p>Hello,</p>
         <p>You have requested to reset your password. Click on the link below to set a new password:</p>
         <p><a href="{reset_url}">Password Reset Link</a></p>
@@ -127,30 +131,17 @@ def send_password_reset_email(user_email, token):
         <p>Best regards,</p>
         <p>HackPlanet.EU Team</p>
         <p>P.S. If you encounter any issues, feel free to contact us at <a href="mailto:support@HackPlanet.EU">support@ctfplatform.com</a>, and we will assist you in regaining access to your account!</p>
-'''
-    send_email(user_email, 'Password Reset Request', msg.html)
+    '''
 
-def send_password_reset_email(user_email, token):
-    reset_url = url_for('main.reset_password', token=token, _external=True)
-    msg = MailMessage(
-        'Password Reset Request',
-        sender='noreply@ctfplatform.com', 
-        recipients=[user_email]
-    )
-    msg.body = '''Hello,
-        You have requested to reset your password. If you did not make this request, please ignore this email. For security reasons, please ensure your email client supports HTML messages.
-        Best regards,
-        HackPlanet.EU Team
-        '''
-    msg.html = f'''<p>Hello,</p>
-        <p>You have requested to reset your password. Click on the link below to set a new password:</p>
-        <p><a href="{reset_url}">Password Reset Link</a></p>
-        <p>If you did not request this, please ignore this email and your password will remain unchanged.</p>
-        <p>Best regards,</p>
-        <p>HackPlanet.EU Team</p>
-        <p>P.S. If you encounter any issues, feel free to contact us at <a href="mailto:support@HackPlanet.EU">support@ctfplatform.com</a>, and we will assist you in regaining access to your account!</p>
-        '''
-    mail.send(msg)
+    try:
+        # Send email using Flask-Mail
+        mail.send(msg)
+        logging.info(f"Password reset email sent to {user_email}")
+        flash(f"Password reset email sent to {user_email}", "success")
+    except Exception as e:
+        logging.error(f"Error sending password reset email: {e}", exc_info=True)
+        flash("An error occurred while sending the password reset email. Please try again later.", "error")
+        
 def _authenticate_and_redirect(username, password):
     user = User.query.filter(func.lower(User.name) == func.lower(username)).first()
     
