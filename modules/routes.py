@@ -344,19 +344,24 @@ def invites():
             invite_token = InviteToken(token=token, creator_user_id=current_user.user_id)
             db.session.add(invite_token)
 
-            # Add the invited email to the whitelist
-            whitelist_entry = Whitelist(email=email)
-            db.session.add(whitelist_entry)
+            # Always add or update the whitelist entry
+            whitelist_entry = Whitelist.query.filter_by(email=email).first()
+            if whitelist_entry:
+                # Update existing entry
+                whitelist_entry.email = email
+            else:
+                # Add new entry
+                whitelist_entry = Whitelist(email=email)
+                db.session.add(whitelist_entry)
 
             try:
                 db.session.commit()
-            except IntegrityError:
-                db.session.rollback()
-                flash('This email is already whitelisted.', 'info')
-            else:
                 invite_url = url_for('main.register', token=token, _external=True, _scheme='https')
                 send_invite_email(email, invite_url)
-                flash('Invite sent successfully and email added to whitelist. The invite expires after 48 hours.', 'success')
+                flash('Invite sent successfully and email added/updated in whitelist. The invite expires after 48 hours.', 'success')
+            except Exception as e:
+                db.session.rollback()
+                flash(f'An error occurred: {str(e)}', 'error')
         else:
             flash('You have reached your invite limit.', 'danger')
         return redirect(url_for('main.invites'))

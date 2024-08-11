@@ -3,7 +3,7 @@ import re, requests, shutil, os, zipfile, smtplib, socket
 from functools import wraps
 from flask import flash, redirect, url_for, request, current_app, flash
 from flask_login import current_user, login_user
-from flask_mail import Message as MailMessage
+from flask_mail import Mail, Message
 from datetime import datetime
 from werkzeug.urls import url_parse
 from werkzeug.utils import secure_filename
@@ -19,6 +19,8 @@ from PIL import ImageOps
 from datetime import datetime
 from wtforms.validators import ValidationError
 import logging, socket
+from smtplib import SMTPException, SMTPAuthenticationError, SMTPConnectError, SMTPDataError, SMTPHeloError, SMTPRecipientsRefused, SMTPSenderRefused
+from ssl import SSLError
 from smtplib import SMTPException, SMTPAuthenticationError, SMTPConnectError, SMTPDataError, SMTPHeloError, SMTPRecipientsRefused, SMTPSenderRefused
 from ssl import SSLError
 
@@ -43,11 +45,9 @@ def is_server_reachable(server, port):
         logging.error(f"Error connecting to mail server {server}:{port}: {e}")
         return False
     
-
 def send_email(to, subject, template):
     """
     Send an email with error handling and pre-send check.
-    Send an email with detailed error handling and logging of SMTP steps.
     """
     # Mail server details from configuration
     mail_server = current_app.config['MAIL_SERVER']
@@ -69,36 +69,21 @@ def send_email(to, subject, template):
 
     # Attempt to send email
     try:
-        # Send email
-        msg = MailMessage(
+        # Create email message using Flask-Mail
+        msg = Message(
             subject,
             sender=current_app.config['MAIL_DEFAULT_SENDER'],
             recipients=[to],
             html=template
         )
+
+        # Send email using Flask-Mail
         mail.send(msg)
+
         print(f"Email sent to {to} with subject {subject}")
         flash(f"Email sent to {to} with subject {subject}")
-        logging.info(f"Establishing connection to SMTP server {mail_server}:{mail_port}")
-        with smtplib.SMTP(mail_server, mail_port) as server:
-            if mail_use_tls:
-                logging.info("Starting TLS connection")
-                server.starttls()
-
-            if mail_use_auth:
-                logging.info(f"Attempting SMTP authentication for user {mail_username}")
-                server.login(mail_username, mail_password)
-            else:
-                logging.info("Skipping SMTP authentication as per configuration")
-
-            msg = MailMessage(subject, sender=current_app.config['MAIL_DEFAULT_SENDER'],
-                              recipients=[to], html=template)
-
-            logging.info(f"Sending email to {to}")
-            server.send_message(msg)
-
-            logging.info(f"Email sent successfully to {to}")
-            flash(f"Email sent successfully to {to}", "success")
+        logging.info(f"Email sent successfully to {to}")
+        flash(f"Email sent successfully to {to}", "success")
     except SMTPAuthenticationError:
         logging.error(f"SMTP Authentication failed for user {mail_username}", exc_info=True)
         flash("Failed to authenticate with the email server. Please check the server settings.", "error")
