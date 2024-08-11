@@ -49,14 +49,13 @@ from modules.models import (
 from modules.utilities import (
     admin_required, _authenticate_and_redirect, square_image, send_email, send_password_reset_email, 
 )
-from modules.azure_utils import get_vm_status, check_azure_authentication
+from modules.azure_utils import get_vm_status, check_azure_authentication, get_azure_cli_path
 
 
 bp = Blueprint('main', __name__)
 
 
 s = URLSafeTimedSerializer('YMecr3tK?IzzsSa@e!Zithpze') 
-AZ_CLI_PATH = r"C:\Program Files (x86)\Microsoft SDKs\Azure\CLI2\wbin\az.cmd"
 has_initialized_whitelist = False
 has_upgraded_admin = False
 has_initialized_setup = False
@@ -1674,11 +1673,12 @@ def manage_vm():
     action = request.form['action']
     subscription_id = Config.AZURE_SUBSCRIPTION_ID
     vm_id = f"/subscriptions/{subscription_id}/resourceGroups/{resource_group}/providers/Microsoft.Compute/virtualMachines/{vm_name}"
+    az_cli_path = get_azure_cli_path()
     try:
         output = ""
         if action == 'status':
             print(f"Executing VM status command for {vm_id}")
-            result = subprocess.run([AZ_CLI_PATH, 'vm', 'get-instance-view', '--ids', vm_id, '--query', '{name:name, powerState:instanceView.statuses[1].displayStatus, osType:storageProfile.osDisk.osType}'], capture_output=True, text=True)
+            result = subprocess.run([az_cli_path, 'vm', 'get-instance-view', '--ids', vm_id, '--query', '{name:name, powerState:instanceView.statuses[1].displayStatus, osType:storageProfile.osDisk.osType}'], capture_output=True, text=True)
             if result.returncode == 0:
                 vm_info = json.loads(result.stdout)
                 output = f"VM Name: {vm_info['name']}, Power State: {vm_info['powerState']}, OS Type: {vm_info['osType']}"
@@ -1692,7 +1692,7 @@ def manage_vm():
                 raise Exception(f"Error fetching VM status: {result.stderr}")
         elif action == 'start':
             print(f"Executing VM start command for {vm_id}")
-            result = subprocess.run([AZ_CLI_PATH, 'vm', 'start', '--ids', vm_id], capture_output=True, text=True)
+            result = subprocess.run([az_cli_path, 'vm', 'start', '--ids', vm_id], capture_output=True, text=True)
             if result.returncode == 0:
                 host = Host.query.filter_by(azure_vm_id=vm_id).first()
                 if host:
@@ -1700,7 +1700,7 @@ def manage_vm():
                     db.session.commit()
         elif action == 'stop':
             print(f"Executing VM stop command for {vm_id}")
-            result = subprocess.run([AZ_CLI_PATH, 'vm', 'stop', '--ids', vm_id], capture_output=True, text=True)
+            result = subprocess.run([az_cli_path, 'vm', 'stop', '--ids', vm_id], capture_output=True, text=True)
             if result.returncode == 0:
                 host = Host.query.filter_by(azure_vm_id=vm_id).first()
                 if host:
@@ -1722,7 +1722,7 @@ def manage_vm():
         return jsonify({"status": "success", "message": output})
     except Exception as e:
         print(f"Detailed error while managing VM: {e}")
-        print(f"Errormanaging VM: {e}")
+        print(f"Error managing VM: {e}")
         return jsonify({"status": "error", "message": str(e)}), 400
 
 @bp.route('/update_host_status', methods=['POST'])
@@ -1748,12 +1748,13 @@ def manage_vpn():
     subscription_id = Config.AZURE_SUBSCRIPTION_ID
     resource_group = Config.AZURE_RESOURCE_GROUP
     vm_id = f"/subscriptions/{subscription_id}/resourceGroups/{resource_group}/providers/Microsoft.Compute/virtualMachines/{vpn_server_name}"
+    az_cli_path = get_azure_cli_path()
     
     try:
         output = ""
         if action == 'status':
-            print(f"Executing VPN status command for {vm_id}")
-            result = subprocess.run([AZ_CLI_PATH, 'vm', 'get-instance-view', '--ids', vm_id, '--query', '{name:name, powerState:instanceView.statuses[1].displayStatus}'], capture_output=True, text=True)
+            print(f"Executing VPN status command for{vm_id}")
+            result = subprocess.run([az_cli_path, 'vm', 'get-instance-view', '--ids', vm_id, '--query', '{name:name, powerState:instanceView.statuses[1].displayStatus}'], capture_output=True, text=True)
             if result.returncode == 0:
                 vm_info = json.loads(result.stdout)
                 output = f"VPN Server: {vm_info['name']}, Power State: {vm_info['powerState']}"
@@ -1761,14 +1762,14 @@ def manage_vpn():
                 raise Exception(f"Error fetching VPN status: {result.stderr}")
         elif action == 'start':
             print(f"Executing VPN start command for {vm_id}")
-            result = subprocess.run([AZ_CLI_PATH, 'vm', 'start', '--ids', vm_id], capture_output=True, text=True)
+            result = subprocess.run([az_cli_path, 'vm', 'start', '--ids', vm_id], capture_output=True, text=True)
             if result.returncode == 0:
                 output = "VPN server started successfully"
             else:
                 raise Exception(f"Error starting VPN: {result.stderr}")
         elif action == 'stop':
             print(f"Executing VPN stop command for {vm_id}")
-            result = subprocess.run([AZ_CLI_PATH, 'vm', 'stop', '--ids', vm_id], capture_output=True, text=True)
+            result = subprocess.run([az_cli_path, 'vm', 'stop', '--ids', vm_id], capture_output=True, text=True)
             if result.returncode == 0:
                 output = "VPN server stopped successfully"
             else:

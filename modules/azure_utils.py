@@ -7,12 +7,18 @@ from flask import Flask, render_template, request, flash, redirect, url_for, jso
 import subprocess
 import json
 import os
+import platform
 
-AZ_CLI_PATH = r"C:\Program Files (x86)\Microsoft SDKs\Azure\CLI2\wbin\az.cmd"
+def get_azure_cli_path():
+    if platform.system() == 'Windows':
+        return r"C:\Program Files (x86)\Microsoft SDKs\Azure\CLI2\wbin\az.cmd"
+    else:
+        return "az"  # On Linux, 'az' should be in the system PATH
 
 def check_azure_authentication():
+    az_cli_path = get_azure_cli_path()
     try:
-        result = subprocess.run([AZ_CLI_PATH, 'account', 'show'], capture_output=True, text=True)
+        result = subprocess.run([az_cli_path, 'account', 'show'], capture_output=True, text=True)
         if result.returncode != 0:
             raise Exception(result.stderr)
         account_info = json.loads(result.stdout)
@@ -72,8 +78,9 @@ def get_vm_status(vm_id):
 
 
 def check_azure_cli_installed():
+    az_cli_path = get_azure_cli_path()
     try:
-        subprocess.run([AZ_CLI_PATH, '--version'], check=True, capture_output=True, text=True)
+        subprocess.run([az_cli_path, '--version'], check=True, capture_output=True, text=True)
         print("Azure CLI is installed.")
     except subprocess.CalledProcessError as e:
         print("Azure CLI is not installed or not found in PATH.")
