@@ -173,6 +173,15 @@ class HostForm(FlaskForm):
     azure_vm_id = StringField('Azure VM ID', validators=[Optional(), Length(max=256)])
     submit = SubmitField('Save Host')
 
+    def __init__(self, *args, **kwargs):
+        super(HostForm, self).__init__(*args, **kwargs)
+        self.image_url.choices = self.get_image_choices()
+
+    def get_image_choices(self):
+        image_folder = os.path.join(current_app.config['UPLOAD_FOLDER'], 'images', 'hosts')
+        image_files = [f for f in os.listdir(image_folder) if f.lower().endswith(('.png', '.jpg', '.jpeg', '.gif'))]
+        return [('', 'Select an image')] + [(f, f) for f in image_files]
+
 class QuizForm(FlaskForm):
     title = StringField('Quiz Title', validators=[DataRequired(), Length(max=128)])
     description = TextAreaField('Description', validators=[Optional(), Length(max=256)])

@@ -231,9 +231,6 @@ def host_editor(host_id=None):
     else:
         form.lab_id.data = labs[0].id if labs else None  # Set a default lab if available
     
-    # Populate the image choices
-    form.image_url.choices = [('', 'Select an image')] + [(f, f) for f in get_image_choices()]
-    
     return render_template('admin/host_editor.html', form=form, host=host, labs=labs)
 
 def get_image_choices():

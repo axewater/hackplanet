@@ -182,6 +182,10 @@ class Host(db.Model):
     def __repr__(self):
         return f"<Host id={self.id}, name={self.name}, difficulty={self.difficulty}>"
 
+    @property
+    def image(self):
+        return self.image_url
+
 
 
 
