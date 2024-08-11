@@ -3,8 +3,9 @@
 {% block content %}
 <div class="container mt-4">
     <div class="card glass-panel">
-        <div class="card-header bg-primary text-white">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
             <h1 class="mb-0">{{ host.name }} Details</h1>
+            <a href="{{ url_for('main.hacking_labs') }}" class="btn btn-secondary">Back to Hacking Labs</a>
         </div>
         <div class="card-body">
             <div class="row">
@@ -89,6 +90,8 @@
         </div>
     </div>
 </div>
+
+<input type="hidden" id="host_id" value="{{ host.id }}">
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="{{ url_for('static', filename='js/host_details.js') }}"></script>

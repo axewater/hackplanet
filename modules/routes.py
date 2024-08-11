@@ -1559,6 +1559,18 @@ def manage_vm():
         print(f"Errormanaging VM: {e}")
         return jsonify({"status": "error", "message": str(e)}), 400
 
+@bp.route('/update_host_status', methods=['POST'])
+@login_required
+def update_host_status():
+    host_id = request.form.get('host_id')
+    status = request.form.get('status') == 'true'
+    host = Host.query.get(host_id)
+    if host:
+        host.status = status
+        db.session.commit()
+        return jsonify({"status": "success", "message": "Host status updated successfully"})
+    return jsonify({"status": "error", "message": "Host not found"}), 404
+
 @bp.route('/manage_vpn', methods=['POST'])
 @login_required
 def manage_vpn():

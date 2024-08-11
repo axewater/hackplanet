@@ -3,7 +3,8 @@
 {% block content %}
 <div class="container">
     <div class="glass-panel">
-        <h1>VPN Management - {{ lab.name }}</h1>
+        <h1>VPN Management</h1>
+        <h2>Lab : {{ lab.name }}</h2>
         <a href="{{ url_for('main.hacking_labs') }}" class="btn btn-secondary">Back to Hacking Labs</a>
         <div class="vpn-controls">
             <button id="status-btn" class="btn btn-info" onclick="performAction('status')">Check Status</button>
