@@ -684,6 +684,16 @@ def whitelist():
     whitelist = Whitelist.query.all()
     return render_template('admin/whitelist.html', title='Whitelist', whitelist=whitelist, form=form)
 
+@bp.route('/admin/whitelist/delete/<int:id>', methods=['POST'])
+@login_required
+@admin_required
+def delete_whitelist(id):
+    whitelist_entry = Whitelist.query.get_or_404(id)
+    db.session.delete(whitelist_entry)
+    db.session.commit()
+    flash('Email removed from whitelist successfully!', 'success')
+    return redirect(url_for('main.whitelist'))
+
 
 
 @bp.route('/admin/user_manager', methods=['GET', 'POST'])
