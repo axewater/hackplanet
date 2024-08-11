@@ -268,3 +268,49 @@ def delete_host(host_id):
             'success': False,
             'message': 'Host not found'
         }), 404
+        
+        
+        
+@bp.route('/admin/challenge_editor/<int:challenge_id>', methods=['GET', 'POST'])
+@bp.route('/admin/challenge_editor', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def challenge_editor(challenge_id=None):
+    form = ChallengeForm()
+    challenge = Challenge.query.get(challenge_id) if challenge_id else None
+
+    if form.validate_on_submit():
+        try:
+            if challenge:
+                challenge.name = form.name.data
+                challenge.description = form.description.data
+                challenge.flag_uuid = form.flag_uuid.data or str(uuid4())
+                challenge.html_link = form.html_link.data
+                challenge.point_value = form.point_value.data
+            else:
+                challenge = Challenge(
+                    name=form.name.data,
+                    description=form.description.data,
+                    flag_uuid=form.flag_uuid.data or str(uuid4()),
+                    html_link=form.html_link.data,
+                    point_value=form.point_value.data
+                )
+                db.session.add(challenge)
+            
+            db.session.commit()
+            flash('Challenge saved successfully.', 'success')
+            return redirect(url_for('main.challenge_manager'))
+        except Exception as e:
+            db.session.rollback()
+            logging.error(f"Error saving challenge: {str(e)}")
+            flash('An error occurred while saving the challenge. Please try again.', 'danger')
+
+    if challenge:
+        form.name.data = challenge.name
+        form.description.data = challenge.description
+        form.flag_uuid.data = challenge.flag_uuid
+        form.html_link.data = challenge.html_link
+        form.point_value.data = challenge.point_value
+
+    return render_template('admin/challenge_editor.html', form=form, challenge=challenge)
+

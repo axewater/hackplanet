@@ -1255,6 +1255,7 @@ def delete_challenge(challenge_id):
             'message': 'Challenge not found'
         }), 404
 
+
 @bp.route('/admin/challenge_editor/<int:challenge_id>', methods=['GET', 'POST'])
 @bp.route('/admin/challenge_editor', methods=['GET', 'POST'])
 @login_required
@@ -1297,8 +1298,6 @@ def challenge_editor(challenge_id=None):
         form.point_value.data = challenge.point_value
 
     return render_template('admin/challenge_editor.html', form=form, challenge=challenge)
-
-
 
 @bp.route('/ctf/submit_flag_api', methods=['GET'])
 def submit_flag_api():

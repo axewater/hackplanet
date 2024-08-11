@@ -155,9 +155,22 @@ class ChallengeForm(FlaskForm):
     name = StringField('Challenge Name', validators=[DataRequired(), Length(max=128)])
     description = TextAreaField('Description', validators=[Optional(), Length(max=256)])
     flag_uuid = StringField('Flag UUID', validators=[Optional(), Length(max=36)])
-    html_link = StringField('HTML Link', validators=[Optional(), Length(max=256)])
+    html_link = SelectField('Image', validators=[Optional()], choices=[])
     point_value = IntegerField('Point Value', validators=[DataRequired(), NumberRange(min=1)])
     submit = SubmitField('Save Challenge')
+
+    def __init__(self, *args, **kwargs):
+        super(ChallengeForm, self).__init__(*args, **kwargs)
+        self.html_link.choices = self.get_image_choices()
+
+    def get_image_choices(self):
+        image_folder = os.path.join(current_app.config['UPLOAD_FOLDER'], 'images', 'challenges')
+        image_files = [f for f in os.listdir(image_folder) if f.lower().endswith(('.png', '.jpg', '.jpeg', '.gif'))]
+        return [('', 'Select an image')] + [(f, f) for f in image_files]
+
+    def validate_html_link(self, field):
+        if field.data and not os.path.exists(os.path.join(current_app.config['UPLOAD_FOLDER'], 'images', 'challenges', field.data)):
+            raise ValidationError('Selected image does not exist.')
 
 class HostForm(FlaskForm):
     name = StringField('Host Name', validators=[DataRequired(), Length(max=128)])
