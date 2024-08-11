@@ -1299,97 +1299,6 @@ def challenge_editor(challenge_id=None):
 
     return render_template('admin/challenge_editor.html', form=form, challenge=challenge)
 
-@bp.route('/ctf/submit_flag_api', methods=['GET'])
-def submit_flag_api():
-    flag = request.args.get('flag')
-    flag_type = request.args.get('flag_type')
-    host_id = request.args.get('host_id')
-
-    if not flag or not flag_type or not host_id:
-        return jsonify({'error': 'Missing required parameters'}), 400
-
-    print(f"Received flag: {flag}, host_id: {host_id}, flag_type: {flag_type}")
-    try:
-        flag_record = Flag.query.filter_by(host_id=host_id, type=flag_type).first()
-    except Exception as e:
-        logging.error(f"Error retrieving flag record: {str(e)}")
-        return jsonify({'error': 'An error occurred while retrieving the flag record'}), 500
-
-    try:
-        if flag_record and flag_record.uuid == flag:
-            try:
-                user_progress = UserProgress.query.filter_by(user_id=current_user.id).first()
-                if not user_progress:
-                    user_progress = UserProgress(user_id=current_user.id, score_total=0)
-                    db.session.add(user_progress)
-            except Exception as e:
-                logging.error(f"Error retrieving or creating user progress: {str(e)}")
-                return jsonify({'error': 'An error occurred while processing user progress'}), 500
-
-            try:
-                flag_obtained = FlagsObtained.query.filter_by(user_id=current_user.id, flag_id=flag_record.id).first()
-            except Exception as e:
-                logging.error(f"Error checking if flag is already obtained: {str(e)}")
-                return jsonify({'error': 'An error occurred while checking if the flag is already obtained'}), 500
-
-            if not flag_obtained:
-                try:
-                    flag_obtained = FlagsObtained(user_id=current_user.id, flag_id=flag_record.id)
-                    db.session.add(flag_obtained)
-
-                    user_progress.score_total += flag_record.point_value
-                    current_user.score_total += flag_record.point_value
-
-                    db.session.commit()
-                except Exception as e:
-                    db.session.rollback()
-                    logging.error(f"Error updating user progress and score: {str(e)}")
-                    return jsonify({'error': 'An error occurred while updating user progress and score'}), 500
-
-                return jsonify({'host_id': host_id, 'flag_type': flag_type, 'result': 'passed'})
-            else:
-                return jsonify({'error': 'Sorry, you have already submitted this flag'}), 400
-        else:
-            return jsonify({'error': 'Invalid flag'}), 400
-    except Exception as e:
-        logging.error(f"Error processing flag submission: {str(e)}")
-        return jsonify({'error': 'An error occurred while processing the flag submission'}), 500
-
-    return jsonify({'host_id': host_id, 'flag_type': flag_type, 'result': 'failed'})
-
-@bp.route('/ctf/submit_challenge_flag_api', methods=['GET'])
-@login_required
-def submit_challenge_flag_api():
-    flag = request.args.get('flag')
-    challenge_id = request.args.get('challenge_id')
-
-    if not flag or not challenge_id:
-        return jsonify({'error': 'Missing required parameters'}), 400
-
-    print(f"Received challenge flag: {flag}, challenge_id: {challenge_id}")
-    try:
-        challenge = Challenge.query.get(challenge_id)
-        if not challenge:
-            return jsonify({'error': 'Challenge not found'}), 404
-
-        if challenge.flag_uuid == flag:
-            challenge_obtained = ChallengesObtained.query.filter_by(user_id=current_user.id, challenge_id=challenge.id).first()
-            if not challenge_obtained:
-                challenge_obtained = ChallengesObtained(user_id=current_user.id, challenge_id=challenge.id)
-                db.session.add(challenge_obtained)
-
-                current_user.score_total += challenge.point_value
-                db.session.commit()
-
-                return jsonify({'challenge_id': challenge_id, 'result': 'passed'})
-            else:
-                return jsonify({'error': 'You have already completed this challenge'}), 400
-        else:
-            return jsonify({'error': 'Invalid flag'}), 400
-    except Exception as e:
-        db.session.rollback()
-        logging.error(f"Error processing challenge flag submission: {str(e)}")
-        return jsonify({'error': 'An error occurred while processing the challenge flag submission'}), 500
 
 @bp.route('/ctf/quizzes')
 @login_required
@@ -1437,6 +1346,45 @@ def quiz_results(quiz_id):
     quiz = Quiz.query.get_or_404(quiz_id)
     user_progress = UserQuizProgress.query.filter_by(user_id=current_user.id, quiz_id=quiz_id).first_or_404()
     return render_template('site/quiz_results.html', quiz=quiz, user_progress=user_progress)
+
+@bp.route('/submit_flag', methods=['POST'])
+@login_required
+def submit_flag():
+    data = request.json
+    host_id = data.get('host_id')
+    flag_type = data.get('flag_type')
+    submitted_flag = data.get('flag')
+
+    if not all([host_id, flag_type, submitted_flag]):
+        return jsonify({'success': False, 'message': 'Missing required parameters'}), 400
+
+    try:
+        flag = Flag.query.filter_by(host_id=host_id, type=flag_type).first()
+        if not flag:
+            return jsonify({'success': False, 'message': 'Invalid flag submission'}), 400
+
+        if flag.uuid == submitted_flag:
+            # Check if the user has already obtained this flag
+            existing_flag = FlagsObtained.query.filter_by(user_id=current_user.id, flag_id=flag.id).first()
+            if existing_flag:
+                return jsonify({'success': False, 'message': 'You have already obtained this flag'}), 400
+
+            # Create a new FlagsObtained record
+            new_flag_obtained = FlagsObtained(user_id=current_user.id, flag_id=flag.id)
+            db.session.add(new_flag_obtained)
+
+            # Update user's score
+            current_user.score_total += flag.point_value
+            db.session.commit()
+
+            return jsonify({'success': True, 'message': 'Flag submitted successfully!'}), 200
+        else:
+            return jsonify({'success': False, 'message': 'Incorrect flag'}), 400
+
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error submitting flag: {str(e)}")
+        return jsonify({'success': False, 'message': 'An error occurred while submitting the flag'}), 500
 
 @bp.route('/ctf/hacking_labs')
 def hacking_labs():
