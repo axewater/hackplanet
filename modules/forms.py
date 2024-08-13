@@ -232,7 +232,17 @@ class QuestionForm(FlaskForm):
     option_d = StringField('Option D', validators=[DataRequired(), Length(max=128)])
     correct_answer = SelectField('Correct Answer', choices=[('A', 'A'), ('B', 'B'), ('C', 'C'), ('D', 'D')], validators=[DataRequired()])
     points = IntegerField('Points', validators=[DataRequired(), NumberRange(min=1)])
+    image = SelectField('Image', validators=[Optional()], choices=[])
     submit = SubmitField('Save Question')
+
+    def __init__(self, *args, **kwargs):
+        super(QuestionForm, self).__init__(*args, **kwargs)
+        self.image.choices = self.get_image_choices()
+
+    def get_image_choices(self):
+        image_folder = os.path.join(current_app.config['UPLOAD_FOLDER'], 'images', 'questions')
+        image_files = [f for f in os.listdir(image_folder) if f.lower().endswith(('.png', '.jpg', '.jpeg', '.gif'))]
+        return [('', 'Select an image')] + [(f, f) for f in image_files]
     
 from modules.models import Host
 

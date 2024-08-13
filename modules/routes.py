@@ -1318,6 +1318,9 @@ def take_quiz(quiz_id):
 
     current_question = questions[user_progress.current_question]
 
+    # Pass the image information to the template
+    question_image = current_question.image if current_question.image else None
+
     if request.method == 'POST':
         answer = request.form.get('answer')
         if not answer:
@@ -1670,6 +1673,7 @@ def question_editor(quiz_id, question_id=None):
             question.option_d = form.option_d.data
             question.correct_answer = form.correct_answer.data
             question.points = form.points.data
+            question.image = form.image.data
         else:
             question = Question(
                 quiz_id=quiz_id,
@@ -1679,7 +1683,8 @@ def question_editor(quiz_id, question_id=None):
                 option_c=form.option_c.data,
                 option_d=form.option_d.data,
                 correct_answer=form.correct_answer.data,
-                points=form.points.data
+                points=form.points.data,
+                image=form.image.data
             )
             db.session.add(question)
         db.session.commit()

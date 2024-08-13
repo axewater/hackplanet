@@ -19,6 +19,9 @@
             <div class="card mb-3">
                 <div class="card-body">
                     <h5 class="card-title">{{ question.question_text }}</h5>
+                    {% if question.image %}
+                    <img src="{{ url_for('static', filename='library/images/questions/' + question.image) }}" alt="Question Image" class="img-fluid mb-3">
+                    {% endif %}
                     <div class="form-check">
                         <input class="form-check-input" type="radio" name="answer" id="answer_a" value="A" required>
                         <label class="form-check-label" for="answer_a">

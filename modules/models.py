@@ -276,6 +276,7 @@ class Question(db.Model):
     option_d = db.Column(db.String(128), nullable=False)
     correct_answer = db.Column(db.String(1), nullable=False)
     points = db.Column(db.Integer, nullable=False)
+    image = db.Column(db.String(256), nullable=True)
 
     def __repr__(self):
         return f"<Question id={self.id}, quiz_id={self.quiz_id}>"
