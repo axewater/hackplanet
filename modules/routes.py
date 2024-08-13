@@ -44,7 +44,7 @@ from modules.forms import (
 
 from modules.models import (
     User, Whitelist, UserPreference, GlobalSettings, InviteToken, Lab, Challenge, Host, 
-    Flag, UserProgress, FlagsObtained, ChallengesObtained, Quiz, Question, UserQuizProgress
+    Flag, UserProgress, FlagsObtained, ChallengesObtained, Quiz, Question, UserQuizProgress, UserQuestionProgress
 )
 from modules.utilities import (
     admin_required, _authenticate_and_redirect, square_image, send_email, send_password_reset_email, 
@@ -1301,27 +1301,67 @@ def take_quiz(quiz_id):
         flash('You have already completed this quiz.', 'info')
         return redirect(url_for('main.quiz_results', quiz_id=quiz_id))
 
-    if request.method == 'POST':
-        score = 0
-        for question in quiz.questions:
-            answer = request.form.get(f'question_{question.id}')
-            if answer == question.correct_answer:
-                score += question.points
-        
-        if not user_progress:
-            user_progress = UserQuizProgress(user_id=current_user.id, quiz_id=quiz_id)
-        
-        user_progress.score = score
-        user_progress.completed = True
-        user_progress.completed_at = datetime.utcnow()
-        
+    if not user_progress:
+        user_progress = UserQuizProgress(user_id=current_user.id, quiz_id=quiz_id)
         db.session.add(user_progress)
         db.session.commit()
-        
-        flash(f'Quiz completed! Your score: {score}', 'success')
-        return redirect(url_for('main.quiz_results', quiz_id=quiz_id))
+
+    questions = Question.query.filter_by(quiz_id=quiz_id).order_by(Question.id).all()
     
-    return render_template('site/take_quiz.html', quiz=quiz)
+    if not questions:
+        flash('This quiz has no questions.', 'warning')
+        return redirect(url_for('main.quizzes'))
+
+    if user_progress.current_question >= len(questions):
+        flash('You have answered all questions in this quiz.', 'info')
+        return redirect(url_for('main.quiz_results', quiz_id=quiz_id))
+
+    current_question = questions[user_progress.current_question]
+
+    if request.method == 'POST':
+        answer = request.form.get('answer')
+        if not answer:
+            flash('Please select an answer.', 'warning')
+            return redirect(url_for('main.take_quiz', quiz_id=quiz_id))
+
+        question_progress = UserQuestionProgress.query.filter_by(
+            user_quiz_progress_id=user_progress.id,
+            question_id=current_question.id
+        ).first()
+
+        if not question_progress:
+            question_progress = UserQuestionProgress(
+                user_quiz_progress_id=user_progress.id,
+                question_id=current_question.id
+            )
+            db.session.add(question_progress)
+
+        question_progress.answered = True
+        question_progress.correct = (answer == current_question.correct_answer)
+        question_progress.user_answer = answer
+
+        if question_progress.correct:
+            user_progress.score += current_question.points
+
+        user_progress.current_question += 1
+        
+        if user_progress.current_question >= len(questions):
+            user_progress.completed = True
+            user_progress.completed_at = datetime.utcnow()
+            flash(f'Quiz completed! Your score: {user_progress.score}', 'success')
+        elif not quiz.sequential:
+            flash('Answer recorded. You can continue with the next question or review previous ones.', 'info')
+        else:
+            flash('Answer recorded. Moving to the next question.', 'info')
+
+        db.session.commit()
+
+        if user_progress.completed or not quiz.sequential:
+            return redirect(url_for('main.quiz_results', quiz_id=quiz_id))
+        else:
+            return redirect(url_for('main.take_quiz', quiz_id=quiz_id))
+
+    return render_template('site/take_quiz.html', quiz=quiz, question=current_question, progress=user_progress)
 
 @bp.route('/ctf/quiz_results/<int:quiz_id>')
 @login_required
@@ -1446,12 +1486,16 @@ def user_progress():
     # Fetch obtained flags
     obtained_flags = FlagsObtained.query.filter_by(user_id=current_user.id).all()
     
+    # Fetch quiz progress
+    quiz_progress = UserQuizProgress.query.filter_by(user_id=current_user.id).all()
+    
     # Calculate total score
-    total_score = current_user.score_total
+    total_score = current_user.score_total + sum(progress.score for progress in quiz_progress)
     
     return render_template('site/user_progress.html', 
                            completed_challenges=completed_challenges,
                            obtained_flags=obtained_flags,
+                           quiz_progress=quiz_progress,
                            total_score=total_score)
 
 @bp.route('/admin/host_manager', methods=['GET'])
@@ -1572,8 +1616,9 @@ def quiz_editor(quiz_id=None):
             quiz.description = form.description.data
             quiz.min_score = form.min_score.data
             quiz.image = form.image.data
+            quiz.sequential = form.sequential.data
         else:
-            quiz = Quiz(title=form.title.data, description=form.description.data, min_score=form.min_score.data, image=form.image.data)
+            quiz = Quiz(title=form.title.data, description=form.description.data, min_score=form.min_score.data, image=form.image.data, sequential=form.sequential.data)
             db.session.add(quiz)
         db.session.commit()
         flash('Quiz saved successfully.', 'success')
@@ -1584,6 +1629,7 @@ def quiz_editor(quiz_id=None):
         form.description.data = quiz.description
         form.min_score.data = quiz.min_score
         form.image.data = quiz.image
+        form.sequential.data = quiz.sequential
 
     return render_template('admin/quiz_editor.html', form=form, quiz=quiz)
 

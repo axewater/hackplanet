@@ -212,6 +212,7 @@ class QuizForm(FlaskForm):
     description = TextAreaField('Description', validators=[Optional(), Length(max=256)])
     min_score = IntegerField('Minimum Score to Pass', validators=[DataRequired(), NumberRange(min=1)])
     image = SelectField('Image', validators=[Optional()], choices=[])
+    sequential = BooleanField('Sequential Questions', default=False)
     submit = SubmitField('Save Quiz')
 
     def __init__(self, *args, **kwargs):

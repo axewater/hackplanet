@@ -259,10 +259,11 @@ class Quiz(db.Model):
     description = db.Column(db.String(256))
     min_score = db.Column(db.Integer, nullable=False)
     image = db.Column(db.String(256), nullable=True)
+    sequential = db.Column(db.Boolean, default=False)
     questions = db.relationship('Question', backref='quiz', lazy=True, cascade="all, delete-orphan")
 
     def __repr__(self):
-        return f"<Quiz id={self.id}, title={self.title}>"
+        return f"<Quiz id={self.id}, title={self.title}, sequential={self.sequential}>"
 
 class Question(db.Model):
     __tablename__ = 'questions'
@@ -287,8 +288,23 @@ class UserQuizProgress(db.Model):
     score = db.Column(db.Integer, nullable=False, default=0)
     completed = db.Column(db.Boolean, default=False)
     completed_at = db.Column(db.DateTime)
+    current_question = db.Column(db.Integer, default=0)
     user = db.relationship('User', backref=db.backref('quiz_progress', lazy=True))
     quiz = db.relationship('Quiz', backref=db.backref('user_progress', lazy=True))
 
     def __repr__(self):
-        return f"<UserQuizProgress id={self.id}, user_id={self.user_id}, quiz_id={self.quiz_id}, score={self.score}>"
+        return f"<UserQuizProgress id={self.id}, user_id={self.user_id}, quiz_id={self.quiz_id}, score={self.score}, current_question={self.current_question}>"
+
+class UserQuestionProgress(db.Model):
+    __tablename__ = 'user_question_progress'
+    id = db.Column(db.Integer, primary_key=True)
+    user_quiz_progress_id = db.Column(db.Integer, db.ForeignKey('user_quiz_progress.id'), nullable=False)
+    question_id = db.Column(db.Integer, db.ForeignKey('questions.id'), nullable=False)
+    answered = db.Column(db.Boolean, default=False)
+    correct = db.Column(db.Boolean, default=False)
+    user_quiz_progress = db.relationship('UserQuizProgress', backref=db.backref('question_progress', lazy=True))
+    question = db.relationship('Question', backref=db.backref('user_progress', lazy=True))
+    user_answer = db.Column(db.String(1), nullable=True)
+
+    def __repr__(self):
+        return f"<UserQuestionProgress id={self.id}, user_quiz_progress_id={self.user_quiz_progress_id}, question_id={self.question_id}, answered={self.answered}, correct={self.correct}, user_answer={self.user_answer}>"

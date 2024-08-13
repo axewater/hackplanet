@@ -1,29 +1,61 @@
-{% extends 'base.html' %}
-
+{% extends "base.html" %}
 {% block content %}
-{% with messages = get_flashed_messages() %}
-{% if messages %}
-<div>
-    {% for message in messages %}
-    <div class="alert alert-info" role="alert">{{ message }}</div>
-    {% endfor %}
-</div>
-{% endif %}
-{% endwith %}
 <div class="container">
     <div class="glass-panel">
         <h1>Quiz Results: {{ quiz.title }}</h1>
         <p>Your score: {{ user_progress.score }} / {{ quiz.questions|sum(attribute='points') }}</p>
-        {% if user_progress.score >= quiz.min_score %}
-        <div class="alert alert-success">
-            Congratulations! You have passed the quiz.
-        </div>
+        {% if user_progress.completed %}
+            {% if user_progress.score >= quiz.min_score %}
+            <p class="text-success">Congratulations! You passed the quiz.</p>
+            {% else %}
+            <p class="text-danger">Unfortunately, you didn't pass the quiz. The minimum score required is {{ quiz.min_score }}.</p>
+            {% endif %}
         {% else %}
-        <div class="alert alert-danger">
-            Unfortunately, you did not meet the minimum score required to pass this quiz. Keep practicing and try again!
-        </div>
+            <p class="text-warning">You haven't completed the quiz yet. Your current progress is saved.</p>
         {% endif %}
+        Certainly! I'll continue with the changes to the quiz_results.html file:
+
+        <h2>Question Summary</h2>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Question</th>
+                    <th>Your Answer</th>
+                    <th>Correct Answer</th>
+                    <th>Points</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for question_progress in user_progress.question_progress %}
+                <tr>
+                    <td>{{ question_progress.question.question_text }}</td>
+                    <td>
+                        {% if question_progress.answered %}
+                            {% if question_progress.user_answer %}
+                                {{ question_progress.question['option_' + question_progress.user_answer.lower()] }}
+                            {% else %}
+                                Not answered
+                            {% endif %}
+                        {% else %}
+                            Not answered
+                        {% endif %}
+                    </td>
+                    <td>{{ question_progress.question['option_' + question_progress.question.correct_answer.lower()] }}</td>
+                    <td>
+                        {% if question_progress.correct %}
+                            {{ question_progress.question.points }}
+                        {% else %}
+                            0
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
         <a href="{{ url_for('main.quizzes') }}" class="btn btn-primary">Back to Quizzes</a>
+        {% if not user_progress.completed %}
+        <a href="{{ url_for('main.take_quiz', quiz_id=quiz.id) }}" class="btn btn-secondary">Continue Quiz</a>
+        {% endif %}
     </div>
 </div>
 {% endblock %}
