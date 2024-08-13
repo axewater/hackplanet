@@ -1502,10 +1502,23 @@ def user_progress():
     # Calculate total score
     total_score = current_user.score_total + sum(progress.score for progress in quiz_progress)
     
+    # Fetch quiz results
+    quiz_results = []
+    for progress in quiz_progress:
+        quiz = Quiz.query.get(progress.quiz_id)
+        quiz_results.append({
+            'title': quiz.title,
+            'score': progress.score,
+            'total_points': sum(question.points for question in quiz.questions),
+            'completed': progress.completed,
+            'completed_at': progress.completed_at
+        })
+    
     return render_template('site/user_progress.html', 
                            completed_challenges=completed_challenges,
                            obtained_flags=obtained_flags,
                            quiz_progress=quiz_progress,
+                           quiz_results=quiz_results,
                            total_score=total_score)
 
 @bp.route('/admin/host_manager', methods=['GET'])
