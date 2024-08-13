@@ -19,6 +19,7 @@
             {% for quiz in quizzes %}
             <div class="col-md-4 mb-4">
                 <div class="card">
+                    <img src="{{ quiz.image_url }}" class="card-img-top" alt="{{ quiz.title }}">
                     <div class="card-body">
                         <h5 class="card-title">{{ quiz.title }}</h5>
                         <p class="card-text">{{ quiz.description }}</p>

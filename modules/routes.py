@@ -1289,6 +1289,13 @@ def quizzes():
     quizzes = Quiz.query.all()
     user_progress = UserQuizProgress.query.filter_by(user_id=current_user.id).all()
     completed_quizzes = {progress.quiz_id: progress.score for progress in user_progress if progress.completed}
+    
+    for quiz in quizzes:
+        if quiz.image:
+            quiz.image_url = url_for('static', filename=f'library/images/quizes/{quiz.image}')
+        else:
+            quiz.image_url = url_for('static', filename='library/images/quizes/default_quiz_image.jpg')
+    
     return render_template('site/quizzes.html', quizzes=quizzes, completed_quizzes=completed_quizzes)
 
 @bp.route('/ctf/take_quiz/<int:quiz_id>', methods=['GET', 'POST'])
