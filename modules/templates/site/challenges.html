@@ -32,6 +32,9 @@
                         <p class="card-text">Category: {{ challenge.category }}</p>
                         <p class="card-text">Points: {{ challenge.point_value }}</p>
                         <p class="card-text">{{ challenge.description }}</p>
+                        {% if challenge.downloadable_file %}
+                        <a href="{{ url_for('static', filename='library/challenges/' + challenge.downloadable_file) }}" class="btn btn-secondary mb-2">Download File</a>
+                        {% endif %}
                         <form id="flag-submission-form" data-challenge-id="{{ challenge.id }}">
                             <div class="flag-input-container">
                                 <input type="text" id="flag-input" placeholder="Enter flag" class="flag-input">

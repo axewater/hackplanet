@@ -157,20 +157,32 @@ class ChallengeForm(FlaskForm):
     flag_uuid = StringField('Flag UUID', validators=[Optional(), Length(max=36)])
     html_link = SelectField('Image', validators=[Optional()], choices=[])
     point_value = IntegerField('Point Value', validators=[DataRequired(), NumberRange(min=1)])
+    downloadable_file = SelectField('Downloadable File', validators=[Optional()], choices=[])
     submit = SubmitField('Save Challenge')
 
     def __init__(self, *args, **kwargs):
         super(ChallengeForm, self).__init__(*args, **kwargs)
         self.html_link.choices = self.get_image_choices()
+        self.downloadable_file.choices = self.get_file_choices()
 
     def get_image_choices(self):
         image_folder = os.path.join(current_app.config['UPLOAD_FOLDER'], 'images', 'challenges')
         image_files = [f for f in os.listdir(image_folder) if f.lower().endswith(('.png', '.jpg', '.jpeg', '.gif'))]
         return [('', 'Select an image')] + [(f, f) for f in image_files]
 
+    def get_file_choices(self):
+        file_folder = os.path.join(current_app.config['UPLOAD_FOLDER'], 'challenges')
+        allowed_extensions = current_app.config['ALLOWED_EXTENSIONS']
+        files = [f for f in os.listdir(file_folder) if f.lower().split('.')[-1] in allowed_extensions]
+        return [('', 'Select a file')] + [(f, f) for f in files]
+
     def validate_html_link(self, field):
         if field.data and not os.path.exists(os.path.join(current_app.config['UPLOAD_FOLDER'], 'images', 'challenges', field.data)):
             raise ValidationError('Selected image does not exist.')
+
+    def validate_downloadable_file(self, field):
+        if field.data and not os.path.exists(os.path.join(current_app.config['UPLOAD_FOLDER'], 'challenges', field.data)):
+            raise ValidationError('Selected file does not exist.')
 
 class HostForm(FlaskForm):
     name = StringField('Host Name', validators=[DataRequired(), Length(max=128)])

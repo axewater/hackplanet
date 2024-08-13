@@ -1252,13 +1252,15 @@ def challenge_editor(challenge_id=None):
                 challenge.flag_uuid = form.flag_uuid.data or str(uuid4())
                 challenge.html_link = form.html_link.data
                 challenge.point_value = form.point_value.data
+                challenge.downloadable_file = form.downloadable_file.data
             else:
                 challenge = Challenge(
                     name=form.name.data,
                     description=form.description.data,
                     flag_uuid=form.flag_uuid.data or str(uuid4()),
                     html_link=form.html_link.data,
-                    point_value=form.point_value.data
+                    point_value=form.point_value.data,
+                    downloadable_file=form.downloadable_file.data
                 )
                 db.session.add(challenge)
             
@@ -1276,6 +1278,7 @@ def challenge_editor(challenge_id=None):
         form.flag_uuid.data = challenge.flag_uuid
         form.html_link.data = challenge.html_link
         form.point_value.data = challenge.point_value
+        form.downloadable_file.data = challenge.downloadable_file
 
     return render_template('admin/challenge_editor.html', form=form, challenge=challenge)
 

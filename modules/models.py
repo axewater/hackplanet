@@ -198,6 +198,7 @@ class Challenge(db.Model):
     flag_uuid = db.Column(db.String(36), unique=True, nullable=False, default=str(uuid4()))
     html_link = db.Column(db.String(256), nullable=True)
     point_value = db.Column(db.Integer, nullable=False)
+    downloadable_file = db.Column(db.String(256), nullable=True)
 
     def __repr__(self):
         return f"<Challenge id={self.id}, name={self.name}, flag_uuid={self.flag_uuid}, point_value={self.point_value}>"
