@@ -1668,9 +1668,24 @@ def admin_help():
 def delete_quiz(quiz_id):
     quiz = Quiz.query.get(quiz_id)
     if quiz:
-        db.session.delete(quiz)
-        db.session.commit()
-        flash('Quiz deleted successfully.', 'success')
+        # Check for related questions
+        if quiz.questions:
+            flash('Cannot delete quiz. Please delete all questions first.', 'error')
+            return redirect(url_for('main.quiz_manager'))
+        
+        # Check for user progress records
+        user_progress = UserQuizProgress.query.filter_by(quiz_id=quiz_id).first()
+        if user_progress:
+            flash('Cannot delete quiz. There are user progress records associated with this quiz.', 'error')
+            return redirect(url_for('main.quiz_manager'))
+        
+        try:
+            db.session.delete(quiz)
+            db.session.commit()
+            flash('Quiz deleted successfully.', 'success')
+        except SQLAlchemyError as e:
+            db.session.rollback()
+            flash(f'An error occurred while deleting the quiz: {str(e)}', 'error')
     else:
         flash('Quiz not found.', 'error')
     return redirect(url_for('main.quiz_manager'))
@@ -1686,6 +1701,11 @@ def question_editor(quiz_id, question_id=None):
 
     if form.validate_on_submit():
         if question:
+            # Check if there's any user progress for this question
+            user_progress_exists = UserQuestionProgress.query.filter_by(question_id=question_id).first() is not None
+            if user_progress_exists:
+                flash('Warning: Editing this question will affect existing user progress.', 'warning')
+            
             question.question_text = form.question_text.data
             question.option_a = form.option_a.data
             question.option_b = form.option_b.data
@@ -1720,6 +1740,11 @@ def question_editor(quiz_id, question_id=None):
         form.correct_answer.data = question.correct_answer
         form.points.data = question.points
 
+        # Check if there's any user progress for this question
+        user_progress_exists = UserQuestionProgress.query.filter_by(question_id=question_id).first() is not None
+        if user_progress_exists:
+            flash('Warning: Editing or deleting this question will affect existing user progress.', 'warning')
+
     return render_template('admin/question_editor.html', form=form, quiz=quiz, question=question)
 
 @bp.route('/admin/delete_question/<int:question_id>', methods=['POST'])
@@ -1729,9 +1754,19 @@ def delete_question(question_id):
     question = Question.query.get(question_id)
     if question:
         quiz_id = question.quiz_id
+        
+        # Delete related UserQuestionProgress entries
+        UserQuestionProgress.query.filter_by(question_id=question_id).delete()
+        
+        # Update UserQuizProgress scores
+        user_quiz_progresses = UserQuizProgress.query.filter_by(quiz_id=quiz_id).all()
+        for progress in user_quiz_progresses:
+            if progress.score >= question.points:
+                progress.score -= question.points
+        
         db.session.delete(question)
         db.session.commit()
-        flash('Question deleted successfully.', 'success')
+        flash('Question and related progress data deleted successfully.', 'success')
         return redirect(url_for('main.quiz_editor', quiz_id=quiz_id))
     else:
         flash('Question not found.', 'error')

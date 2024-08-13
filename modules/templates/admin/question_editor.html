@@ -1,10 +1,10 @@
 {% extends "base.html" %}
 {% block content %}
-{% with messages = get_flashed_messages() %}
+{% with messages = get_flashed_messages(with_categories=true) %}
 {% if messages %}
 <div>
-    {% for message in messages %}
-    <div class="alert alert-info" role="alert">{{ message }}</div>
+    {% for category, message in messages %}
+    <div class="alert alert-{{ category }}" role="alert">{{ message }}</div>
     {% endfor %}
 </div>
 {% endif %}
@@ -12,6 +12,11 @@
 <div class="container">
     <div class="glass-panel">
         <h1>{{ 'Edit Question' if question else 'Create New Question' }} for Quiz: {{ quiz.title }}</h1>
+        {% if question %}
+        <div class="alert alert-warning" role="alert">
+            Warning: Editing or deleting this question may affect existing user progress.
+        </div>
+        {% endif %}
         <form method="POST">
             {{ form.hidden_tag() }}
             <div class="mb-3">
