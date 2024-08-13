@@ -243,6 +243,7 @@ class QuestionForm(FlaskForm):
     def get_image_choices(self):
         image_folder = os.path.join(current_app.config['UPLOAD_FOLDER'], 'images', 'questions')
         image_files = [f for f in os.listdir(image_folder) if f.lower().endswith(('.png', '.jpg', '.jpeg', '.gif'))]
+        image_files.sort()  # Sort the image files alphabetically
         return [('', 'Select an image')] + [(f, f) for f in image_files]
     
 from modules.models import Host
