@@ -8,7 +8,7 @@
             <div class="col-md-4">
                 <img src="{{ url_for('static', filename=user_data['avatarpath']) }}" alt="Avatar" class="img-fluid rounded-circle mb-3" style="max-width: 200px;">
                 <h3>{{ user_data['name'] }}</h3>
-                <p>Email: {{ user_data['email'] }}</p>
+                <!-- Removed email display -->
                 <p>Total Score: {{ user_data['score_total'] }}</p>
             </div>
             <div class="col-md-8">

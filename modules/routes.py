@@ -1543,7 +1543,6 @@ def user_details(user_id):
     user_data = {
         'id': user.id,
         'name': user.name,
-        'email': user.email,
         'avatarpath': user.avatarpath,
         'score_total': total_score
     }
