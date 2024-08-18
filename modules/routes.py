@@ -1070,6 +1070,7 @@ def leaderboard():
     for user, quiz_score in users:
         total_score = user.score_total + (quiz_score or 0)
         user_data.append({
+            'id': user.id,
             'name': user.name,
             'score_total': total_score,
             'avatarpath': user.avatarpath
@@ -1518,6 +1519,52 @@ def user_progress():
                            completed_challenges=completed_challenges,
                            obtained_flags=obtained_flags,
                            quiz_progress=quiz_progress,
+                           quiz_results=quiz_results,
+                           total_score=total_score)
+
+@bp.route('/ctf/user_details/<int:user_id>')
+@login_required
+def user_details(user_id):
+    user = User.query.get_or_404(user_id)
+    
+    # Fetch completed challenges
+    completed_challenges = ChallengesObtained.query.filter_by(user_id=user.id).all()
+    
+    # Fetch obtained flags
+    obtained_flags = FlagsObtained.query.filter_by(user_id=user.id).all()
+    
+    # Fetch quiz progress
+    quiz_progress = UserQuizProgress.query.filter_by(user_id=user.id).all()
+    
+    # Calculate total score
+    total_score = user.score_total + sum(progress.score for progress in quiz_progress)
+    
+    # Prepare user data
+    user_data = {
+        'id': user.id,
+        'name': user.name,
+        'email': user.email,
+        'avatarpath': user.avatarpath,
+        'score_total': total_score
+    }
+    
+    # Fetch quiz results
+    quiz_results = []
+    for progress in quiz_progress:
+        quiz = Quiz.query.get(progress.quiz_id)
+        quiz_results.append({
+            'title': quiz.title,
+            'score': progress.score,
+            'total_points': sum(question.points for question in quiz.questions),
+            'completed': progress.completed,
+            'completed_at': progress.completed_at
+        })
+    
+    return render_template('site/user_details.html', 
+                           user_data=user_data,
+                           user=user,
+                           completed_challenges=completed_challenges,
+                           obtained_flags=obtained_flags,
                            quiz_results=quiz_results,
                            total_score=total_score)
 

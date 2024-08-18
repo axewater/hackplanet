@@ -34,10 +34,10 @@
             <tr>
                 <td>{{ loop.index }}</td>
                 <td>
-                    <img src="{{ url_for('static', filename=user.avatarpath) }}" alt="Avatar" style="width: 50px; height: 50px; border-radius: 50%;">
+                    <img src="{{ url_for('static', filename=user['avatarpath']) }}" alt="Avatar" style="width: 50px; height: 50px; border-radius: 50%;">
                 </td>
-                <td>{{ user.name }}</td>
-                <td>{{ user.score_total }}</td>
+                <td><a href="{{ url_for('main.user_details', user_id=user['id']) }}">{{ user['name'] }}</a></td>
+                <td>{{ user['score_total'] }}</td>
             </tr>
             {% endfor %}
         </tbody>
