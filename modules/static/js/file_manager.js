@@ -159,11 +159,30 @@ document.addEventListener('DOMContentLoaded', function() {
             if (data.success) {
                 $('#uploadModal').modal('hide');
                 loadFileList(currentPath);
+                showAlert('success', 'File uploaded successfully');
             } else {
-                alert('Error uploading file: ' + data.message);
+                showAlert('error', 'Error uploading file: ' + data.message);
             }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showAlert('error', 'An unexpected error occurred');
         });
     });
+
+    function showAlert(type, message) {
+        const alertDiv = document.createElement('div');
+        alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+        alertDiv.role = 'alert';
+        alertDiv.innerHTML = `
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        `;
+        document.querySelector('.container').prepend(alertDiv);
+        setTimeout(() => {
+            alertDiv.remove();
+        }, 5000);
+    }
 
     document.getElementById('createFolderBtn').addEventListener('click', function() {
         $('#createFolderModal').modal('show');

@@ -941,9 +941,13 @@ def media_upload():
             return jsonify({'success': False, 'message': 'Invalid path'}), 400
         
         file_path = os.path.join(full_path, filename)
-        file.save(file_path)
-        
-        return jsonify({'success': True, 'message': 'File uploaded successfully'})
+        try:
+            file.save(file_path)
+            return jsonify({'success': True, 'message': 'File uploaded successfully'})
+        except PermissionError:
+            return jsonify({'success': False, 'message': 'Permission denied. Unable to save file.'}), 403
+        except Exception as e:
+            return jsonify({'success': False, 'message': f'An error occurred: {str(e)}'}), 500
     
     return jsonify({'success': False, 'message': 'File upload failed'}), 400
 
