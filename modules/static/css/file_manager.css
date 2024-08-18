@@ -13,3 +13,29 @@
     flex-direction: row;
     align-items: center;
 }
+
+.breadcrumb-chip {
+    display: inline-block;
+    padding: 0.25em 0.6em;
+    font-size: 0.9em;
+    line-height: 1;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: baseline;
+    border-radius: 10rem;
+    color: #fff;
+    background-color: #007bff;
+    text-decoration: none;
+    transition: background-color 0.15s ease-in-out;
+}
+
+.breadcrumb-chip:hover {
+    background-color: #0056b3;
+    color: #fff;
+    text-decoration: none;
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+    content: ">";
+    color: #6c757d;
+}

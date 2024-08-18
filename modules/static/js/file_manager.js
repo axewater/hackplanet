@@ -76,19 +76,19 @@ document.addEventListener('DOMContentLoaded', function() {
     function updateBreadcrumb(path) {
         const breadcrumb = document.getElementById('breadcrumb');
         const parts = path.split('/').filter(Boolean);
-        let html = '<ol class="breadcrumb"><li class="breadcrumb-item"><a href="#" data-path="/">Root</a></li>';
+        let html = '<nav aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="#" data-path="/" class="breadcrumb-chip">Root</a></li>';
         let currentPath = '';
         parts.forEach((part, index) => {
             currentPath += '/' + part;
-            html += `<li class="breadcrumb-item${index === parts.length - 1 ? ' active' : ''}">`;
+            html += '<li class="breadcrumb-item">';
             if (index === parts.length - 1) {
-                html += part;
+                html += `<span class="breadcrumb-chip">${part}</span>`;
             } else {
-                html += `<a href="#" data-path="${currentPath}">${part}</a>`;
+                html += `<a href="#" data-path="${currentPath}" class="breadcrumb-chip">${part}</a>`;
             }
             html += '</li>';
         });
-        html += '</ol>';
+        html += '</ol></nav>';
         breadcrumb.innerHTML = html;
     }
 
