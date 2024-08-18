@@ -1417,7 +1417,7 @@ def submit_flag():
 
     except Exception as e:
         db.session.rollback()
-        print(f"Error submitting flag: {str(e)}")
+        current_app.logger.error(f"Error submitting flag: {str(e)}")
         return jsonify({'success': False, 'message': 'An error occurred while submitting the flag'}), 500
 
 @bp.route('/submit_challenge_flag', methods=['POST'])
@@ -1455,7 +1455,7 @@ def submit_challenge_flag():
 
     except Exception as e:
         db.session.rollback()
-        print(f"Error submitting challenge flag: {str(e)}")
+        current_app.logger.error(f"Error submitting challenge flag: {str(e)}")
         return jsonify({'success': False, 'message': 'An error occurred while submitting the flag'}), 500
 
 @bp.route('/ctf/hacking_labs')
@@ -1600,16 +1600,16 @@ def host_editor(host_id=None):
                 if form.image_url.data:
                     host.image_url = form.image_url.data
 
-                print(f"Debug: Lab ID being set: {host.lab_id}")
-                print(f"Debug: Full form data: {form.data}")
+                current_app.logger.info(f"Lab ID being set: {host.lab_id}")
+                current_app.logger.debug(f"Full form data: {form.data}")
                 db.session.commit()
                 return jsonify({'success': True, 'message': 'Host saved successfully.'})
             except Exception as e:
                 db.session.rollback()
-                logging.error(f"Error saving host: {str(e)}")
+                current_app.logger.error(f"Error saving host: {str(e)}")
                 return jsonify({'success': False, 'message': 'An error occurred while saving the host.', 'errors': form.errors}), 400
         else:
-            logging.error(f"Form validation failed: {form.errors}")
+            current_app.logger.warning(f"Form validation failed: {form.errors}")
             return jsonify({'success': False, 'message': 'Validation failed.', 'errors': form.errors}), 400
 
     if host:
@@ -1650,9 +1650,14 @@ def host_details(host_id):
 def delete_host(host_id):
     host = Host.query.get(host_id)
     if host:
-        db.session.delete(host)
-        db.session.commit()
-        return jsonify({'success': True})
+        try:
+            db.session.delete(host)
+            db.session.commit()
+            return jsonify({'success': True})
+        except Exception as e:
+            db.session.rollback()
+            current_app.logger.error(f"Error deleting host: {str(e)}")
+            return jsonify({'success': False, 'message': 'An error occurred while deleting the host.'}), 500
     else:
         return jsonify({
             'success': False,
@@ -1731,7 +1736,8 @@ def delete_quiz(quiz_id):
             flash('Quiz deleted successfully.', 'success')
         except SQLAlchemyError as e:
             db.session.rollback()
-            flash(f'An error occurred while deleting the quiz: {str(e)}', 'error')
+            current_app.logger.error(f"Error deleting quiz: {str(e)}")
+            flash('An error occurred while deleting the quiz.', 'error')
     else:
         flash('Quiz not found.', 'error')
     return redirect(url_for('main.quiz_manager'))
