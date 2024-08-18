@@ -251,7 +251,6 @@ font-size: large;
     color: #ddd;
     margin-top: 15px;
     text-align: justify;
-    
 }
 
 .content-restricted-textblock {
@@ -283,7 +282,37 @@ font-size: large;
     margin-top: 15px;
     text-align: justify;
     padding-right: 20px;
+}
 
+.chip {
+    display: inline-block;
+    padding: 10px 20px;
+    border-radius: 25px;
+    background-color: #0a440f;
+    color: white;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.dark-background {
+    background-color: #1a1a1a;
+    border-radius: 15px;
+    color: white;
+}
+
+.progress {
+    height: 25px;
+    background-color: #333;
+    border-radius: 12.5px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    background-color: #0a440f;
+    color: white;
+    text-align: center;
+    line-height: 25px;
+    font-weight: bold;
 }
 
 

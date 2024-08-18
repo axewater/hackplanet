@@ -3,54 +3,65 @@
 {% block content %}
 <div class="container">
     <div class="glass-panel">
-        <h1>Hacker Profile: {{ user_data['name'] }}</h1>
+        <div class="chip">
+            <h1>Hacker Profile: {{ user_data['name'] }}</h1>
+        </div>
         <div class="row">
             <div class="col-md-4">
                 <img src="{{ url_for('static', filename=user_data['avatarpath']) }}" alt="Avatar" class="img-fluid rounded-circle mb-3" style="max-width: 200px;">
-                <h3>{{ user_data['name'] }}</h3>
-                <!-- Removed email display -->
-                <p>Total Score: {{ user_data['score_total'] }}</p>
+                <div class="chip">
+                    <h3>{{ user_data['name'] }}</h3>
+                </div>
+                <div class="dark-background p-3 mt-3">
+                    <h4 class="text-light">Total Score:</h4>
+                    <h2 class="text-light">{{ user_data['score_total'] }}</h2>
+                    <div class="progress mt-2">
+                        <div class="progress-bar" role="progressbar" style="width: {{ (user_data['score_total'] / 1000) * 100 }}%;" aria-valuenow="{{ user_data['score_total'] }}" aria-valuemin="0" aria-valuemax="1000">{{ user_data['score_total'] }} / 1000</div>
+                    </div>
+                </div>
             </div>
             <div class="col-md-8">
-                <h2>Completed Challenges</h2>
-                <ul class="list-group mb-4">
-                    {% for challenge in completed_challenges %}
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        {{ challenge.challenge.name }}
-                        <span class="badge bg-primary rounded-pill">{{ challenge.challenge.point_value }} points</span>
-                    </li>
-                    {% else %}
-                    <li class="list-group-item">No challenges completed yet.</li>
-                    {% endfor %}
-                </ul>
+                <div class="dark-background p-3">
+                    <h2 class="text-light">Completed Challenges</h2>
+                    <ul class="list-group mb-4">
+                        {% for challenge in completed_challenges %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            {{ challenge.challenge.name }}
+                            <span class="badge bg-primary rounded-pill">{{ challenge.challenge.point_value }} points</span>
+                        </li>
+                        {% else %}
+                        <li class="list-group-item">No challenges completed yet.</li>
+                        {% endfor %}
+                    </ul>
 
-                <h2>Obtained Flags</h2>
-                <ul class="list-group mb-4">
-                    {% for flag in obtained_flags %}
-                    <li class="list-group-item d-flex justify-content-between align-items-center">
-                        {{ flag.flag.host.name }} - {{ flag.flag.type }}
-                        <span class="badge bg-success rounded-pill">{{ flag.flag.point_value }} points</span>
-                    </li>
-                    {% else %}
-                    <li class="list-group-item">No flags obtained yet.</li>
-                    {% endfor %}
-                </ul>
+                    <h2 class="text-light">Obtained Flags</h2>
+                    <ul class="list-group mb-4">
+                        {% for flag in obtained_flags %}
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            {{ flag.flag.host.name }} - {{ flag.flag.type }}
+                            <span class="badge bg-success rounded-pill">{{ flag.flag.point_value }} points</span>
+                        </li>
+                        {% else %}
+                        <li class="list-group-item">No flags obtained yet.</li>
+                        {% endfor %}
+                    </ul>
 
-                <h2>Quiz Results</h2>
-                <ul class="list-group">
-                    {% for result in quiz_results %}
-                    <li class="list-group-item">
-                        <h5>{{ result.title }}</h5>
-                        <p>Score: {{ result.score }} / {{ result.total_points }}</p>
-                        <p>Status: {% if result.completed %}Completed{% else %}In Progress{% endif %}</p>
-                        {% if result.completed_at %}
-                        <p>Completed on: {{ result.completed_at.strftime('%Y-%m-%d %H:%M:%S') }}</p>
-                        {% endif %}
-                    </li>
-                    {% else %}
-                    <li class="list-group-item">No quizzes taken yet.</li>
-                    {% endfor %}
-                </ul>
+                    <h2 class="text-light">Quiz Results</h2>
+                    <ul class="list-group">
+                        {% for result in quiz_results %}
+                        <li class="list-group-item">
+                            <h5>{{ result.title }}</h5>
+                            <p>Score: {{ result.score }} / {{ result.total_points }}</p>
+                            <p>Status: {% if result.completed %}Completed{% else %}In Progress{% endif %}</p>
+                            {% if result.completed_at %}
+                            <p>Completed on: {{ result.completed_at.strftime('%Y-%m-%d %H:%M:%S') }}</p>
+                            {% endif %}
+                        </li>
+                        {% else %}
+                        <li class="list-group-item">No quizzes taken yet.</li>
+                        {% endfor %}
+                    </ul>
+                </div>
             </div>
         </div>
         <a href="{{ url_for('main.leaderboard') }}" class="btn btn-primary mt-4">Back to Leaderboard</a>
