@@ -78,7 +78,10 @@
                 <span class="link-text">Progress</span>
             </a>
 
-
+            <a href="{{ url_for('main.leaderboard') }}" class="sidebar-link">
+                <i class="fas fa-trophy"></i>
+                <span class="link-text">Leaderboard</span>
+            </a>
 
             {% if show_help_button %}
                 <a href="{{ url_for('site.helpfaq') }}" class="sidebar-link"><i class="fas fa-question-circle"></i><span class="link-text">Help</span></a>
