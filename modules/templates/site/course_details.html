@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <div class="glass-panel">
+        <h1 class="mb-4">{{ course.name }}</h1>
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                {% if course.image %}
+                    <img src="{{ url_for('static', filename='library/images/courses/' + course.image) }}" class="img-fluid rounded shadow" alt="{{ course.name }}">
+                {% else %}
+                    <img src="{{ url_for('static', filename='library/images/courses/default_course_image.jpg') }}" class="img-fluid rounded shadow" alt="Default Course Image">
+                {% endif %}
+            </div>
+            <div class="col-md-8">
+                <table class="table table-bordered">
+                    <tbody>
+                        <tr>
+                            <th scope="row" class="bg-light">Description</th>
+                            <td>{{ course.description }}</td>
+                        </tr>
+                        <tr>
+                            <th scope="row" class="bg-light">Tags</th>
+                            <td>
+                                {% for tag in course.tags.split(',') %}
+                                    <span class="badge bg-secondary me-1">{{ tag.strip() }}</span>
+                                {% endfor %}
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                {% if course.file_attachment %}
+                    <div class="mt-4">
+                        <a href="{{ url_for('static', filename='library/studyfiles/' + course.file_attachment) }}" class="btn btn-primary btn-lg" download>
+                            <i class="fas fa-download me-2"></i>Download Course Material
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="mt-4">
+        <a href="{{ url_for('main.study_room') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Back to Study Room
+        </a>
+    </div>
+</div>
+{% endblock %}

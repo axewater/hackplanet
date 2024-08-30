@@ -260,3 +260,27 @@ class FlagForm(FlaskForm):
     def __init__(self, *args, **kwargs):
         super(FlagForm, self).__init__(*args, **kwargs)
         self.host_id.choices = [(h.id, h.name) for h in Host.query.all()]
+
+class CourseForm(FlaskForm):
+    name = StringField('Course Name', validators=[DataRequired(), Length(max=128)])
+    description = TextAreaField('Description', validators=[Optional()])
+    file_attachment = SelectField('File Attachment', validators=[Optional()], choices=[])
+    image = SelectField('Course Image', validators=[Optional()], choices=[])  # New field for course image
+    tags = StringField('Tags', validators=[Optional(), Length(max=256)])
+    submit = SubmitField('Save Course')
+
+    def __init__(self, *args, **kwargs):
+        super(CourseForm, self).__init__(*args, **kwargs)
+        self.file_attachment.choices = self.get_file_choices()
+        self.image.choices = self.get_image_choices()  # New method call
+
+    def get_file_choices(self):
+        file_folder = os.path.join(current_app.config['UPLOAD_FOLDER'], 'studyfiles')
+        allowed_extensions = current_app.config['ALLOWED_EXTENSIONS']
+        files = [f for f in os.listdir(file_folder) if f.lower().split('.')[-1] in allowed_extensions]
+        return [('', 'Select a file')] + [(f, f) for f in files]
+
+    def get_image_choices(self):
+        image_folder = os.path.join(current_app.config['UPLOAD_FOLDER'], 'images', 'courses')
+        image_files = [f for f in os.listdir(image_folder) if f.lower().endswith(('.png', '.jpg', '.jpeg', '.gif'))]
+        return [('', 'Select an image')] + [(f, f) for f in image_files]

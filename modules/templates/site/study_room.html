@@ -18,9 +18,26 @@
         </div>
         <div class="row">
             <div class="col-md-12">
-                <p>Welcome to the Study Room! This is where you can find resources to enhance your hacking skills.</p>
-                <p>More content will be added soon. Stay tuned!</p>
+                <p>Welcome to the Study Room! Here you can find resources to enhance your hacking skills.</p>
             </div>
+        </div>
+        <div class="row mt-4">
+            {% for course in courses %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    {% if course.image %}
+                        <img src="{{ url_for('static', filename='library/images/courses/' + course.image) }}" class="card-img-top" alt="{{ course.name }}">
+                    {% else %}
+                        <img src="{{ url_for('static', filename='library/images/courses/default_course_image.jpg') }}" class="card-img-top" alt="Default Course Image">
+                    {% endif %}
+                    <div class="card-body">
+                        <h5 class="card-title">{{ course.name }}</h5>
+                        <p class="card-text">{{ course.description[:100] }}{% if course.description|length > 100 %}...{% endif %}</p>
+                        <a href="{{ url_for('main.course_details', course_id=course.id) }}" class="btn btn-primary">View Course</a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
         </div>
     </div>
 </div>

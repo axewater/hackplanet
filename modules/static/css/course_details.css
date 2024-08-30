@@ -1,0 +1,32 @@
+.glass-panel {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.course-image {
+    transition: transform 0.3s ease-in-out;
+}
+
+.course-image:hover {
+    transform: scale(1.05);
+}
+
+.table {
+    background-color: rgba(255, 255, 255, 0.8);
+}
+
+.table th {
+    width: 30%;
+}
+
+.badge {
+    font-size: 0.9em;
+}
+
+.btn-lg {
+    padding: 15px 30px;
+    font-size: 1.2em;
+}

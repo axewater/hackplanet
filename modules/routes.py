@@ -39,12 +39,12 @@ from modules.forms import (
     UserPasswordForm, UserDetailForm, EditProfileForm, NewsletterForm, WhitelistForm, EditUserForm, ChallengeForm,
     UserManagementForm, CsrfProtectForm, LoginForm, ResetPasswordRequestForm, RegistrationForm, HostForm,
     CreateUserForm, UserPreferencesForm, InviteForm, CsrfForm, LabForm, FlagSubmissionForm, ChallengeSubmissionForm,
-    QuizForm, QuestionForm, FlagForm
+    QuizForm, QuestionForm, FlagForm, CourseForm
 )
 
 from modules.models import (
     User, Whitelist, UserPreference, GlobalSettings, InviteToken, Lab, Challenge, Host, 
-    Flag, UserProgress, FlagsObtained, ChallengesObtained, Quiz, Question, UserQuizProgress, UserQuestionProgress
+    Flag, UserProgress, FlagsObtained, ChallengesObtained, Quiz, Question, UserQuizProgress, UserQuestionProgress, Course
 )
 from modules.utilities import (
     admin_required, _authenticate_and_redirect, square_image, send_email, send_password_reset_email, 
@@ -1341,7 +1341,14 @@ def quizzes():
 @bp.route('/ctf/study_room')
 @login_required
 def study_room():
-    return render_template('site/study_room.html')
+    courses = Course.query.all()
+    return render_template('site/study_room.html', courses=courses)
+
+@bp.route('/ctf/course_details/<int:course_id>')
+@login_required
+def course_details(course_id):
+    course = Course.query.get_or_404(course_id)
+    return render_template('site/course_details.html', course=course)
 
 @bp.route('/ctf/take_quiz/<int:quiz_id>', methods=['GET', 'POST'])
 @login_required
@@ -2077,4 +2084,44 @@ def add_flag():
 @login_required
 @admin_required
 def studyroom_manager():
-    return render_template('admin/studyroom_manager.html')
+    courses = Course.query.all()
+    return render_template('admin/studyroom_manager.html', courses=courses)
+
+@bp.route('/admin/course_editor', methods=['GET', 'POST'])
+@bp.route('/admin/course_editor/<int:course_id>', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def course_editor(course_id=None):
+    form = CourseForm()
+    course = Course.query.get(course_id) if course_id else None
+
+    if form.validate_on_submit():
+        if course:
+            form.populate_obj(course)
+        else:
+            course = Course(
+                name=form.name.data,
+                description=form.description.data,
+                file_attachment=form.file_attachment.data,
+                image=form.image.data,  # New field
+                tags=form.tags.data
+            )
+            db.session.add(course)
+        db.session.commit()
+        flash('Course saved successfully.', 'success')
+        return redirect(url_for('main.studyroom_manager'))
+
+    if course:
+        form = CourseForm(obj=course)
+
+    return render_template('admin/course_editor.html', form=form, course=course)
+
+@bp.route('/admin/delete_course/<int:course_id>', methods=['POST'])
+@login_required
+@admin_required
+def delete_course(course_id):
+    course = Course.query.get_or_404(course_id)
+    db.session.delete(course)
+    db.session.commit()
+    flash('Course deleted successfully.', 'success')
+    return redirect(url_for('main.studyroom_manager'))

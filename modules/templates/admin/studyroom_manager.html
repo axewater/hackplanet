@@ -1,10 +1,10 @@
 {% extends "base.html" %}
 {% block content %}
-{% with messages = get_flashed_messages() %}
+{% with messages = get_flashed_messages(with_categories=true) %}
 {% if messages %}
 <div>
-    {% for message in messages %}
-    <div class="alert alert-info" role="alert">{{ message }}</div>
+    {% for category, message in messages %}
+    <div class="alert alert-{{ category }}" role="alert">{{ message }}</div>
     {% endfor %}
 </div>
 {% endif %}
@@ -12,8 +12,36 @@
 <div class="container">
     <div class="glass-panel">
         <h1>StudyRoom Manager</h1>
-        <p>Welcome to the StudyRoom Manager! This feature is currently under development.</p>
-        <a href="{{ url_for('main.admin_dashboard') }}" class="btn btn-primary">Back to Dashboard</a>
+        <a href="{{ url_for('main.course_editor') }}" class="btn btn-primary mb-3">Add New Course</a>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>File Attachment</th>
+                    <th>Tags</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for course in courses %}
+                <tr>
+                    <td>{{ course.name }}</td>
+                    <td>{{ course.description[:50] }}...</td>
+                    <td>{{ course.file_attachment }}</td>
+                    <td>{{ course.tags }}</td>
+                    <td>
+                        <a href="{{ url_for('main.course_editor', course_id=course.id) }}" class="btn btn-sm btn-primary">Edit</a>
+                        <form action="{{ url_for('main.delete_course', course_id=course.id) }}" method="POST" style="display: inline;">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this course?')">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <a href="{{ url_for('main.admin_dashboard') }}" class="btn btn-secondary">Back to Dashboard</a>
     </div>
 </div>
 {% endblock %}
