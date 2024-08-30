@@ -1098,6 +1098,17 @@ def challenges():
             challenge.image = challenge.html_link
         else:
             challenge.image = 'default_challenge_image.jpg'
+        
+        # Check if the user has already used a hint for this challenge
+        if current_user.is_authenticated:
+            challenge_obtained = ChallengesObtained.query.filter_by(
+                user_id=current_user.id, 
+                challenge_id=challenge.id
+            ).first()
+            challenge.hint_used = challenge_obtained.used_hint if challenge_obtained else False
+        else:
+            challenge.hint_used = False
+
     form = ChallengeSubmissionForm()
     return render_template('site/challenges.html', challenges=challenges, form=form)
 
@@ -1111,7 +1122,9 @@ def get_hint(challenge_id):
         user_challenge = ChallengesObtained(user_id=current_user.id, challenge_id=challenge_id, used_hint=True)
         db.session.add(user_challenge)
     else:
-        user_challenge.used_hint = True
+        if not user_challenge.used_hint:
+            user_challenge.used_hint = True
+            current_user.score_total -= challenge.hint_cost
     
     db.session.commit()
     
