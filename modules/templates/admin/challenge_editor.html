@@ -38,8 +38,36 @@
             {{ form.point_value.label }}
             {{ form.point_value(class="form-control") }}
         </div>
+        <div class="form-group">
+            {{ form.hint.label }}
+            {{ form.hint(class="form-control") }}
+        </div>
+        <div class="form-group">
+            {{ form.hint_cost.label }}
+            {{ form.hint_cost(class="form-control") }}
+        </div>
         {{ form.submit(class="btn btn-primary") }}
         <a href="{{ url_for('main.challenge_manager') }}" class="btn btn-secondary">Cancel</a>
     </form>
 </div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var pointValueInput = document.getElementById('point_value');
+        var hintCostInput = document.getElementById('hint_cost');
+
+        function validateHintCost() {
+            var pointValue = parseInt(pointValueInput.value);
+            var hintCost = parseInt(hintCostInput.value);
+
+            if (hintCost > pointValue) {
+                hintCostInput.setCustomValidity('Hint cost must be less than or equal to the total points.');
+            } else {
+                hintCostInput.setCustomValidity('');
+            }
+        }
+
+        pointValueInput.addEventListener('input', validateHintCost);
+        hintCostInput.addEventListener('input', validateHintCost);
+    });
+</script>
 {% endblock %}

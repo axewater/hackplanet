@@ -35,13 +35,19 @@
                         {% if challenge.downloadable_file %}
                         <a href="{{ url_for('static', filename='library/challenges/' + challenge.downloadable_file) }}" class="btn btn-secondary mb-2">Download File</a>
                         {% endif %}
-                        <form id="flag-submission-form" data-challenge-id="{{ challenge.id }}">
+                        {% if challenge.hint %}
+                        <button class="btn btn-info mb-2" onclick="showHint({{ challenge.id }}, {{ challenge.hint_cost }})">Get Hint (Cost: {{ challenge.hint_cost }} points)</button>
+                        <div id="hint-{{ challenge.id }}" style="display: none;">
+                            <p><strong>Hint:</strong> {{ challenge.hint }}</p>
+                        </div>
+                        {% endif %}
+                        <form id="flag-submission-form-{{ challenge.id }}" data-challenge-id="{{ challenge.id }}">
                             <div class="flag-input-container">
-                                <input type="text" id="flag-input" placeholder="Enter flag" class="flag-input">
+                                <input type="text" id="flag-input-{{ challenge.id }}" placeholder="Enter flag" class="flag-input">
                                 <button type="submit" class="btn btn-primary">Submit</button>
                             </div>
                         </form>
-                        <div id="result-message" style="display: none;"></div>
+                        <div id="result-message-{{ challenge.id }}" style="display: none;"></div>
                         </div>
                     </div>
                 </div>
@@ -50,4 +56,60 @@
         </div>
     </div>
 </div>
+
+<script>
+function showHint(challengeId, hintCost) {
+    if (confirm(`Are you sure you want to use the hint? It will cost ${hintCost} points.`)) {
+        document.getElementById(`hint-${challengeId}`).style.display = 'block';
+        document.getElementById(`flag-submission-form-${challengeId}`).dataset.usedHint = 'true';
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('[id^="flag-submission-form-"]').forEach(form => {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            const challengeId = this.dataset.challengeId;
+            const flag = document.getElementById(`flag-input-${challengeId}`).value;
+            const usedHint = this.dataset.usedHint === 'true';
+
+            fetch('/submit_challenge_flag', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({
+                    challenge_id: challengeId,
+                    flag: flag,
+                    used_hint: usedHint
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                const resultMessage = document.getElementById(`result-message-${challengeId}`);
+                resultMessage.textContent = data.message;
+                resultMessage.style.display = 'block';
+                if (data.success) {
+                    resultMessage.style.color = 'green';
+                    // Update the user's score if needed
+                    const userScoreElement = document.getElementById('user-score');
+                    if (userScoreElement) {
+                        userScoreElement.textContent = data.new_score;
+                    }
+                } else {
+                    resultMessage.style.color = 'red';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                const resultMessage = document.getElementById(`result-message-${challengeId}`);
+                resultMessage.textContent = 'An error occurred. Please try again.';
+                resultMessage.style.display = 'block';
+                resultMessage.style.color = 'red';
+            });
+        });
+    });
+});
+</script>
 {% endblock %}

@@ -23,6 +23,8 @@
                 <th>Name</th>
                 <th>Description</th>
                 <th>Point Value</th>
+                <th>Hint</th>
+                <th>Hint Cost</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -32,6 +34,8 @@
                 <td>{{ challenge.name }}</td>
                 <td>{{ challenge.description }}</td>
                 <td>{{ challenge.point_value }}</td>
+                <td>{{ 'Yes' if challenge.hint else 'No' }}</td>
+                <td>{{ challenge.hint_cost if challenge.hint_cost else 'N/A' }}</td>
                 <td>
                     <a href="{{ url_for('main.challenge_editor', challenge_id=challenge.id) }}" class="btn btn-sm btn-primary">Edit</a>
                     <button onclick="deleteChallenge({{ challenge.id }})" class="btn btn-sm btn-danger">Delete</button>

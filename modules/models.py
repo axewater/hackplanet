@@ -199,6 +199,8 @@ class Challenge(db.Model):
     html_link = db.Column(db.String(256), nullable=True)
     point_value = db.Column(db.Integer, nullable=False)
     downloadable_file = db.Column(db.String(256), nullable=True)
+    hint = db.Column(db.String(512), nullable=True)
+    hint_cost = db.Column(db.Integer, nullable=True)
 
     def __repr__(self):
         return f"<Challenge id={self.id}, name={self.name}, flag_uuid={self.flag_uuid}, point_value={self.point_value}>"
@@ -246,11 +248,12 @@ class ChallengesObtained(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     challenge_id = db.Column(db.Integer, db.ForeignKey('challenges.id'), nullable=False)
     completed_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    used_hint = db.Column(db.Boolean, default=False, nullable=False)
     user = db.relationship('User', backref=db.backref('challenges_obtained', lazy=True))
     challenge = db.relationship('Challenge', backref=db.backref('users_obtained', lazy=True))
 
     def __repr__(self):
-        return f"<ChallengesObtained id={self.id}, user_id={self.user_id}, challenge_id={self.challenge_id}, completed_at={self.completed_at}>"
+        return f"<ChallengesObtained id={self.id}, user_id={self.user_id}, challenge_id={self.challenge_id}, completed_at={self.completed_at}, used_hint={self.used_hint}>"
 
 class Quiz(db.Model):
     __tablename__ = 'quizzes'

@@ -1101,6 +1101,22 @@ def challenges():
     form = ChallengeSubmissionForm()
     return render_template('site/challenges.html', challenges=challenges, form=form)
 
+@bp.route('/get_hint/<int:challenge_id>', methods=['POST'])
+@login_required
+def get_hint(challenge_id):
+    challenge = Challenge.query.get_or_404(challenge_id)
+    user_challenge = ChallengesObtained.query.filter_by(user_id=current_user.id, challenge_id=challenge_id).first()
+    
+    if not user_challenge:
+        user_challenge = ChallengesObtained(user_id=current_user.id, challenge_id=challenge_id, used_hint=True)
+        db.session.add(user_challenge)
+    else:
+        user_challenge.used_hint = True
+    
+    db.session.commit()
+    
+    return jsonify({'hint': challenge.hint})
+
 
 
 @bp.route('/admin/lab_editor/<int:lab_id>', methods=['GET', 'POST'])
@@ -1258,6 +1274,8 @@ def challenge_editor(challenge_id=None):
                 challenge.html_link = form.html_link.data
                 challenge.point_value = form.point_value.data
                 challenge.downloadable_file = form.downloadable_file.data
+                challenge.hint = form.hint.data
+                challenge.hint_cost = form.hint_cost.data
             else:
                 challenge = Challenge(
                     name=form.name.data,
@@ -1265,7 +1283,9 @@ def challenge_editor(challenge_id=None):
                     flag_uuid=form.flag_uuid.data or str(uuid4()),
                     html_link=form.html_link.data,
                     point_value=form.point_value.data,
-                    downloadable_file=form.downloadable_file.data
+                    downloadable_file=form.downloadable_file.data,
+                    hint=form.hint.data,
+                    hint_cost=form.hint_cost.data
                 )
                 db.session.add(challenge)
             
@@ -1284,6 +1304,8 @@ def challenge_editor(challenge_id=None):
         form.html_link.data = challenge.html_link
         form.point_value.data = challenge.point_value
         form.downloadable_file.data = challenge.downloadable_file
+        form.hint.data = challenge.hint
+        form.hint_cost.data = challenge.hint_cost
 
     return render_template('admin/challenge_editor.html', form=form, challenge=challenge)
 
@@ -1430,6 +1452,7 @@ def submit_challenge_flag():
     data = request.json
     challenge_id = data.get('challenge_id')
     submitted_flag = data.get('flag')
+    used_hint = data.get('used_hint', False)
 
     if not all([challenge_id, submitted_flag]):
         return jsonify({'success': False, 'message': 'Missing required parameters'}), 400
@@ -1446,14 +1469,24 @@ def submit_challenge_flag():
                 return jsonify({'success': False, 'message': 'You have already completed this challenge'}), 400
 
             # Create a new ChallengesObtained record
-            new_challenge_obtained = ChallengesObtained(user_id=current_user.id, challenge_id=challenge.id)
+            new_challenge_obtained = ChallengesObtained (user_id=current_user.id, challenge_id=challenge.id, used_hint=used_hint)
             db.session.add(new_challenge_obtained)
 
+            # Calculate points based on hint usage
+            points_earned = challenge.point_value
+            if used_hint and challenge.hint_cost:
+                points_earned -= challenge.hint_cost
+
             # Update user's score
-            current_user.score_total += challenge.point_value
+            current_user.score_total += points_earned
             db.session.commit()
 
-            return jsonify({'success': True, 'message': 'Challenge completed successfully!', 'new_score': current_user.score_total}), 200
+            return jsonify({
+                'success': True, 
+                'message': 'Challenge completed successfully!', 
+                'new_score': current_user.score_total,
+                'points_earned': points_earned
+            }), 200
         else:
             return jsonify({'success': False, 'message': 'Incorrect flag'}), 400
 

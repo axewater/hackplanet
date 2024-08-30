@@ -158,6 +158,8 @@ class ChallengeForm(FlaskForm):
     html_link = SelectField('Image', validators=[Optional()], choices=[])
     point_value = IntegerField('Point Value', validators=[DataRequired(), NumberRange(min=1)])
     downloadable_file = SelectField('Downloadable File', validators=[Optional()], choices=[])
+    hint = TextAreaField('Hint', validators=[Optional(), Length(max=512)])
+    hint_cost = IntegerField('Hint Cost', validators=[Optional(), NumberRange(min=0)])
     submit = SubmitField('Save Challenge')
 
     def __init__(self, *args, **kwargs):
