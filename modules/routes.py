@@ -1541,8 +1541,8 @@ def hacking_labs():
 @bp.route('/ctf/user_progress')
 @login_required
 def user_progress():
-    # Fetch completed challenges
-    completed_challenges = ChallengesObtained.query.filter_by(user_id=current_user.id).all()
+    # Fetch completed challenges with hint usage information
+    completed_challenges = db.session.query(ChallengesObtained, Challenge).join(Challenge).filter(ChallengesObtained.user_id == current_user.id).all()
     
     # Fetch obtained flags
     obtained_flags = FlagsObtained.query.filter_by(user_id=current_user.id).all()
