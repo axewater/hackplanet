@@ -2072,3 +2072,9 @@ def add_flag():
         flash('New flag added successfully', 'success')
         return redirect(url_for('main.flag_manager'))
     return render_template('admin/flag_editor.html', form=form)
+
+@bp.route('/admin/studyroom_manager')
+@login_required
+@admin_required
+def studyroom_manager():
+    return render_template('admin/studyroom_manager.html')
