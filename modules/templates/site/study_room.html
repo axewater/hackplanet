@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+<div>
+    {% for message in messages %}
+    <div class="alert alert-info" role="alert">{{ message }}</div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endwith %}
+
+<div class="container">
+    <div class="glass-panel">
+        <div class="labs_title">
+            <h1>Study Room</h1>
+        </div>
+        <div class="row">
+            <div class="col-md-12">
+                <p>Welcome to the Study Room! This is where you can find resources to enhance your hacking skills.</p>
+                <p>More content will be added soon. Stay tuned!</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

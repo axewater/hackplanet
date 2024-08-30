@@ -1338,6 +1338,11 @@ def quizzes():
     
     return render_template('site/quizzes.html', quizzes=quizzes, completed_quizzes=completed_quizzes)
 
+@bp.route('/ctf/study_room')
+@login_required
+def study_room():
+    return render_template('site/study_room.html')
+
 @bp.route('/ctf/take_quiz/<int:quiz_id>', methods=['GET', 'POST'])
 @login_required
 def take_quiz(quiz_id):
