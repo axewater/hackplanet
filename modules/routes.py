@@ -1350,6 +1350,11 @@ def course_details(course_id):
     course = Course.query.get_or_404(course_id)
     return render_template('site/course_details.html', course=course)
 
+@bp.route('/ctf/view_course_material/<path:filename>')
+@login_required
+def view_course_material(filename):
+    return send_from_directory(current_app.config['UPLOAD_FOLDER'], 'studyfiles/' + filename)
+
 @bp.route('/ctf/take_quiz/<int:quiz_id>', methods=['GET', 'POST'])
 @login_required
 def take_quiz(quiz_id):
