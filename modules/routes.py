@@ -1526,12 +1526,13 @@ def submit_challenge_flag():
         return jsonify({'success': False, 'message': 'An error occurred while submitting the flag'}), 500
 
 @bp.route('/ctf/hacking_labs')
+@login_required
 def hacking_labs():
-    # Fetch labs and their hosts from the database
-    labs = Lab.query.options(joinedload(Lab.hosts).joinedload(Host.flags)).all()
+    # Fetch labs and their hosts from the database, excluding flags
+    labs = Lab.query.options(joinedload(Lab.hosts)).all()
     
-    # Check if the user is an admin
-    is_admin = current_user.is_authenticated and current_user.role == 'admin'
+    # Check if the user is an admin (we'll keep this for other potential admin features)
+    is_admin = current_user.role == 'admin'
 
     # Initialize flags
     no_labs = len(labs) == 0
