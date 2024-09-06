@@ -1377,13 +1377,13 @@ def take_quiz(quiz_id):
         return redirect(url_for('main.quizzes'))
 
     if user_progress.current_question >= len(questions):
-        flash('You have answered all questions in this quiz.', 'info')
+        user_progress.completed = True
+        user_progress.completed_at = datetime.utcnow()
+        db.session.commit()
+        flash(f'Quiz completed! Your score: {user_progress.score}', 'success')
         return redirect(url_for('main.quiz_results', quiz_id=quiz_id))
 
     current_question = questions[user_progress.current_question]
-
-    # Pass the image information to the template
-    question_image = current_question.image if current_question.image else None
 
     if request.method == 'POST':
         answer = request.form.get('answer')
@@ -1411,22 +1411,19 @@ def take_quiz(quiz_id):
             user_progress.score += current_question.points
 
         user_progress.current_question += 1
-        
+        db.session.commit()
+
         if user_progress.current_question >= len(questions):
             user_progress.completed = True
             user_progress.completed_at = datetime.utcnow()
+            db.session.commit()
             flash(f'Quiz completed! Your score: {user_progress.score}', 'success')
-        elif not quiz.sequential:
-            flash('Answer recorded. You can continue with the next question or review previous ones.', 'info')
-        else:
-            flash('Answer recorded. Moving to the next question.', 'info')
-
-        db.session.commit()
-
-        if user_progress.completed or not quiz.sequential:
             return redirect(url_for('main.quiz_results', quiz_id=quiz_id))
-        else:
+        
+        if quiz.sequential:
             return redirect(url_for('main.take_quiz', quiz_id=quiz_id))
+        else:
+            flash('Answer recorded. You can continue with the next question or review previous ones.', 'info')
 
     return render_template('site/take_quiz.html', quiz=quiz, question=current_question, progress=user_progress)
 
@@ -1435,6 +1432,25 @@ def take_quiz(quiz_id):
 def quiz_results(quiz_id):
     quiz = Quiz.query.get_or_404(quiz_id)
     user_progress = UserQuizProgress.query.filter_by(user_id=current_user.id, quiz_id=quiz_id).first_or_404()
+    
+    # Ensure all questions are marked as answered
+    questions = Question.query.filter_by(quiz_id=quiz_id).all()
+    for question in questions:
+        question_progress = UserQuestionProgress.query.filter_by(
+            user_quiz_progress_id=user_progress.id,
+            question_id=question.id
+        ).first()
+        if not question_progress:
+            question_progress = UserQuestionProgress(
+                user_quiz_progress_id=user_progress.id,
+                question_id=question.id,
+                answered=False,
+                correct=False
+            )
+            db.session.add(question_progress)
+    
+    db.session.commit()
+    
     return render_template('site/quiz_results.html', quiz=quiz, user_progress=user_progress)
 
 @bp.route('/submit_flag', methods=['POST'])
@@ -1834,6 +1850,7 @@ def question_editor(quiz_id, question_id=None):
             question.correct_answer = form.correct_answer.data
             question.points = form.points.data
             question.image = form.image.data
+            question.explanation = form.explanation.data  # Add this line
         else:
             question = Question(
                 quiz_id=quiz_id,
@@ -1844,7 +1861,8 @@ def question_editor(quiz_id, question_id=None):
                 option_d=form.option_d.data,
                 correct_answer=form.correct_answer.data,
                 points=form.points.data,
-                image=form.image.data
+                image=form.image.data,
+                explanation=form.explanation.data  # Add this line
             )
             db.session.add(question)
         db.session.commit()

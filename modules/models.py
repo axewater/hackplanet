@@ -280,6 +280,7 @@ class Question(db.Model):
     correct_answer = db.Column(db.String(1), nullable=False)
     points = db.Column(db.Integer, nullable=False)
     image = db.Column(db.String(256), nullable=True)
+    explanation = db.Column(db.Text, nullable=True)  # New field for explanation
 
     def __repr__(self):
         return f"<Question id={self.id}, quiz_id={self.quiz_id}>"

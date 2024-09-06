@@ -51,6 +51,10 @@
                 {{ form.image.label(class="form-label") }}
                 {{ form.image(class="form-select") }}
             </div>
+            <div class="mb-3">
+                {{ form.explanation.label(class="form-label") }}
+                {{ form.explanation(class="form-control", rows=4) }}
+            </div>
             {{ form.submit(class="btn btn-primary") }}
         </form>
     </div>

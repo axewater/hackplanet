@@ -13,7 +13,6 @@
         {% else %}
             <p class="text-warning">You haven't completed the quiz yet. Your current progress is saved.</p>
         {% endif %}
-        Certainly! I'll continue with the changes to the quiz_results.html file:
 
         <h2>Question Summary</h2>
         <table class="table">
@@ -46,6 +45,16 @@
                             {{ question_progress.question.points }}
                         {% else %}
                             0
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="4">
+                        <strong>Explanation:</strong> 
+                        {% if question_progress.question.explanation %}
+                            {{ question_progress.question.explanation }}
+                        {% else %}
+                            No explanation provided.
                         {% endif %}
                     </td>
                 </tr>

@@ -236,6 +236,7 @@ class QuestionForm(FlaskForm):
     correct_answer = SelectField('Correct Answer', choices=[('A', 'A'), ('B', 'B'), ('C', 'C'), ('D', 'D')], validators=[DataRequired()])
     points = IntegerField('Points', validators=[DataRequired(), NumberRange(min=1)])
     image = SelectField('Image', validators=[Optional()], choices=[])
+    explanation = TextAreaField('Explanation', validators=[Optional(), Length(max=1000)])  # New field
     submit = SubmitField('Save Question')
 
     def __init__(self, *args, **kwargs):
