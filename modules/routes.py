@@ -54,6 +54,49 @@ from modules.azure_utils import get_vm_status, check_azure_authentication, get_a
 
 bp = Blueprint('main', __name__)
 
+@bp.route('/ctf/test_quiz/<int:quiz_id>', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def test_quiz(quiz_id):
+    quiz = Quiz.query.get_or_404(quiz_id)
+    questions = Question.query.filter_by(quiz_id=quiz_id).order_by(Question.id).all()
+    
+    if 'current_question' not in session:
+        session['current_question'] = 0
+        session['results'] = []
+        session['total_score'] = 0
+    
+    if request.method == 'POST':
+        answer = request.form.get('answer')
+        current_question = questions[session['current_question']]
+        is_correct = answer == current_question.correct_answer
+        if is_correct:
+            session['total_score'] += current_question.points
+        session['results'].append({
+            'question': current_question.question_text,
+            'user_answer': answer,
+            'correct_answer': current_question.correct_answer,
+            'is_correct': is_correct,
+            'explanation': current_question.explanation
+        })
+        session['current_question'] += 1
+        session.modified = True
+        
+        if session['current_question'] >= len(questions):
+            results = session['results']
+            total_score = session['total_score']
+            session.pop('current_question', None)
+            session.pop('results', None)
+            session.pop('total_score', None)
+            return render_template('site/test_quiz_results.html', quiz=quiz, results=results, total_score=total_score)
+    
+    if session['current_question'] < len(questions):
+        question = questions[session['current_question']]
+        return render_template('site/test_quiz.html', quiz=quiz, question=question, progress=session['current_question']+1, total=len(questions))
+    
+    # This should not happen, but just in case
+    return redirect(url_for('main.quizzes'))
+
 
 s = URLSafeTimedSerializer('YMecr3tK?IzzsSa@e!Zithpze') 
 has_initialized_whitelist = False

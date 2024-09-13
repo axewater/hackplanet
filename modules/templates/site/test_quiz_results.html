@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+    <div class="glass-panel">
+        <h1>Test Quiz Results: {{ quiz.title }}</h1>
+        <h2>Question Summary</h2>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Question</th>
+                    <th>Your Answer</th>
+                    <th>Correct Answer</th>
+                    <th>Result</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for result in results %}
+                <tr>
+                    <td>{{ result.question }}</td>
+                    <td>{{ result.user_answer }}</td>
+                    <td>{{ result.correct_answer }}</td>
+                    <td>
+                        {% if result.is_correct %}
+                            <span class="text-success">Correct</span>
+                        {% else %}
+                            <span class="text-danger">Incorrect</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="4">
+                        <strong>Explanation:</strong> 
+                        {% if result.explanation %}
+                            {{ result.explanation }}
+                        {% else %}
+                            No explanation provided.
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <h3>Total Score: {{ total_score }}</h3>
+        <a href="{{ url_for('main.quizzes') }}" class="btn btn-primary">Back to Quizzes</a>
+    </div>
+</div>
+{% endblock %}

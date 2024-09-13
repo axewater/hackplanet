@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+    <div class="glass-panel">
+        <h1>Test Quiz: {{ quiz.title }}</h1>
+        <p>{{ quiz.description }}</p>
+        <p>Question {{ progress }} of {{ total }}</p>
+        <form method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+            <div class="card mb-3">
+                <div class="card-body">
+                    {% if question.image %}
+                    <img src="{{ url_for('static', filename='library/images/questions/' + question.image) }}" alt="Question Image" class="img-fluid mb-3">
+                    {% endif %}
+                    <h5 class="card-title">{{ question.question_text }}</h5>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="answer" id="answer_a" value="A" required>
+                        <label class="form-check-label" for="answer_a">
+                            {{ question.option_a }}
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="answer" id="answer_b" value="B">
+                        <label class="form-check-label" for="answer_b">
+                            {{ question.option_b }}
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="answer" id="answer_c" value="C">
+                        <label class="form-check-label" for="answer_c">
+                            {{ question.option_c }}
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="answer" id="answer_d" value="D">
+                        <label class="form-check-label" for="answer_d">
+                            {{ question.option_d }}
+                        </label>
+                    </div>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Next Question</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

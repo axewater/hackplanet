@@ -29,6 +29,9 @@
                         {% else %}
                             <a href="{{ url_for('main.take_quiz', quiz_id=quiz.id) }}" class="btn btn-primary">Take Quiz</a>
                         {% endif %}
+                        {% if current_user.role == 'admin' %}
+                            <a href="{{ url_for('main.test_quiz', quiz_id=quiz.id) }}" class="btn btn-warning mt-2">Test Quiz</a>
+                        {% endif %}
                     </div>
                 </div>
             </div>
