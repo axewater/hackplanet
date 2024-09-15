@@ -1893,7 +1893,7 @@ def question_editor(quiz_id, question_id=None):
             question.correct_answer = form.correct_answer.data
             question.points = form.points.data
             question.image = form.image.data
-            question.explanation = form.explanation.data  # Add this line
+            question.explanation = form.explanation.data
         else:
             question = Question(
                 quiz_id=quiz_id,
@@ -1905,7 +1905,7 @@ def question_editor(quiz_id, question_id=None):
                 correct_answer=form.correct_answer.data,
                 points=form.points.data,
                 image=form.image.data,
-                explanation=form.explanation.data  # Add this line
+                explanation=form.explanation.data
             )
             db.session.add(question)
         db.session.commit()
@@ -1920,6 +1920,11 @@ def question_editor(quiz_id, question_id=None):
         form.option_d.data = question.option_d
         form.correct_answer.data = question.correct_answer
         form.points.data = question.points
+        form.image.data = question.image
+        form.explanation.data = question.explanation
+
+
+
 
         # Check if there's any user progress for this question
         user_progress_exists = UserQuestionProgress.query.filter_by(question_id=question_id).first() is not None
