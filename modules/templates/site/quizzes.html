@@ -9,6 +9,9 @@
 </div>
 {% endif %}
 {% endwith %}
+
+<link rel="stylesheet" href="/static/css/quizzes.css">
+
 <div class="container">
     <div class="glass-panel">
         <div class="text-start">
@@ -18,14 +21,27 @@
         <div class="row">
             {% for quiz in quizzes %}
             <div class="col-md-4 mb-4">
-                <div class="card">
-                    <img src="{{ quiz.image_url }}" class="card-img-top" alt="{{ quiz.title }}">
+                <div class="card quiz-card">
+                    <div class="quiz-image-container">
+                        <img src="{{ quiz.image_url }}" class="card-img-top" alt="{{ quiz.title }}">
+                        {% if quiz.id in completed_quizzes %}
+                            {% if completed_quizzes[quiz.id] >= quiz.min_score %}
+                                <div class="quiz-overlay completed"><span>COMPLETED</span></div>
+                            {% else %}
+                                <div class="quiz-overlay failed"><span>FAILED</span></div>
+                            {% endif %}
+                        {% endif %}
+                    </div>
                     <div class="card-body">
                         <h5 class="card-title">{{ quiz.title }}</h5>
                         <p class="card-text">{{ quiz.description }}</p>
                         <p class="card-text"><small class="text-muted">Questions: {{ quiz.question_count }} | Max Score: {{ quiz.max_score }}</small></p>
                         {% if quiz.id in completed_quizzes %}
-                            <p class="text-success">Completed - Score: {{ completed_quizzes[quiz.id] }}</p>
+                            {% if completed_quizzes[quiz.id] >= quiz.min_score %}
+                                <p class="text-success">Completed - Score: {{ completed_quizzes[quiz.id] }} (Passing score: {{ quiz.min_score }})</p>
+                            {% else %}
+                                <p class="text-danger">Completed - Score: {{ completed_quizzes[quiz.id] }} (Failed)</p>
+                            {% endif %}
                             <a href="{{ url_for('main.quiz_results', quiz_id=quiz.id) }}" class="btn btn-secondary">View Results</a>
                         {% else %}
                             <a href="{{ url_for('main.take_quiz', quiz_id=quiz.id) }}" class="btn btn-primary">Take Quiz</a>
