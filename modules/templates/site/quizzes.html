@@ -26,7 +26,7 @@
                         <img src="{{ quiz.image_url }}" class="card-img-top" alt="{{ quiz.title }}">
                         {% if quiz.id in completed_quizzes %}
                             {% if completed_quizzes[quiz.id] >= quiz.min_score %}
-                                <div class="quiz-overlay completed"><span>COMPLETED</span></div>
+                                <div class="quiz-overlay completed"><span>PASSED</span></div>
                             {% else %}
                                 <div class="quiz-overlay failed"><span>FAILED</span></div>
                             {% endif %}
