@@ -23,6 +23,7 @@
                     <div class="card-body">
                         <h5 class="card-title">{{ quiz.title }}</h5>
                         <p class="card-text">{{ quiz.description }}</p>
+                        <p class="card-text"><small class="text-muted">Questions: {{ quiz.question_count }} | Max Score: {{ quiz.max_score }}</small></p>
                         {% if quiz.id in completed_quizzes %}
                             <p class="text-success">Completed - Score: {{ completed_quizzes[quiz.id] }}</p>
                             <a href="{{ url_for('main.quiz_results', quiz_id=quiz.id) }}" class="btn btn-secondary">View Results</a>

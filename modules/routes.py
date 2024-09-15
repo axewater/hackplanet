@@ -1378,8 +1378,21 @@ def quizzes():
             quiz.image_url = url_for('static', filename=f'library/images/quizes/{quiz.image}')
         else:
             quiz.image_url = url_for('static', filename='library/images/quizes/default_quiz_image.jpg')
+        
+        # Calculate quiz details
+        quiz_details = get_quiz_details(quiz.id)
+        quiz.question_count = quiz_details['question_count']
+        quiz.max_score = quiz_details['max_score']
     
     return render_template('site/quizzes.html', quizzes=quizzes, completed_quizzes=completed_quizzes)
+
+@bp.route('/api/quiz_details/<int:quiz_id>')
+@login_required
+def get_quiz_details(quiz_id):
+    questions = Question.query.filter_by(quiz_id=quiz_id).all()
+    question_count = len(questions)
+    max_score = sum(question.points for question in questions)
+    return {'question_count': question_count, 'max_score': max_score}
 
 @bp.route('/ctf/study_room')
 @login_required
