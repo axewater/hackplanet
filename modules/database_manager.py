@@ -27,3 +27,19 @@ class DatabaseManager:
         finally:
             # Close the database connection
             self.engine.dispose()
+
+    def add_used_by_column_to_invite_tokens(self):
+        add_column_sql = """
+        ALTER TABLE invite_tokens
+        ADD COLUMN IF NOT EXISTS used_by VARCHAR(36) REFERENCES users(user_id);
+        """
+        print("Adding 'used_by' column to invite_tokens table")
+        try:
+            with self.engine.connect() as connection:
+                connection.execute(text(add_column_sql))
+                connection.commit()
+            print("Column 'used_by' successfully added to the 'invite_tokens' table.")
+        except Exception as e:
+            print(f"An error occurred: {e}")
+        finally:
+            self.engine.dispose()

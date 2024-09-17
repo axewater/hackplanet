@@ -275,7 +275,7 @@ def register():
                 email_verification_token=s.dumps(form.email.data, salt='email-confirm'),
                 token_creation_time=datetime.utcnow(),
                 created=datetime.utcnow(),
-                # invited_by=invite.creator_user_id if invite else None
+                invited_by=invite.creator_user_id if invite else None
             )
             user.set_password(form.password.data)
             db.session.add(user)
@@ -285,6 +285,7 @@ def register():
             if invite:
                 print(f"Found valid invite: {invite.token}, expires at: {invite.expires_at}, used: {invite.used}")
                 invite.used = True
+                invite.used_by = user.user_id
                 db.session.commit()
             else:
                 print("No valid invite found or invite expired/used.")
@@ -410,8 +411,11 @@ def invites():
             flash('You have reached your invite limit.', 'danger')
         return redirect(url_for('main.invites'))
 
-    invites = InviteToken.query.filter_by(creator_user_id=current_user.user_id, used=False).all()
-    current_invites_count = len(invites)
+    invites = InviteToken.query.filter_by(creator_user_id=current_user.user_id).all()
+    for invite in invites:
+        if invite.used_by:
+            invite.used_by_user = User.query.filter_by(user_id=invite.used_by).first()
+    current_invites_count = len([invite for invite in invites if not invite.used])
     remaining_invites = max(0, current_user.invite_quota - current_invites_count)
 
     return render_template('/login/invites.html', form=form, invites=invites, invite_quota=current_user.invite_quota, remaining_invites=remaining_invites)
@@ -419,8 +423,10 @@ def invites():
 @bp.route('/delete_invite/<int:invite_id>', methods=['POST'])
 @login_required
 def delete_invite(invite_id):
-    invite = InviteToken.query.filter_by(id=invite_id, creator_user_id=current_user.user_id, used=False).first()
+    invite = InviteToken.query.filter_by(id=invite_id, creator_user_id=current_user.user_id).first()
     if invite:
+        if invite.used:
+            return jsonify({'success': False, 'message': 'Cannot delete a used invite.'}), 400
         try:
             db.session.delete(invite)
             db.session.commit()

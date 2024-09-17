@@ -135,9 +135,10 @@ class InviteToken(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     expires_at = db.Column(db.DateTime, default=lambda: datetime.utcnow() + timedelta(days=2), nullable=False)
     used = db.Column(db.Boolean, default=False, nullable=False)
+    used_by = db.Column(db.String(36), db.ForeignKey('users.user_id'), nullable=True)
 
     def __repr__(self):
-        return f'<InviteToken {self.token}, Creator: {self.creator_user_id}, Expires: {self.expires_at}>'
+        return f'<InviteToken {self.token}, Creator: {self.creator_user_id}, Expires: {self.expires_at}, Used By: {self.used_by}>'
 
 
 class Lab(db.Model):
