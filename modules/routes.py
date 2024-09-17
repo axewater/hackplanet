@@ -1397,8 +1397,26 @@ def get_quiz_details(quiz_id):
 @bp.route('/ctf/study_room')
 @login_required
 def study_room():
-    courses = Course.query.all()
-    return render_template('site/study_room.html', courses=courses)
+    tag = request.args.get('tag')
+    search = request.args.get('search')
+    
+    courses_query = Course.query
+    
+    if tag:
+        courses_query = courses_query.filter(Course.tags.contains(tag))
+    
+    if search:
+        courses_query = courses_query.filter(
+            (Course.name.ilike(f'%{search}%')) | (Course.description.ilike(f'%{search}%'))
+        )
+    
+    courses = courses_query.all()
+    all_tags = set()
+    for course in Course.query.all():
+        if course.tags:
+            all_tags.update(tag.strip() for tag in course.tags.split(','))
+    
+    return render_template('site/study_room.html', courses=courses, all_tags=all_tags, current_tag=tag, search=search)
 
 @bp.route('/ctf/course_details/<int:course_id>')
 @login_required

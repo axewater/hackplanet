@@ -21,6 +21,25 @@
                 <p>Welcome to the Study Room! Here you can find resources to enhance your hacking skills.</p>
             </div>
         </div>
+        
+        <!-- Search and Filter Section -->
+        <div class="row mb-4">
+            <div class="col-md-6">
+                <form action="{{ url_for('main.study_room') }}" method="get" class="d-flex">
+                    <input type="text" name="search" class="form-control me-2" placeholder="Search courses" value="{{ search }}">
+                    <button type="submit" class="btn btn-primary">Search</button>
+                </form>
+            </div>
+            <div class="col-md-6">
+                <div class="d-flex flex-wrap">
+                    <a href="{{ url_for('main.study_room') }}" class="btn btn-outline-secondary me-2 mb-2">All</a>
+                    {% for tag in all_tags %}
+                        <a href="{{ url_for('main.study_room', tag=tag) }}" class="btn btn-outline-primary me-2 mb-2 {% if tag == current_tag %}active{% endif %}">{{ tag }}</a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        
         <div class="row mt-4">
             {% for course in courses %}
             <div class="col-md-4 mb-4">

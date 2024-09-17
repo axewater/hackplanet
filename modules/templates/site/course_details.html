@@ -42,8 +42,8 @@
                         <tr>
                             <th scope="row" class="bg-light">Tags</th>
                             <td>
-                                {% for tag in course.tags.split(',') %}
-                                    <span class="badge bg-secondary me-1">{{ tag.strip() }}</span>
+                                {% for tag in course.tag_list %}
+                                    <a href="{{ url_for('main.study_room', tag=tag) }}" class="badge bg-secondary me-1 text-decoration-none">{{ tag }}</a>
                                 {% endfor %}
                             </td>
                         </tr>

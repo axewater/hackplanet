@@ -320,10 +320,14 @@ class Course(db.Model):
     name = db.Column(db.String(128), nullable=False)
     description = db.Column(db.Text, nullable=True)
     file_attachment = db.Column(db.String(256), nullable=True)
-    image = db.Column(db.String(256), nullable=True)  # New field for course image
+    image = db.Column(db.String(256), nullable=True)
     tags = db.Column(db.String(256), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     def __repr__(self):
         return f"<Course id={self.id}, name={self.name}>"
+
+    @property
+    def tag_list(self):
+        return [tag.strip() for tag in self.tags.split(',')] if self.tags else []
