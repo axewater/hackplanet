@@ -266,14 +266,15 @@ class CourseForm(FlaskForm):
     name = StringField('Course Name', validators=[DataRequired(), Length(max=128)])
     description = TextAreaField('Description', validators=[Optional()])
     file_attachment = SelectField('File Attachment', validators=[Optional()], choices=[])
-    image = SelectField('Course Image', validators=[Optional()], choices=[])  # New field for course image
+    image = SelectField('Course Image', validators=[Optional()], choices=[])
     tags = StringField('Tags', validators=[Optional(), Length(max=256)])
+    purchase_url = URLField('Purchase URL', validators=[Optional(), URL(message='Please enter a valid URL.')])
     submit = SubmitField('Save Course')
 
     def __init__(self, *args, **kwargs):
         super(CourseForm, self).__init__(*args, **kwargs)
         self.file_attachment.choices = self.get_file_choices()
-        self.image.choices = self.get_image_choices()  # New method call
+        self.image.choices = self.get_image_choices()
 
     def get_file_choices(self):
         file_folder = os.path.join(current_app.config['UPLOAD_FOLDER'], 'studyfiles')

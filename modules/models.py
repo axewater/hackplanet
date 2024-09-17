@@ -324,6 +324,7 @@ class Course(db.Model):
     tags = db.Column(db.String(256), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    purchase_url = db.Column(db.String(512), nullable=True)  # New field for purchase URL
 
     def __repr__(self):
         return f"<Course id={self.id}, name={self.name}>"

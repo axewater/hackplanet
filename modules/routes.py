@@ -1394,40 +1394,6 @@ def get_quiz_details(quiz_id):
     max_score = sum(question.points for question in questions)
     return {'question_count': question_count, 'max_score': max_score}
 
-@bp.route('/ctf/study_room')
-@login_required
-def study_room():
-    tag = request.args.get('tag')
-    search = request.args.get('search')
-    
-    courses_query = Course.query
-    
-    if tag:
-        courses_query = courses_query.filter(Course.tags.contains(tag))
-    
-    if search:
-        courses_query = courses_query.filter(
-            (Course.name.ilike(f'%{search}%')) | (Course.description.ilike(f'%{search}%'))
-        )
-    
-    courses = courses_query.all()
-    all_tags = set()
-    for course in Course.query.all():
-        if course.tags:
-            all_tags.update(tag.strip() for tag in course.tags.split(','))
-    
-    return render_template('site/study_room.html', courses=courses, all_tags=all_tags, current_tag=tag, search=search)
-
-@bp.route('/ctf/course_details/<int:course_id>')
-@login_required
-def course_details(course_id):
-    course = Course.query.get_or_404(course_id)
-    return render_template('site/course_details.html', course=course)
-
-@bp.route('/ctf/view_course_material/<path:filename>')
-@login_required
-def view_course_material(filename):
-    return send_from_directory(current_app.config['UPLOAD_FOLDER'], 'studyfiles/' + filename)
 
 @bp.route('/ctf/take_quiz/<int:quiz_id>', methods=['GET', 'POST'])
 @login_required
@@ -2183,6 +2149,7 @@ def add_flag():
         return redirect(url_for('main.flag_manager'))
     return render_template('admin/flag_editor.html', form=form)
 
+
 @bp.route('/admin/studyroom_manager')
 @login_required
 @admin_required
@@ -2206,13 +2173,18 @@ def course_editor(course_id=None):
                 name=form.name.data,
                 description=form.description.data,
                 file_attachment=form.file_attachment.data,
-                image=form.image.data,  # New field
-                tags=form.tags.data
+                image=form.image.data,
+                tags=form.tags.data,
+                purchase_url=form.purchase_url.data
             )
             db.session.add(course)
         db.session.commit()
         flash('Course saved successfully.', 'success')
         return redirect(url_for('main.studyroom_manager'))
+    elif form.errors:
+        for field, errors in form.errors.items():
+            for error in errors:
+                flash(f"{field.capitalize()}: {error}", 'error')
 
     if course:
         form = CourseForm(obj=course)
@@ -2228,3 +2200,43 @@ def delete_course(course_id):
     db.session.commit()
     flash('Course deleted successfully.', 'success')
     return redirect(url_for('main.studyroom_manager'))
+
+
+@bp.route('/ctf/study_room')
+@login_required
+def study_room():
+    tag = request.args.get('tag')
+    search = request.args.get('search')
+    
+    courses_query = Course.query
+    
+    if tag:
+        courses_query = courses_query.filter(Course.tags.contains(tag))
+    
+    if search:
+        courses_query = courses_query.filter(
+            (Course.name.ilike(f'%{search}%')) | (Course.description.ilike(f'%{search}%'))
+        )
+    
+    courses = courses_query.all()
+    
+    # Add purchase URL to each course
+    for course in courses:
+        course.purchase_url = course.purchase_url if course.purchase_url else None
+    all_tags = set()
+    for course in Course.query.all():
+        if course.tags:
+            all_tags.update(tag.strip() for tag in course.tags.split(','))
+    
+    return render_template('site/study_room.html', courses=courses, all_tags=all_tags, current_tag=tag, search=search)
+
+@bp.route('/ctf/course_details/<int:course_id>')
+@login_required
+def course_details(course_id):
+    course = Course.query.get_or_404(course_id)
+    return render_template('site/course_details.html', course=course)
+
+@bp.route('/ctf/view_course_material/<path:filename>')
+@login_required
+def view_course_material(filename):
+    return send_from_directory(current_app.config['UPLOAD_FOLDER'], 'studyfiles/' + filename)

@@ -1,6 +1,9 @@
 {% extends 'base.html' %}
 
 {% block content %}
+
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
 <!-- Modal for viewing course material -->
 <div class="modal fade" id="courseMaterialModal" tabindex="-1" aria-labelledby="courseMaterialModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl">
@@ -57,6 +60,13 @@
                         <button class="btn btn-success btn-lg ms-2" onclick="viewCourseMaterial('{{ course.file_attachment }}')">
                             <i class="fas fa-eye me-2"></i>View Course Material
                         </button>
+                    </div>
+                {% endif %}
+                {% if course.purchase_url %}
+                    <div class="mt-4">
+                        <a href="{{ course.purchase_url }}" class="btn btn-warning btn-lg" target="_blank">
+                            <i class="fas fa-shopping-cart me-2"></i>Buy (External)
+                        </a>
                     </div>
                 {% endif %}
             </div>

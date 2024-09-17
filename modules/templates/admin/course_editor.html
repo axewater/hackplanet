@@ -7,27 +7,28 @@
             {{ form.hidden_tag() }}
             <div class="mb-3">
                 {{ form.name.label(class="form-label") }}
-                {{ form.name(class="form-control") }}
+                {{ form.name(class="form-control", title="Enter the name of the course") }}
             </div>
             <div class="mb-3">
                 {{ form.description.label(class="form-label") }}
-                {{ form.description(class="form-control") }}
+                {{ form.description(class="form-control", title="Provide a brief description of the course") }}
             </div>
             <div class="mb-3">
                 {{ form.file_attachment.label(class="form-label") }}
-                {{ form.file_attachment(class="form-select") }}
+                {{ form.file_attachment(class="form-select", title="Select a file attachment for the course") }}
             </div>
             <div class="mb-3">
                 {{ form.image.label(class="form-label") }}
-                {{ form.image(class="form-select") }}
+                {{ form.image(class="form-select", title="Choose an image for the course") }}
             </div>
             <div class="mb-3">
                 {{ form.tags.label(class="form-label") }}
-                {{ form.tags(class="form-control") }}
+                {{ form.tags(class="form-control", title="Enter tags separated by commas") }}
+            </div>
+            <div class="mb-3">
+                {{ form.purchase_url.label(class="form-label") }}
+                {{ form.purchase_url(class="form-control", title="Enter a valid URL where the course can be purchased") }}
             </div>
             {{ form.submit(class="btn btn-primary") }}
         </form>
-        <a href="{{ url_for('main.studyroom_manager') }}" class="btn btn-secondary mt-3">Back to StudyRoom Manager</a>
-    </div>
-</div>
 {% endblock %}

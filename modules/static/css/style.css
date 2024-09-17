@@ -112,3 +112,19 @@ body {
     background-color: #6c757d;
     border-color: #6c757d;
 }
+
+.btn-success {
+    color: #fff;
+    background-color: #28a745;
+    border-color: #28a745;
+}
+
+.btn-success:hover {
+    color: #fff;
+    background-color: #218838;
+    border-color: #1e7e34;
+}
+
+.mt-2 {
+    margin-top: 0.5rem !important;
+}
