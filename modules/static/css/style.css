@@ -80,3 +80,35 @@ body {
 .bg-primary {
     background-color: #007bff;
 }
+
+/* New styles for the search and filter container */
+.search-filter-container {
+    background-color: #f8f9fa;
+    border: 1px solid #e9ecef;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.btn-outline-primary {
+    color: #007bff;
+    border-color: #007bff;
+    background-color: white;
+}
+
+.btn-outline-primary:hover,
+.btn-outline-primary.active {
+    color: white;
+    background-color: #007bff;
+    border-color: #007bff;
+}
+
+.btn-outline-secondary {
+    color: #6c757d;
+    border-color: #6c757d;
+    background-color: white;
+}
+
+.btn-outline-secondary:hover {
+    color: white;
+    background-color: #6c757d;
+    border-color: #6c757d;
+}
