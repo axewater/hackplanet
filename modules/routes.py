@@ -1161,15 +1161,24 @@ def challenges():
         else:
             challenge.image = 'default_challenge_image.jpg'
         
-        # Check if the user has already used a hint for this challenge
+        # Check if the user has already completed or used a hint for this challenge
         if current_user.is_authenticated:
             challenge_obtained = ChallengesObtained.query.filter_by(
                 user_id=current_user.id, 
                 challenge_id=challenge.id
             ).first()
-            challenge.hint_used = challenge_obtained.used_hint if challenge_obtained else False
+            if challenge_obtained:
+                challenge.completed = challenge_obtained.completed
+                challenge.hint_used = challenge_obtained.used_hint
+                challenge.completed_at = challenge_obtained.completed_at
+            else:
+                challenge.completed = False
+                challenge.hint_used = False
+                challenge.completed_at = None
         else:
+            challenge.completed = False
             challenge.hint_used = False
+            challenge.completed_at = None
 
     form = ChallengeSubmissionForm()
     return render_template('site/challenges.html', challenges=challenges, form=form)

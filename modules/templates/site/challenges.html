@@ -11,7 +11,10 @@
 </div>
 {% endif %}
 {% endwith %}
+
 <meta name="csrf-token" content="{{ csrf_token() }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
 <script src="{{ url_for('static', filename='js/challenge_flag_submission.js') }}"></script>
 <div class="container">
     <div class="glass-panel">
@@ -22,11 +25,17 @@
             {% for challenge in challenges %}
             <div class="col-md-4">
                 <div class="card">
-                    <div style="display: flex; justify-content: center; margin-top: 15px;">
+                    <div style="display: flex; justify-content: center; margin-top: 15px; position: relative;">
                         <img src="{{ url_for('static', filename='library/images/challenges/' + challenge.html_link) }}" 
                              class="card-img-top" 
                              alt="{{ challenge.name }}"
                              style="width: 100px; height: 100px; object-fit: cover;">
+                        {% if challenge.completed %}
+                        <div class="challenge-overlay completed">
+                            <span>Completed</span>
+                            <small>{{ challenge.completed_at.strftime('%Y-%m-%d %H:%M:%S') }}</small>
+                        </div>
+                        {% endif %}
                     </div>
                     <div class="card-body">
                         <h5 class="card-title">{{ challenge.name }}</h5>
@@ -37,22 +46,23 @@
                         <a href="{{ url_for('static', filename='library/challenges/' + challenge.downloadable_file) }}" class="btn btn-secondary mb-2">Download File</a>
                         {% endif %}
                         {% if challenge.hint %}
-                        <button id="hint-button-{{ challenge.id }}" class="btn btn-info mb-2" onclick="showHint({{ challenge.id }}, {{ challenge.hint_cost }})" {% if challenge.hint_used %}disabled{% endif %}>
+                        <button id="hint-button-{{ challenge.id }}" class="btn btn-info mb-2" onclick="showHint({{ challenge.id }}, {{ challenge.hint_cost }})" {% if challenge.hint_used or challenge.completed %}disabled{% endif %}>
                             {% if challenge.hint_used %}Hint Used{% else %}Get Hint (Cost: {{ challenge.hint_cost }} points){% endif %}
                         </button>
                         <div id="hint-{{ challenge.id }}" style="{% if challenge.hint_used %}display: block;{% else %}display: none;{% endif %}">
                             <p><strong>Hint:</strong> {{ challenge.hint }}</p>
                         </div>
                         {% endif %}
+                        {% if not challenge.completed %}
                         <form id="flag-submission-form-{{ challenge.id }}" data-challenge-id="{{ challenge.id }}" data-hint-used="{{ 'true' if challenge.hint_used else 'false' }}">
                             <div class="flag-input-container">
                                 <input type="text" id="flag-input-{{ challenge.id }}" placeholder="Enter flag" class="flag-input">
                                 <button type="submit" class="btn btn-primary">Submit</button>
                             </div>
                         </form>
+                        {% endif %}
                         <div id="result-message-{{ challenge.id }}" style="display: none;"></div>
-                        </div>
-     
+                    </div>
                 </div>
             </div>
             {% endfor %}
