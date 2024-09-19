@@ -1679,6 +1679,8 @@ def user_progress():
             'score': progress.score,
             'total_points': sum(question.points for question in quiz.questions),
             'completed': progress.completed,
+            'passed': progress.score >= quiz.min_score,
+            'min_score': quiz.min_score,
             'completed_at': progress.completed_at.strftime('%Y-%m-%d %H:%M:%S') if progress.completed_at else 'Not completed'
         })
     

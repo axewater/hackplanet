@@ -54,11 +54,10 @@
                     </thead>
                     <tbody>
                     {% for challenge_obtained, challenge in completed_challenges %}
-                        {% if challenge_obtained.completed %}
-                        <tr class="{{ 'hint-used' if challenge_obtained.used_hint else '' }}">
+                        <tr class="{{ 'hint-used' if challenge_obtained.used_hint and challenge_obtained.completed else '' }}">
                             <td>{{ challenge.name }}</td>
                             <td>
-                                {% if challenge_obtained.used_hint %}
+                                {% if challenge_obtained.used_hint and challenge_obtained.completed %}
                                     <span class="badge bg-warning" title="Reduced points due to hint usage">
                                         {{ challenge.point_value - challenge.hint_cost }}
                                     </span>
@@ -73,9 +72,14 @@
                                     <span class="badge bg-secondary">No</span>
                                 {% endif %}
                             </td>
-                            <td><small>{{ challenge_obtained.completed_at.strftime('%Y-%m-%d %H:%M:%S') }}</small></td>
+                            <td><small>
+                                {% if challenge_obtained.completed_at %}
+                                    {{ challenge_obtained.completed_at.strftime('%Y-%m-%d %H:%M:%S') }}
+                                {% else %}
+                                    In Progress
+                                {% endif %}
+                            </small></td>
                         </tr>
-                        {% endif %}
                     {% else %}
                         <tr>
                             <td colspan="4">No challenges completed yet.</td>
