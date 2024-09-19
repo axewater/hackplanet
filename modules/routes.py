@@ -1309,9 +1309,26 @@ def challenge_manager():
 def delete_challenge(challenge_id):
     challenge = Challenge.query.get(challenge_id)
     if challenge:
-        db.session.delete(challenge)
-        db.session.commit()
-        return jsonify({'success': True})
+        try:
+            # Check for related data
+            related_data = ChallengesObtained.query.filter_by(challenge_id=challenge_id).first()
+            if related_data:
+                return jsonify({
+                    'success': False,
+                    'message': 'Cannot delete challenge. It has related user progress data.'
+                }), 400
+
+            db.session.delete(challenge)
+            db.session.commit()
+            flash('Challenge deleted successfully.', 'success')
+            return jsonify({'success': True})
+        except Exception as e:
+            db.session.rollback()
+            logging.error(f"Error deleting challenge: {str(e)}")
+            return jsonify({
+                'success': False,
+                'message': 'An error occurred while deleting the challenge.'
+            }), 500
     else:
         return jsonify({
             'success': False,

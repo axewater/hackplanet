@@ -61,8 +61,12 @@ function deleteChallenge(challengeId) {
             if (data.success) {
                 location.reload();
             } else {
-                alert('Failed to delete challenge');
+                alert(data.message || 'Failed to delete challenge');
             }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while deleting the challenge');
         });
     }
 }
