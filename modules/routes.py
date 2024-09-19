@@ -1713,8 +1713,8 @@ def user_details(user_id):
     # Fetch quiz progress
     quiz_progress = UserQuizProgress.query.filter_by(user_id=user.id).all()
     
-    # Calculate total score
-    total_score = user.score_total + sum(progress.score for progress in quiz_progress)
+    # Calculate total score using the new method
+    total_score = user.calculate_total_score()
     
     # Prepare user data
     user_data = {
