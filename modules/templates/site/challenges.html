@@ -72,10 +72,15 @@ function showHint(challengeId, hintCost) {
         .then(response => response.json())
         .then(data => {
             if (data.hint) {
+                document.getElementById(`hint-${challengeId}`).innerHTML = `<p><strong>Hint:</strong> ${data.hint}</p>`;
                 document.getElementById(`hint-${challengeId}`).style.display = 'block';
                 document.getElementById(`hint-button-${challengeId}`).disabled = true;
                 document.getElementById(`hint-button-${challengeId}`).textContent = 'Hint Used';
-                document.getElementById(`flag-submission-form-${challengeId}`).dataset.hintUsed = 'true';
+                // Update user's score
+                const userScoreElement = document.getElementById('user-score');
+                if (userScoreElement) {
+                    userScoreElement.textContent = parseInt(userScoreElement.textContent) - data.cost;
+                }
             }
         });
     }
@@ -87,7 +92,6 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
             const challengeId = this.dataset.challengeId;
             const flag = document.getElementById(`flag-input-${challengeId}`).value;
-            const usedHint = this.dataset.usedHint === 'true';
 
             fetch('/submit_challenge_flag', {
                 method: 'POST',
@@ -97,8 +101,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 },
                 body: JSON.stringify({
                     challenge_id: challengeId,
-                    flag: flag,
-                    used_hint: usedHint
+                    flag: flag
                 })
             })
             .then(response => response.json())

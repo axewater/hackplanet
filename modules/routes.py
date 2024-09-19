@@ -1170,14 +1170,13 @@ def get_hint(challenge_id):
     if not user_challenge:
         user_challenge = ChallengesObtained(user_id=current_user.id, challenge_id=challenge_id, used_hint=True)
         db.session.add(user_challenge)
-    else:
-        if not user_challenge.used_hint:
-            user_challenge.used_hint = True
-            current_user.score_total -= challenge.hint_cost
+    elif not user_challenge.used_hint:
+        user_challenge.used_hint = True
+        current_user.score_total -= challenge.hint_cost
     
     db.session.commit()
     
-    return jsonify({'hint': challenge.hint})
+    return jsonify({'hint': challenge.hint, 'cost': challenge.hint_cost})
 
 
 
@@ -1561,7 +1560,6 @@ def submit_challenge_flag():
     data = request.json
     challenge_id = data.get('challenge_id')
     submitted_flag = data.get('flag')
-    used_hint = data.get('used_hint', False)
 
     if not all([challenge_id, submitted_flag]):
         return jsonify({'success': False, 'message': 'Missing required parameters'}), 400
@@ -1575,15 +1573,19 @@ def submit_challenge_flag():
             # Check if the user has already completed this challenge
             existing_challenge = ChallengesObtained.query.filter_by(user_id=current_user.id, challenge_id=challenge.id).first()
             if existing_challenge:
-                return jsonify({'success': False, 'message': 'You have already completed this challenge'}), 400
+                if existing_challenge.completed:
+                    return jsonify({'success': False, 'message': 'You have already completed this challenge'}), 400
+            else:
+                existing_challenge = ChallengesObtained(user_id=current_user.id, challenge_id=challenge.id)
+                db.session.add(existing_challenge)
 
-            # Create a new ChallengesObtained record
-            new_challenge_obtained = ChallengesObtained (user_id=current_user.id, challenge_id=challenge.id, used_hint=used_hint)
-            db.session.add(new_challenge_obtained)
+            # Mark the challenge as completed
+            existing_challenge.completed = True
+            existing_challenge.completed_at = datetime.utcnow()
 
             # Calculate points based on hint usage
             points_earned = challenge.point_value
-            if used_hint and challenge.hint_cost:
+            if existing_challenge.used_hint and challenge.hint_cost:
                 points_earned -= challenge.hint_cost
 
             # Update user's score

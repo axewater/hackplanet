@@ -248,13 +248,14 @@ class ChallengesObtained(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     challenge_id = db.Column(db.Integer, db.ForeignKey('challenges.id'), nullable=False)
-    completed_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    completed_at = db.Column(db.DateTime, nullable=True)
     used_hint = db.Column(db.Boolean, default=False, nullable=False)
+    completed = db.Column(db.Boolean, default=False, nullable=False)
     user = db.relationship('User', backref=db.backref('challenges_obtained', lazy=True))
     challenge = db.relationship('Challenge', backref=db.backref('users_obtained', lazy=True))
 
     def __repr__(self):
-        return f"<ChallengesObtained id={self.id}, user_id={self.user_id}, challenge_id={self.challenge_id}, completed_at={self.completed_at}, used_hint={self.used_hint}>"
+        return f"<ChallengesObtained id={self.id}, user_id={self.user_id}, challenge_id={self.challenge_id}, completed_at={self.completed_at}, used_hint={self.used_hint}, completed={self.completed}>"
 
 class Quiz(db.Model):
     __tablename__ = 'quizzes'
