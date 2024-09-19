@@ -857,6 +857,14 @@ def manage_settings():
         # Convert settings to the appropriate format for the template if necessary
         return render_template('admin/admin_settings.html', current_settings=current_settings)
 
+@bp.before_request
+def check_maintenance_mode():
+    settings_record = GlobalSettings.query.first()
+    if settings_record and settings_record.settings.get('enableMaintenanceMode', False):
+        if not current_user.is_authenticated or current_user.role != 'admin':
+            if request.path.startswith('/ctf'):
+                return render_template('maintenance.html'), 503
+
 
 @bp.route('/admin/status_page')
 @login_required

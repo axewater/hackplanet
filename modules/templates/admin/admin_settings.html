@@ -44,6 +44,12 @@
                     Enable Newsletter Feature
                 </label>
             </div>
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="enableMaintenanceMode">
+                <label class="form-check-label" for="enableMaintenanceMode">
+                    Enable Maintenance Mode
+                </label>
+            </div>
             <button type="submit" class="btn btn-primary mt-3">Save Settings</button>
         </form>
     </div>
@@ -75,7 +81,8 @@ document.addEventListener('DOMContentLoaded', function() {
             showSystemLogo: document.getElementById('showSystemLogo').checked,
             showHelpButton: document.getElementById('showHelpButton').checked,
             enableServerStatusFeature: document.getElementById('enableServerStatusFeature').checked,
-            enableNewsletterFeature: document.getElementById('enableNewsletterFeature').checked
+            enableNewsletterFeature: document.getElementById('enableNewsletterFeature').checked,
+            enableMaintenanceMode: document.getElementById('enableMaintenanceMode').checked
         };
         console.log("Settings to be saved:", settings);
 
