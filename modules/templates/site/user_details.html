@@ -1,6 +1,14 @@
 {% extends "base.html" %}
 
 {% block content %}
+<style>
+    .hint-used {
+        background-color: #fff3cd;
+    }
+    .hint-used .badge {
+        color: #856404;
+    }
+</style>
 <div class="container">
     <div class="glass-panel">
         <div class="chip">
@@ -24,11 +32,20 @@
                 <div class="dark-background p-3">
                     <h2 class="text-light">Completed Challenges</h2>
                     <ul class="list-group mb-4">
-                        {% for challenge in completed_challenges %}
-                        <li class="list-group-item d-flex justify-content-between align-items-center">
-                            {{ challenge.challenge.name }}
-                            <span class="badge bg-primary rounded-pill">{{ challenge.challenge.point_value }} points</span>
-                        </li>
+                        {% for challenge_obtained, challenge in completed_challenges %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center {{ 'hint-used' if challenge_obtained.used_hint else '' }}">
+                                {{ challenge.name }}
+                                <div>
+                                    {% if challenge_obtained.used_hint %}
+                                        <span class="badge bg-warning" title="Reduced points due to hint usage">
+                                            {{ challenge.point_value - challenge.hint_cost }} points
+                                        </span>
+                                        <span class="badge bg-info">Hint Used</span>
+                                    {% else %}
+                                        <span class="badge bg-success">{{ challenge.point_value }} points</span>
+                                    {% endif %}
+                                </div>
+                            </li>
                         {% else %}
                         <li class="list-group-item">No challenges completed yet.</li>
                         {% endfor %}

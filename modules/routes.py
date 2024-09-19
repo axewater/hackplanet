@@ -54,9 +54,7 @@ import logging
 
 bp = Blueprint('main', __name__)
 
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+
 
 @bp.route('/ctf/test_quiz/<int:quiz_id>', methods=['GET', 'POST'])
 @login_required
@@ -107,7 +105,7 @@ has_initialized_whitelist = False
 has_upgraded_admin = False
 has_initialized_setup = False
 app_start_time = datetime.now()
-app_version = '1.2.1'
+app_version = '1.3.0'
 
 @bp.before_app_request
 def initial_setup():
@@ -1704,8 +1702,11 @@ def user_progress():
 def user_details(user_id):
     user = User.query.get_or_404(user_id)
     
-    # Fetch completed challenges
-    completed_challenges = ChallengesObtained.query.filter_by(user_id=user.id).all()
+    # Fetch completed challenges with hint usage information
+    completed_challenges = db.session.query(ChallengesObtained, Challenge).join(Challenge).filter(
+        ChallengesObtained.user_id == user.id,
+        ChallengesObtained.completed == True
+    ).all()
     
     # Fetch obtained flags
     obtained_flags = FlagsObtained.query.filter_by(user_id=user.id).all()
