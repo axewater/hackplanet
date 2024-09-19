@@ -2,7 +2,7 @@
 from argon2.exceptions import VerifyMismatchError
 from modules import db
 from sqlalchemy import Boolean
-from sqlalchemy import Table, Column, Integer, String, ForeignKey, Float, DateTime, Enum
+from sqlalchemy import Table, Column, Integer, String, ForeignKey, Float, DateTime, Enum, func
 from sqlalchemy.dialects.sqlite import TEXT as SQLite_TEXT
 from sqlalchemy.orm import relationship
 from sqlalchemy.types import TypeDecorator, TEXT
@@ -78,6 +78,14 @@ class User(db.Model):
     def rehash_password(self, password):
         if not self.password_hash.startswith('$argon2'):
             self.password_hash = ph.hash(password)
+
+    def calculate_total_score(self):
+        from modules.models import ChallengesObtained, UserQuizProgress, FlagsObtained, Flag
+        challenge_score = db.session.query(func.sum(Challenge.point_value)).join(ChallengesObtained).filter(ChallengesObtained.user_id == self.id, ChallengesObtained.completed == True).scalar() or 0
+        hint_cost = db.session.query(func.sum(Challenge.hint_cost)).join(ChallengesObtained).filter(ChallengesObtained.user_id == self.id, ChallengesObtained.used_hint == True, ChallengesObtained.completed == True).scalar() or 0
+        quiz_score = db.session.query(func.sum(UserQuizProgress.score)).filter(UserQuizProgress.user_id == self.id).scalar() or 0
+        flag_score = db.session.query(func.sum(Flag.point_value)).join(FlagsObtained).filter(FlagsObtained.user_id == self.id).scalar() or 0
+        return challenge_score - hint_cost + quiz_score + flag_score
 
     @property
     def is_authenticated(self):

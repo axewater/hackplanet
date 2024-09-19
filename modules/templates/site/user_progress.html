@@ -42,7 +42,7 @@
         
         <div class="row">
             <div class="col-md-6 mb-4">
-                <h3>Completed Challenges</h3>
+                <h3>Challenges Progress</h3>
                 <table class="table table-striped">
                     <thead>
                         <tr>
@@ -54,10 +54,10 @@
                     </thead>
                     <tbody>
                     {% for challenge_obtained, challenge in completed_challenges %}
-                        <tr class="{{ 'hint-used' if challenge_obtained.used_hint else '' }}">
+                        <tr class="{{ 'hint-used' if challenge_obtained.used_hint and challenge_obtained.completed else '' }}">
                             <td>{{ challenge.name }}</td>
                             <td>
-                                {% if challenge_obtained.used_hint %}
+                                {% if challenge_obtained.used_hint and challenge_obtained.completed %}
                                     <span class="badge bg-warning" title="Reduced points due to hint usage">
                                         {{ challenge.point_value - challenge.hint_cost }}
                                     </span>
@@ -72,7 +72,13 @@
                                     <span class="badge bg-secondary">No</span>
                                 {% endif %}
                             </td>
-                            <td><small>{{ challenge_obtained.completed_at.strftime('%Y-%m-%d %H:%M:%S') }}</small></td>
+                            <td><small>
+                                {% if challenge_obtained.completed_at %}
+                                    {{ challenge_obtained.completed_at.strftime('%Y-%m-%d %H:%M:%S') }}
+                                {% else %}
+                                    In Progress
+                                {% endif %}
+                            </small></td>
                         </tr>
                     {% else %}
                         <tr>
@@ -89,7 +95,7 @@
             </div>
             
             <div class="col-md-6 mb-4">
-                <h3>Hacked Flags</h3>
+                <h3>Hacking Labs Progress</h3>
                 <table class="table table-striped">
                     <thead>
                         <tr>
@@ -142,11 +148,7 @@
                                 {% endif %}
                             </td>
                             <td>
-                                {% if result.completed_at %}
-                                    <small>{{ result.completed_at.strftime('%Y-%m-%d %H:%M:%S') }}</small>
-                                {% else %}
-                                    N/A
-                                {% endif %}
+                                <small>{{ result.completed_at }}</small>
                             </td>
                         </tr>
                     {% else %}

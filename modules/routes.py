@@ -50,9 +50,13 @@ from modules.utilities import (
     admin_required, _authenticate_and_redirect, square_image, send_email, send_password_reset_email, 
 )
 from modules.azure_utils import get_vm_status, check_azure_authentication, get_azure_cli_path
-
+import logging
 
 bp = Blueprint('main', __name__)
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 @bp.route('/ctf/test_quiz/<int:quiz_id>', methods=['GET', 'POST'])
 @login_required
@@ -1018,7 +1022,7 @@ def media_thumbnail():
             img_io.seek(0)
             return send_file(img_io, mimetype='image/jpeg')
     except Exception as e:
-        current_app.logger.error(f"Error generating thumbnail: {str(e)}")
+        print(f"Error generating thumbnail: {str(e)}")
         abort(500)
 
 @bp.route('/admin/media/download')
@@ -1116,18 +1120,21 @@ def ctf_home():
 def leaderboard():
     # Fetch user scores from the database
     print("Fetching user scores from the database...")
-    users = db.session.query(User, func.sum(UserQuizProgress.score).label('quiz_score')).outerjoin(UserQuizProgress).group_by(User.id).order_by((User.score_total + func.coalesce(func.sum(UserQuizProgress.score), 0)).desc()).all()
+    users = User.query.all()
     
     # Prepare user data for the template
     user_data = []
-    for user, quiz_score in users:
-        total_score = user.score_total + (quiz_score or 0)
+    for user in users:
+        total_score = user.calculate_total_score()
         user_data.append({
             'id': user.id,
             'name': user.name,
             'score_total': total_score,
             'avatarpath': user.avatarpath
         })
+    
+    # Sort users by total score
+    user_data.sort(key=lambda x: x['score_total'], reverse=True)
     
     # Debug print to verify fetched data
     if user_data:
@@ -1164,19 +1171,34 @@ def challenges():
 @bp.route('/get_hint/<int:challenge_id>', methods=['POST'])
 @login_required
 def get_hint(challenge_id):
-    challenge = Challenge.query.get_or_404(challenge_id)
-    user_challenge = ChallengesObtained.query.filter_by(user_id=current_user.id, challenge_id=challenge_id).first()
-    
-    if not user_challenge:
-        user_challenge = ChallengesObtained(user_id=current_user.id, challenge_id=challenge_id, used_hint=True)
-        db.session.add(user_challenge)
-    elif not user_challenge.used_hint:
-        user_challenge.used_hint = True
-        current_user.score_total -= challenge.hint_cost
-    
-    db.session.commit()
-    
-    return jsonify({'hint': challenge.hint, 'cost': challenge.hint_cost})
+    try:
+        challenge = Challenge.query.get_or_404(challenge_id)
+        user_challenge = ChallengesObtained.query.filter_by(user_id=current_user.id, challenge_id=challenge_id).first()
+        
+        if not user_challenge:
+            user_challenge = ChallengesObtained(user_id=current_user.id, challenge_id=challenge_id, used_hint=True)
+            db.session.add(user_challenge)
+        elif not user_challenge.used_hint:
+            user_challenge.used_hint = True
+        
+        db.session.commit()
+        
+        
+        
+        print(f"Hint provided for challenge {challenge_id} to user {current_user.id}")
+        return jsonify({
+            'success': True,
+            'hint': challenge.hint,
+            'cost': challenge.hint_cost,
+            
+        })
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error getting hint for challenge {challenge_id}: {str(e)}", exc_info=True)
+        return jsonify({
+            'success': False,
+            'message': 'An error occurred while fetching the hint.'
+        }), 500
 
 
 
@@ -1252,29 +1274,29 @@ def delete_lab(lab_id):
     try:
         lab = Lab.query.get(lab_id)
         if lab:
-            current_app.logger.info(f"Deleting lab: {lab.name}")
+            print(f"Deleting lab: {lab.name}")
             try:
                 # Delete associated hosts first
                 hosts_deleted = Host.query.filter_by(lab_id=lab_id).delete()
                 db.session.delete(lab)
                 db.session.commit()
-                current_app.logger.info(f"Lab and {hosts_deleted} associated hosts deleted successfully")
+                print(f"Lab and {hosts_deleted} associated hosts deleted successfully")
                 return jsonify({'success': True, 'message': f'Lab and {hosts_deleted} associated hosts deleted successfully'})
             except Exception as e:
                 db.session.rollback()
-                current_app.logger.error(f"Error deleting lab: {str(e)}", exc_info=True)
+                print(f"Error deleting lab: {str(e)}", exc_info=True)
                 return jsonify({
                     'success': False,
                     'message': f'An error occurred while deleting the lab: {str(e)}'
                 }), 500
         else:
-            current_app.logger.warning(f"Lab not found: {lab_id}")
+            print(f"Lab not found: {lab_id}")
             return jsonify({
                 'success': False,
                 'message': 'Lab not found'
             }), 404
     except Exception as e:
-        current_app.logger.error(f"Unexpected error in delete_lab: {str(e)}", exc_info=True)
+        print(f"Unexpected error in delete_lab: {str(e)}", exc_info=True)
         return jsonify({
             'success': False,
             'message': f'An unexpected error occurred: {str(e)}'
@@ -1541,7 +1563,7 @@ def submit_flag():
             new_flag_obtained = FlagsObtained(user_id=current_user.id, flag_id=flag.id)
             db.session.add(new_flag_obtained)
 
-            # Update user's score
+            # Update user's score (redundant now)
             current_user.score_total += flag.point_value
             db.session.commit()
 
@@ -1551,7 +1573,7 @@ def submit_flag():
 
     except Exception as e:
         db.session.rollback()
-        current_app.logger.error(f"Error submitting flag: {str(e)}")
+        print(f"Error submitting flag: {str(e)}")
         return jsonify({'success': False, 'message': 'An error occurred while submitting the flag'}), 500
 
 @bp.route('/submit_challenge_flag', methods=['POST'])
@@ -1583,27 +1605,23 @@ def submit_challenge_flag():
             existing_challenge.completed = True
             existing_challenge.completed_at = datetime.utcnow()
 
-            # Calculate points based on hint usage
-            points_earned = challenge.point_value
-            if existing_challenge.used_hint and challenge.hint_cost:
-                points_earned -= challenge.hint_cost
-
-            # Update user's score
-            current_user.score_total += points_earned
             db.session.commit()
+
+            # Calculate the new total score
+            new_score = current_user.calculate_total_score()
 
             return jsonify({
                 'success': True, 
                 'message': 'Challenge completed successfully!', 
-                'new_score': current_user.score_total,
-                'points_earned': points_earned
+                'new_score': new_score,
+                'points_earned': challenge.point_value
             }), 200
         else:
             return jsonify({'success': False, 'message': 'Incorrect flag'}), 400
 
     except Exception as e:
         db.session.rollback()
-        current_app.logger.error(f"Error submitting challenge flag: {str(e)}")
+        print(f"Error submitting challenge flag: {str(e)}")
         return jsonify({'success': False, 'message': 'An error occurred while submitting the flag'}), 500
 
 @bp.route('/ctf/hacking_labs')
@@ -1649,8 +1667,8 @@ def user_progress():
     # Fetch quiz progress
     quiz_progress = UserQuizProgress.query.filter_by(user_id=current_user.id).all()
     
-    # Calculate total score
-    total_score = current_user.score_total + sum(progress.score for progress in quiz_progress)
+    # Calculate total score using the new method
+    total_score = current_user.calculate_total_score()
     
     # Fetch quiz results
     quiz_results = []
@@ -1661,7 +1679,7 @@ def user_progress():
             'score': progress.score,
             'total_points': sum(question.points for question in quiz.questions),
             'completed': progress.completed,
-            'completed_at': progress.completed_at
+            'completed_at': progress.completed_at.strftime('%Y-%m-%d %H:%M:%S') if progress.completed_at else 'Not completed'
         })
     
     return render_template('site/user_progress.html', 
@@ -1749,16 +1767,16 @@ def host_editor(host_id=None):
                 if form.image_url.data:
                     host.image_url = form.image_url.data
 
-                current_app.logger.info(f"Lab ID being set: {host.lab_id}")
-                current_app.logger.debug(f"Full form data: {form.data}")
+                print(f"Lab ID being set: {host.lab_id}")
+                print(f"Full form data: {form.data}")
                 db.session.commit()
                 return jsonify({'success': True, 'message': 'Host saved successfully.'})
             except Exception as e:
                 db.session.rollback()
-                current_app.logger.error(f"Error saving host: {str(e)}")
+                print(f"Error saving host: {str(e)}")
                 return jsonify({'success': False, 'message': 'An error occurred while saving the host.', 'errors': form.errors}), 400
         else:
-            current_app.logger.warning(f"Form validation failed: {form.errors}")
+            print(f"Form validation failed: {form.errors}")
             return jsonify({'success': False, 'message': 'Validation failed.', 'errors': form.errors}), 400
 
     if host:
@@ -1805,7 +1823,7 @@ def delete_host(host_id):
             return jsonify({'success': True})
         except Exception as e:
             db.session.rollback()
-            current_app.logger.error(f"Error deleting host: {str(e)}")
+            print(f"Error deleting host: {str(e)}")
             return jsonify({'success': False, 'message': 'An error occurred while deleting the host.'}), 500
     else:
         return jsonify({
@@ -1885,7 +1903,7 @@ def delete_quiz(quiz_id):
             flash('Quiz deleted successfully.', 'success')
         except SQLAlchemyError as e:
             db.session.rollback()
-            current_app.logger.error(f"Error deleting quiz: {str(e)}")
+            print(f"Error deleting quiz: {str(e)}")
             flash('An error occurred while deleting the quiz.', 'error')
     else:
         flash('Quiz not found.', 'error')
