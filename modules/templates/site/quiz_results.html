@@ -5,7 +5,7 @@
 <div class="container">
     <div class="glass-panel">
         <h1>Quiz Results: {{ quiz.title }}</h1>
-        <p>Your score: {{ user_progress.score }} / {{ quiz.questions|sum(attribute='points') }}</p>
+        <p class="quiz-score">Your score: {{ user_progress.score }} / {{ quiz.questions|sum(attribute='points') }}</p>
         {% if user_progress.completed %}
             <div class="result-message-container">
                 <div class="result-message-background">
