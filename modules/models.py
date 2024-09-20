@@ -204,7 +204,7 @@ class Challenge(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(128), nullable=False)
     description = db.Column(db.String(2048), nullable=True)
-    flag_uuid = db.Column(db.String(36), unique=True, nullable=False, default=str(uuid4()))
+    flag_uuid = db.Column(db.String(128), unique=True, nullable=False, default=str(uuid4()))
     html_link = db.Column(db.String(256), nullable=True)
     point_value = db.Column(db.Integer, nullable=False)
     downloadable_file = db.Column(db.String(256), nullable=True)

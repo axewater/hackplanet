@@ -30,7 +30,7 @@
                         <img src="{{ url_for('static', filename='library/images/challenges/' + challenge.html_link) }}" 
                              class="card-img-top" 
                              alt="{{ challenge.name }}"
-                             style="width: 100px; height: 100px; object-fit: cover;">
+                             style="object-fit: cover;">
                         {% if challenge.completed %}
                         <div class="challenge-overlay completed">
                             <span>Completed</span>
