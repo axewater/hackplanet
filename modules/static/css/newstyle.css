@@ -135,18 +135,6 @@ body {
 
 
 
-.btn-green {
-    background-color: #0e461b;
-    border-color: #28a745;
-    color: white;
-}
-.btn-green:hover {
-    background-color: #08b72e;
-    border-color: #00ff3c;
-    color: white;
-    transform: translateY(-5px);
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
-}
 
 
 .button-login {

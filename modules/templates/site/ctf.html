@@ -1,4 +1,4 @@
-<!-- /modules/templates/ctf.html -->
+<!-- /modules/templa    tes/ctf.html -->
 {% extends 'base.html' %}
 
 {% block content %}
@@ -14,10 +14,12 @@
 
 
 <link rel="stylesheet" href="/static/css/ctf.css">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/extra.css') }}">
+
 
 <div class="container">
     <div class="glass-panel">
-        <div class="labs_title">
+        <div class="hackplanet_titles">
             <h1>HackPlanet.EU Training Grounds</h1>
         </div>
 
@@ -25,13 +27,17 @@
             <div class="col-md-6">
                 <a href="{{ url_for('main.hacking_labs') }}" class="btn btn-green btn-block">
                     <img src="{{ url_for('static', filename='/newstyle/labs.png') }}" alt="Hacking Labs" class="img-fluid ctf-button-image">
-                    <h2>Hacking Labs</h2>
+                    <div class="ctf-label">
+                        <h2>Hacking Labs</h2>
+                    </div>
                 </a>
             </div>
             <div class="col-md-6">
                 <a href="{{ url_for('main.challenges') }}" class="btn btn-green btn-block">
                     <img src="{{ url_for('static', filename='/newstyle/challenges.png') }}" alt="Challenges" class="img-fluid ctf-button-image">
-                    <h2>Crypto Challenges</h2>
+                    <div class="ctf-label">
+                        <h2>Crypto Challenges</h2>
+                    </div>
                 </a>
             </div>
         </div>
@@ -39,13 +45,17 @@
             <div class="col-md-6">
                 <a href="{{ url_for('main.study_room') }}" class="btn btn-green btn-block">
                     <img src="{{ url_for('static', filename='/newstyle/study.png') }}" alt="Study Room" class="img-fluid ctf-button-image">
-                    <h2>Study Room</h2>
+                    <div class="ctf-label">
+                        <h2>Study Room</h2>
+                    </div>
                 </a>
             </div>
             <div class="col-md-6">
                 <a href="{{ url_for('main.quizzes') }}" class="btn btn-green btn-block">
                     <img src="{{ url_for('static', filename='/newstyle/quiz.png') }}" alt="Quizzes" class="img-fluid ctf-button-image">
-                    <h2>Quizzes</h2>
+                    <div class="ctf-label">
+                        <h2>Quizzes</h2>
+                    </div>
                 </a>
             </div>
 

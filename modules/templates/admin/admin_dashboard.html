@@ -10,12 +10,13 @@
 {% endif %}
 {% endwith %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/extra.css') }}">
 
 <div class="admin-panel">
-    <div class="admin-header">
+    <div class="hackplanet_titles">
         <h1>HackPlanet.EU Admin Panel</h1>
-        <img src="{{ url_for('static', filename='newstyle/captainscabin.png') }}" alt="Captain's Cabin" class="captains-image">
     </div>
+    
     <div class="container-fluid">
         <div class="row row-cols-1 row-cols-md-3 g-4">
             <!-- Server Management -->

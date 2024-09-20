@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/extra.css') }}">
 {% with messages = get_flashed_messages() %}
 {% if messages %}
 <div>
@@ -13,7 +14,7 @@
 
     <div class="container">
         <div class="glass-panel">
-            <div class="labs_title">
+            <div class="hackplanet_titles">
                 <h1>Study Room</h1>
             </div>
             <div class="row">

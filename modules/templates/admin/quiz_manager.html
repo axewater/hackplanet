@@ -2,6 +2,7 @@
 {% block content %}
 {% with messages = get_flashed_messages(with_categories=true) %}
 {% if messages %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/extra.css') }}">
 <div>
     {% for category, message in messages %}
     <div class="alert alert-{{ category }}" role="alert">{{ message }}</div>

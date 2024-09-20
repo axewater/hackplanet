@@ -2,7 +2,11 @@
 .ctf-button-image {
     max-width: 250px;
     max-height: 250px;
-    width: auto;
-    height: auto;
-    object-fit: contain;
+    padding: 10px;
+}
+
+.ctf-label {
+    margin-top: 10px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* X-offset, Y-offset, blur radius, color */
+    
 }

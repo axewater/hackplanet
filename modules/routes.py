@@ -524,30 +524,6 @@ def delete_avatar(avatar_path):
 
     return redirect(url_for('main.bot_generator'))
 
-@bp.route('/settings_account', methods=['GET', 'POST'])
-@login_required
-def account():
-    print("Route: /settings_account")
-
-    user = User.query.filter_by(id=current_user.id).first()
-    form = UserDetailForm(about=str(user.about))
-    
-
-    if form.validate_on_submit():
-      
-        try:
-            db.session.commit()
-            
-
-            flash('Account details updated successfully!', 'success')
-        except Exception as e:
-            db.session.rollback()
-            print(f"Error updating account details: {e}")
-            flash('Failed to update account details. Please try again.', 'error')
-
-        return redirect(url_for('main.account'))
-
-    return render_template('settings/settings_account.html', title='Account', form=form, user=user)
 
 @bp.route('/settings_profile_edit', methods=['GET', 'POST'])
 @login_required

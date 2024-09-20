@@ -1,33 +1,7 @@
 
 
 
-.labs_title {
-    color: #fff;
-    font-weight: bold;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-    background-color: #0a440f;
-    padding: 20px;
-    border-radius: 15px;
-    margin-bottom: 20px;
-    text-align: center;
-}
 
-
-.labs_title h1 {
-    color: #fff;
-    font-size: 32px;
-    font-weight: bold;
-    margin: 0;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-}
-
-.lab {
-    background-color: #000;
-    padding: 20px;
-    border-radius: 15px;
-    margin-bottom: 20px;
-    border: 1px solid #ccc;
-}
 
 .lab h2 {
     color: #fff;
