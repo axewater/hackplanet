@@ -9,6 +9,6 @@ if __name__ == '__main__':
     db_manager = DatabaseManager()
     db_manager.add_purchase_url_column_if_not_exists()
     db_manager.add_used_by_column_to_invite_tokens()
-    db_manager.add_solution_column_if_not_exists()  # Add this line
+    db_manager.add_solution_column_if_not_exists()
     
     app.run(host="0.0.0.0", debug=True, port=5001)

@@ -203,7 +203,7 @@ class Challenge(db.Model):
     __tablename__ = 'challenges'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(128), nullable=False)
-    description = db.Column(db.String(256), nullable=True)
+    description = db.Column(db.String(2048), nullable=True)
     flag_uuid = db.Column(db.String(36), unique=True, nullable=False, default=str(uuid4()))
     html_link = db.Column(db.String(256), nullable=True)
     point_value = db.Column(db.Integer, nullable=False)
