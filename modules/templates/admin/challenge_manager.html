@@ -26,6 +26,7 @@
                 <th>Point Value</th>
                 <th>Hint</th>
                 <th>Hint Cost</th>
+                <th>Solution</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -38,6 +39,13 @@
                 <td>{{ 'Yes' if challenge.hint else 'No' }}</td>
                 <td>{{ challenge.hint_cost if challenge.hint_cost else 'N/A' }}</td>
                 <td>
+                    {% if challenge.solution %}
+                    <button class="btn btn-sm btn-info" onclick="viewSolution({{ challenge.id }})">View Solution</button>
+                    {% else %}
+                    No Solution
+                    {% endif %}
+                </td>
+                <td>
                     <a href="{{ url_for('main.challenge_editor', challenge_id=challenge.id) }}" class="btn btn-sm btn-primary">Edit</a>
                     <button onclick="deleteChallenge({{ challenge.id }})" class="btn btn-sm btn-danger">Delete</button>
                 </td>
@@ -47,6 +55,32 @@
     </table>
 </div>
 </div>
+
+<!-- Modal for viewing solution -->
+<div class="modal fade" id="solutionModal" tabindex="-1" aria-labelledby="solutionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="solutionModalLabel">Challenge Solution</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="solutionContent">
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function viewSolution(challengeId) {
+    fetch(`/admin/get_solution/${challengeId}`)
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('solutionContent').innerHTML = data.solution;
+            new bootstrap.Modal(document.getElementById('solutionModal')).show();
+        })
+        .catch(error => console.error('Error:', error));
+}
+</script>
 <script>
 function deleteChallenge(challengeId) {
     if (confirm('Are you sure you want to delete this challenge?')) {

@@ -210,6 +210,7 @@ class Challenge(db.Model):
     downloadable_file = db.Column(db.String(256), nullable=True)
     hint = db.Column(db.String(512), nullable=True)
     hint_cost = db.Column(db.Integer, nullable=True)
+    solution = db.Column(db.Text, nullable=True)  # New field for solution
 
     def __repr__(self):
         return f"<Challenge id={self.id}, name={self.name}, flag_uuid={self.flag_uuid}, point_value={self.point_value}>"

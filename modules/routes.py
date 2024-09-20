@@ -1350,6 +1350,13 @@ def delete_challenge(challenge_id):
             'message': 'Challenge not found'
         }), 404
 
+@bp.route('/admin/get_solution/<int:challenge_id>')
+@login_required
+@admin_required
+def get_solution(challenge_id):
+    challenge = Challenge.query.get_or_404(challenge_id)
+    return jsonify({'solution': challenge.solution})
+
 
 @bp.route('/admin/challenge_editor/<int:challenge_id>', methods=['GET', 'POST'])
 @bp.route('/admin/challenge_editor', methods=['GET', 'POST'])
@@ -1370,6 +1377,8 @@ def challenge_editor(challenge_id=None):
                 challenge.downloadable_file = form.downloadable_file.data
                 challenge.hint = form.hint.data
                 challenge.hint_cost = form.hint_cost.data
+                challenge.solution = form.solution.data  # Add this line to save the solution
+                challenge.solution = form.solution.data  # New field
             else:
                 challenge = Challenge(
                     name=form.name.data,
@@ -1379,7 +1388,8 @@ def challenge_editor(challenge_id=None):
                     point_value=form.point_value.data,
                     downloadable_file=form.downloadable_file.data,
                     hint=form.hint.data,
-                    hint_cost=form.hint_cost.data
+                    hint_cost=form.hint_cost.data,
+                    solution=form.solution.data  # New field
                 )
                 db.session.add(challenge)
             
@@ -1400,6 +1410,7 @@ def challenge_editor(challenge_id=None):
         form.downloadable_file.data = challenge.downloadable_file
         form.hint.data = challenge.hint
         form.hint_cost.data = challenge.hint_cost
+        form.solution.data = challenge.solution  # Add this line to populate the solution field
 
     return render_template('admin/challenge_editor.html', form=form, challenge=challenge)
 

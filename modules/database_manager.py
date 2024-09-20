@@ -28,6 +28,26 @@ class DatabaseManager:
             # Close the database connection
             self.engine.dispose()
 
+    def add_solution_column_if_not_exists(self):
+        # SQL command to add a new column
+        add_column_sql = """
+        ALTER TABLE challenges
+        ADD COLUMN IF NOT EXISTS solution TEXT;
+        """
+        print("Adding 'solution' column to challenges table")
+        try:
+            with self.engine.connect() as connection:
+                connection.execute(text(add_column_sql))
+                connection.commit()
+            print("Column 'solution' successfully added to the 'challenges' table.")
+        except Exception as e:
+            print(f"An error occurred: {e}")
+        finally:
+            self.engine.dispose()
+
+
+
+
     def add_used_by_column_to_invite_tokens(self):
         add_column_sql = """
         ALTER TABLE invite_tokens

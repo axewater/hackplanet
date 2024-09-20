@@ -160,6 +160,7 @@ class ChallengeForm(FlaskForm):
     downloadable_file = SelectField('Downloadable File', validators=[Optional()], choices=[])
     hint = TextAreaField('Hint', validators=[Optional(), Length(max=512)])
     hint_cost = IntegerField('Hint Cost', validators=[Optional(), NumberRange(min=0)])
+    solution = TextAreaField('Solution', validators=[Optional()])  # New field for solution
     submit = SubmitField('Save Challenge')
 
     def __init__(self, *args, **kwargs):
@@ -280,9 +281,11 @@ class CourseForm(FlaskForm):
         file_folder = os.path.join(current_app.config['UPLOAD_FOLDER'], 'studyfiles')
         allowed_extensions = current_app.config['ALLOWED_EXTENSIONS']
         files = [f for f in os.listdir(file_folder) if f.lower().split('.')[-1] in allowed_extensions]
+        files.sort()  # Sort the files alphabetically
         return [('', 'Select a file')] + [(f, f) for f in files]
 
     def get_image_choices(self):
         image_folder = os.path.join(current_app.config['UPLOAD_FOLDER'], 'images', 'courses')
         image_files = [f for f in os.listdir(image_folder) if f.lower().endswith(('.png', '.jpg', '.jpeg', '.gif'))]
+        image_files.sort()  # Sort the image files alphabetically
         return [('', 'Select an image')] + [(f, f) for f in image_files]
