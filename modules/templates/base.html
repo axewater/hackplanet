@@ -46,7 +46,7 @@
     {% endif %}
     <a href="/ctf">
         {% if show_logo %}
-            <div class="menu-logo-image">
+            <div class="menu-logo-image {% if enable_maintenance_mode %}maintenance-mode{% endif %}">
                 <!-- Your CSS will apply here, displaying the logo -->
             </div>
         {% endif %}
