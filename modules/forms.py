@@ -153,7 +153,7 @@ class ChallengeSubmissionForm(FlaskForm):
 
 class ChallengeForm(FlaskForm):
     name = StringField('Challenge Name', validators=[DataRequired(), Length(max=128)])
-    description = TextAreaField('Description', validators=[Optional(), Length(max=256)])
+    description = TextAreaField('Description', validators=[Optional(), Length(max=2048)])
     flag_uuid = StringField('Flag UUID', validators=[Optional(), Length(max=36)])
     html_link = SelectField('Image', validators=[Optional()], choices=[])
     point_value = IntegerField('Point Value', validators=[DataRequired(), NumberRange(min=1)])
