@@ -11,6 +11,7 @@
                         <th>Host</th>
                         <th>Flag Type</th>
                         <th>Flag Value</th>
+                        <th>Point Value</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -20,6 +21,7 @@
                             <td>{{ flag.host.name }}</td>
                             <td>{{ flag.type }}</td>
                             <td>{{ flag.uuid }}</td>
+                            <td>{{ flag.point_value }}</td>
                             <td>
                                 <a href="{{ url_for('main.edit_flag', flag_id=flag.id) }}" class="btn btn-primary btn-sm">Edit</a>
                                 <button class="btn btn-danger btn-sm delete-flag" data-flag-id="{{ flag.id }}">Delete</button>
