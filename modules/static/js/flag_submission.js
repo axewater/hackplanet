@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
     window.submitFlag = function(hostId, flagType) {
         const flagInput = document.getElementById(`${flagType}-flag-${hostId}`);
         const flag = flagInput.value.trim();
+        const submitButton = document.querySelector(`button[onclick="submitFlag('${hostId}', '${flagType}')"]`);
 
         if (!flag) {
             showModal('Error', 'Please enter a flag.');
@@ -26,6 +27,21 @@ document.addEventListener('DOMContentLoaded', function() {
             if (data.success) {
                 showModal('🎉 Success', 'Flag submitted successfully! 🚩');
                 flagInput.value = '';
+                submitButton.disabled = true;
+                submitButton.textContent = 'Completed';
+                
+                // Remove the input field
+                flagInput.style.display = 'none';
+                
+                // Check if both flags are completed
+                const otherFlagType = flagType === 'user' ? 'root' : 'user';
+                const otherSubmitButton = document.querySelector(`button[onclick="submitFlag('${hostId}', '${otherFlagType}')"]`);
+                const otherFlagInput = document.getElementById(`${otherFlagType}-flag-${hostId}`);
+                if (otherSubmitButton && otherSubmitButton.disabled) {
+                    showCompletedBanner(hostId);
+                    // Remove the other input field if both flags are completed
+                    otherFlagInput.style.display = 'none';
+                }
             } else {
                 showModal('⚠️ Error', data.message || 'Failed to submit flag. Please try again. 🔄');
             }
@@ -53,4 +69,17 @@ document.addEventListener('DOMContentLoaded', function() {
         const bootstrapModal = new bootstrap.Modal(modal);
         bootstrapModal.show();
     }
+
+
+
+    // Check for completed flags on page load
+    document.querySelectorAll('.host').forEach(host => {
+        const hostId = host.dataset.hostId;
+        const userButton = host.querySelector(`button[onclick="submitFlag('${hostId}', 'user')"]`);
+        const rootButton = host.querySelector(`button[onclick="submitFlag('${hostId}', 'root')"]`);
+
+        if (userButton && rootButton && userButton.disabled && rootButton.disabled) {
+            showCompletedOverlay(hostId);
+        }
+    });
 });

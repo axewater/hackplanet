@@ -1,8 +1,3 @@
-
-
-
-
-
 .lab h2 {
     color: #fff;
     font-size: 24px;
@@ -18,9 +13,7 @@
     height: auto;
     border-radius: 10px;
     margin-bottom: 10px;
-
-    }
-
+}
 
 .hosts {
     display: flex;
@@ -38,15 +31,13 @@
     margin-bottom: 20px;
     flex-basis: calc(33.33% - 20px);
     text-align: center;
-    border: 1px solid #ccc;
     max-width: 250px;
+    position: relative;
 }
 
 .host-inputarea {
     display: flex;
     flex-direction: column;
-
-
 }
 
 .host-image-container {
@@ -61,10 +52,7 @@
     width: 300px;
     height: 300px;
     height: auto;
-
 }
-
-
 
 .host h3 {
     color: #fff;
@@ -85,12 +73,11 @@
 }
 
 .avatar {
-        width: 50px;
-        height: 50px;
-        border-radius: 15px;
-        object-fit: cover;
-    }
-
+    width: 50px;
+    height: 50px;
+    border-radius: 15px;
+    object-fit: cover;
+}
 
 .labschip {
     display: inline-block;
@@ -98,10 +85,9 @@
     margin: 5px;
     background-color: #0a440f;
     border-radius: 15px;
-    border: 1px solid #ffffff;
+
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
     color: #ffffff;
-    
 }
 
 .labschip h2, .labschip p {
@@ -109,12 +95,9 @@
     padding: 5px 0;
     color: inherit;
 }
-    
 
 .download-button {
-    
     color: #ffffff;
-    
     padding: 10px 20px;
     border-radius: 15px;
     margin-left: 20px;
@@ -152,8 +135,6 @@
     border: 1px solid #ccc;
 }
 
-
-
 .features {
     display: flex;
     flex-direction: row;
@@ -178,7 +159,6 @@
 .feature-block h3 {
     margin-top: 0;
     color: #333;
-
 }
 
 .feature-block p {
@@ -190,9 +170,6 @@
     text-align: center;
     margin-top: 20px;
 }
-
-
-
 
 /* Modal styles */
 .modal {
@@ -217,7 +194,6 @@
 
 .kalismurf-credentials {
     background-color: #f0f0f0;
-
     padding: 10px;
     margin-top: 10px;
 }
@@ -227,6 +203,24 @@
     color: #c42424;
     font-weight: bold;
     margin: 5px 0;
+}
+
+.completed-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 50%;
+    background-color: rgba(0, 255, 0, 0.3);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 38px;
+    font-weight: bold;
+    color: white;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    border-radius: 15px;
+    pointer-events: none;
 }
 
 

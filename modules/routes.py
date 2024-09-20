@@ -1638,6 +1638,13 @@ def hacking_labs():
             # Fetch the latest status for each host
             for host in lab.hosts:
                 host.status = Host.query.get(host.id).status
+                
+                # Check if user has completed flags for this host
+                user_flag = FlagsObtained.query.filter_by(user_id=current_user.id, flag_id=host.flags[0].id).first() if host.flags else None
+                root_flag = FlagsObtained.query.filter_by(user_id=current_user.id, flag_id=host.flags[1].id).first() if len(host.flags) > 1 else None
+                
+                host.user_flag_completed = user_flag is not None
+                host.root_flag_completed = root_flag is not None
 
     # Instantiate the FlagSubmissionForm
     form = FlagSubmissionForm()

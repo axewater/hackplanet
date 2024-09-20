@@ -55,8 +55,7 @@
                         </div>
                     {% else %}
                         {% for host in lab.hosts %}
-                        <div class="host">
-
+                        <div class="host" data-host-id="{{ host.id }}">
                             <h3>{{ host.name | upper }} </h3>
                             <div class="host-image-container">
                                 <img src="{{ '/static/library/images/hosts/' + host.image_url }}" alt="{{ host.name }}" class="host-image">
@@ -66,17 +65,23 @@
                             <p>Status: <span class="status-indicator {{ 'online' if host.status else 'offline' }}" style="color: {{ '#28a745' if host.status else '#dc3545' }};">{{ 'Online' if host.status else 'Offline' }}</span></p>
                             <a href="{{ url_for('main.host_details', host_id=host.id) }}" class="btn btn-info">Host Details</a>
 
-            
                             <div class="host-inputarea">
                                 {% if host.name != 'kalismurf' %}
                                 <div class="flag-input-container">
-                                    <input type="text" id="user-flag-{{ host.id }}" placeholder="Enter User Flag" class="flag-input">
-                                    <button type="button" class="btn btn-success" onclick="submitFlag('{{ host.id }}', 'user')">Submit</button>
+                                    <input type="text" id="user-flag-{{ host.id }}" placeholder="Enter User Flag" class="flag-input" {% if host.user_flag_completed %}style="display: none;"{% endif %}>
+                                    <button type="button" class="btn btn-success" onclick="submitFlag('{{ host.id }}', 'user')" {% if host.user_flag_completed %}disabled{% endif %}>
+                                        {% if host.user_flag_completed %}User Flag Hacked{% else %}Submit User Flag{% endif %}
+                                    </button>
                                 </div>
                                 <div class="flag-input-container">
-                                    <input type="text" id="root-flag-{{ host.id }}" placeholder="Enter Root Flag" class="flag-input">
-                                    <button type="button" class="btn btn-danger" onclick="submitFlag('{{ host.id }}', 'root')">Submit</button>
+                                    <input type="text" id="root-flag-{{ host.id }}" placeholder="Enter Root Flag" class="flag-input" {% if host.root_flag_completed %}style="display: none;"{% endif %}>
+                                    <button type="button" class="btn btn-danger" onclick="submitFlag('{{ host.id }}', 'root')" {% if host.root_flag_completed %}disabled{% endif %}>
+                                        {% if host.root_flag_completed %}Root Flag Hacked{% else %}Submit Root Flag{% endif %}
+                                    </button>
                                 </div>
+                                {% if host.user_flag_completed and host.root_flag_completed %}
+                                <div class="completed-overlay">PWNED!</div>
+                                {% endif %}
                                 {% else %}
                                 <div class="kalismurf-credentials">
                                     <p>username : kali</p>
