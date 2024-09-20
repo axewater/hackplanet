@@ -1,15 +1,21 @@
 {% extends "base.html" %}
 {% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
 <div class="container">
     <div class="glass-panel">
         <h1>Quiz Results: {{ quiz.title }}</h1>
         <p>Your score: {{ user_progress.score }} / {{ quiz.questions|sum(attribute='points') }}</p>
         {% if user_progress.completed %}
-            {% if user_progress.score >= quiz.min_score %}
-            <p class="text-success">Congratulations! You passed the quiz.</p>
-            {% else %}
-            <p class="text-danger">Unfortunately, you didn't pass the quiz. The minimum score required is {{ quiz.min_score }}.</p>
-            {% endif %}
+            <div class="result-message-container">
+                <div class="result-message-background">
+                    {% if user_progress.score >= quiz.min_score %}
+                    <p class="text-success result-message">Congratulations! You passed the quiz.</p>
+                    {% else %}
+                    <p class="text-danger result-message">Unfortunately, you didn't pass the quiz. The minimum score required is {{ quiz.min_score }}.</p>
+                    {% endif %}
+                </div>
+            </div>
         {% else %}
             <p class="text-warning">You haven't completed the quiz yet. Your current progress is saved.</p>
         {% endif %}
