@@ -70,7 +70,18 @@
                         <li class="list-group-item">
                             <h5>{{ result.title }}</h5>
                             <p>Score: {{ result.score }} / {{ result.total_points }}</p>
-                            <p>Status: {% if result.completed %}Completed{% else %}In Progress{% endif %}</p>
+                            <p>Status: 
+                                {% if result.completed %}
+                                    {% if result.passed %}
+                                        <span class="badge bg-success">Passed</span>
+                                    {% else %}
+                                        <span class="badge bg-danger">Failed</span>
+                                    {% endif %}
+                                {% else %}
+                                    <span class="badge bg-warning">In Progress</span>
+                                {% endif %}
+                            </p>
+                            <p>Minimum Score to Pass: {{ result.min_score }}</p>
                             {% if result.completed_at %}
                             <p>Completed on: {{ result.completed_at.strftime('%Y-%m-%d %H:%M:%S') }}</p>
                             {% endif %}

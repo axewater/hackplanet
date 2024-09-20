@@ -1722,7 +1722,9 @@ def user_details(user_id):
             'score': progress.score,
             'total_points': sum(question.points for question in quiz.questions),
             'completed': progress.completed,
-            'completed_at': progress.completed_at
+            'completed_at': progress.completed_at,
+            'passed': progress.score >= quiz.min_score,
+            'min_score': quiz.min_score
         })
     
     return render_template('site/user_details.html', 
