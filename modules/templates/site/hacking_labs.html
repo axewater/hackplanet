@@ -43,7 +43,7 @@
                     <a href="{{ url_for('main.vpn_management', lab_id=lab.id) }}" class="btn btn-secondary">VPN Management</a>
                     {% endif %}
                     <p>{{ lab.description }}</p>
-                </div>
+                
 
                 <div class="hosts">
                     {% if lab in labs_without_hosts %}
@@ -89,6 +89,7 @@
                     {% endif %}
                 </div>
             </div>
+        </div>
             {% endfor %}
         {% endif %}
     </div>
