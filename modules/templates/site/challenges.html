@@ -46,12 +46,12 @@
                         {% if challenge.downloadable_file %}
                         <a href="{{ url_for('static', filename='library/challenges/' + challenge.downloadable_file) }}" class="btn btn-secondary mb-2">Download File</a>
                         {% endif %}
-                        {% if challenge.hint %}
+                        {% if challenge.hint_cost is not none %}
                         <button id="hint-button-{{ challenge.id }}" class="btn btn-info mb-2" onclick="showHint({{ challenge.id }}, {{ challenge.hint_cost }})" {% if challenge.hint_used or challenge.completed %}disabled{% endif %}>
                             {% if challenge.hint_used %}Hint Used{% else %}Get Hint (Cost: {{ challenge.hint_cost }} points){% endif %}
                         </button>
-                        <div id="hint-{{ challenge.id }}" style="{% if challenge.hint_used %}display: block;{% else %}display: none;{% endif %}">
-                            <p><strong>Hint:</strong> {{ challenge.hint }}</p>
+                        <div id="hint-{{ challenge.id }}" style="display: none;">
+                            <p><strong>Hint:</strong></p>
                         </div>
                         {% endif %}
                         {% if not challenge.completed %}
