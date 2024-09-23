@@ -34,7 +34,14 @@
             {% for challenge in challenges %}
             <tr>
                 <td>{{ challenge.name }}</td>
-                <td>{{ challenge.description }}</td>
+                <td>
+                    {% if challenge.description|length > 50 %}
+                        {{ challenge.description[:50] }}...
+                        <button class="btn btn-sm btn-link" onclick="viewFullDescription({{ challenge.id }})">View More</button>
+                    {% else %}
+                        {{ challenge.description }}
+                    {% endif %}
+                </td>
                 <td>{{ challenge.point_value }}</td>
                 <td>{{ 'Yes' if challenge.hint else 'No' }}</td>
                 <td>{{ challenge.hint_cost if challenge.hint_cost else 'N/A' }}</td>
@@ -77,6 +84,16 @@ function viewSolution(challengeId) {
         .then(data => {
             document.getElementById('solutionContent').innerHTML = data.solution;
             new bootstrap.Modal(document.getElementById('solutionModal')).show();
+        })
+        .catch(error => console.error('Error:', error));
+}
+
+function viewFullDescription(challengeId) {
+    fetch(`/admin/get_challenge_description/${challengeId}`)
+        .then(response => response.json())
+        .then(data => {
+            document.getElementById('descriptionContent').innerHTML = data.description;
+            new bootstrap.Modal(document.getElementById('descriptionModal')).show();
         })
         .catch(error => console.error('Error:', error));
 }

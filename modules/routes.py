@@ -1357,6 +1357,12 @@ def get_solution(challenge_id):
     challenge = Challenge.query.get_or_404(challenge_id)
     return jsonify({'solution': challenge.solution})
 
+@bp.route('/admin/get_challenge_description/<int:challenge_id>')
+@login_required
+@admin_required
+def get_challenge_description(challenge_id):
+    challenge = Challenge.query.get_or_404(challenge_id)
+    return jsonify({'description': challenge.description})
 
 @bp.route('/admin/challenge_editor/<int:challenge_id>', methods=['GET', 'POST'])
 @bp.route('/admin/challenge_editor', methods=['GET', 'POST'])
@@ -1651,8 +1657,8 @@ def hacking_labs():
                 host.status = Host.query.get(host.id).status
                 
                 # Check if user has completed flags for this host
-                user_flag = FlagsObtained.query.filter_by(user_id=current_user.id, flag_id=host.flags[0].id).first() if host.flags else None
-                root_flag = FlagsObtained.query.filter_by(user_id=current_user.id, flag_id=host.flags[1].id).first() if len(host.flags) > 1 else None
+                user_flag = FlagsObtained.query.filter_by(user_id=current_user.id, flag_id=Flag.query.filter_by(host_id=host.id, type='user').first().id).first() if host.flags else None
+                root_flag = FlagsObtained.query.filter_by(user_id=current_user.id, flag_id=Flag.query.filter_by(host_id=host.id, type='root').first().id).first() if host.flags else None
                 
                 host.user_flag_completed = user_flag is not None
                 host.root_flag_completed = root_flag is not None

@@ -20,7 +20,7 @@
 .dashboard-button:hover {
     text-decoration: none;
     color: rgb(9, 12, 12);
-    transform: scale(1.05);
+    transform: scale(1.1);
 }
 
 .admin-panel {
@@ -29,10 +29,14 @@
     background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(10px);
     border-radius: 15px;
-    padding: 30px;
-    margin: 20px auto;
-    box-shadow: 0 9px 16px rgba(17, 2, 2, 0.2);
-    max-width: 1200px;
+    padding: 20px;
+    margin: 20px;
+    grid-template-columns: auto 1fr auto;
+    gap: 10px;
+    justify-content: space-between;
+    box-shadow: 0 9px 16px rgba(17, 2, 2, 2);
+    padding-bottom: 50px;
+    width: 680px;
 }
 
 .admin-header {
