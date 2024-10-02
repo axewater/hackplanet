@@ -24,6 +24,9 @@
                 <div class="dark-background p-3 mt-3">
                     <h4 class="text-light">Total Score:</h4>
                     <h2 class="text-light">{{ user_data['score_total'] }}</h2>
+                    {% if current_user.role == 'admin' %}
+                        <p>Email: {{ user.email }}</p>
+                    {% endif %}
                     <div class="progress mt-2">
                         <div class="progress-bar" role="progressbar" style="width: {{ (user_data['score_total'] / 1000) * 100 }}%;" aria-valuenow="{{ user_data['score_total'] }}" aria-valuemin="0" aria-valuemax="1000">{{ user_data['score_total'] }} / 1000</div>
                     </div>
