@@ -120,6 +120,7 @@ class UserPreference(db.Model):
     items_per_page = db.Column(db.Integer, default=20)
     default_sort = db.Column(db.String(50), default='name')
     default_sort_order = db.Column(db.String(4), default='asc')
+    theme = db.Column(db.String(50), default='default')
 
     user = db.relationship('User', backref=db.backref('preferences', uselist=False))
 

@@ -6,6 +6,13 @@ from flask_wtf.file import FileField, FileAllowed, FileRequired
 from wtforms.validators import DataRequired, Length, Optional, NumberRange, Regexp, URL,Email, EqualTo
 from wtforms.widgets import TextInput
 from wtforms_sqlalchemy.fields import QuerySelectMultipleField
+
+class ThemeUploadForm(FlaskForm):
+    theme_zip = FileField('Theme ZIP File', validators=[
+        FileRequired(),
+        FileAllowed(['zip'], 'ZIP files only!')
+    ])
+    submit = SubmitField('Upload Theme')
 from flask import current_app
 from wtforms.widgets import ListWidget, CheckboxInput, TextArea
 from wtforms.fields import URLField, DateField
@@ -138,6 +145,7 @@ class UserPreferencesForm(FlaskForm):
     items_per_page = SelectField('Max items per Page', choices=items_per_page_choices, coerce=int)
     default_sort = SelectField('Default Sort', choices=default_sort_choices)
     default_sort_order = SelectField('Default Sort Order', choices=default_sort_order_choices)
+    theme = SelectField('Theme', choices=[])
     submit = SubmitField('Save Preferences')
 
 class FlagSubmissionForm(FlaskForm):

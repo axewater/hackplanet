@@ -17,6 +17,16 @@
     <link rel="stylesheet" href="/static/css/course_details.css">
 
     {% endblock %}
+
+
+
+    {% if current_theme and current_theme != 'default' %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='themes/' + current_theme + '/css/style.css') }}">
+    {% endif %}
+    {% block extra_css %}{% endblock %}
+
+
+
 </head>
 <body>
 

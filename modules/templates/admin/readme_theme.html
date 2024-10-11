@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+    <h1>How to Create a Theme for HackPlanet</h1>
+    <p>Creating a theme for HackPlanet is easy. Follow these steps:</p>
+    <ol>
+        <li>Create a new directory for your theme.</li>
+        <li>Inside this directory, create a file named <code>theme.json</code> with the following structure:
+            <pre>
+{
+    "name": "Your Theme Name",
+    "description": "A brief description of your theme",
+    "author": "Your Name",
+    "release_date": "YYYY-MM-DD"
+}
+            </pre>
+        </li>
+        <li>Create a subdirectory named <code>css</code>.</li>
+        <li>Inside the <code>css</code> directory, create your CSS files. The main CSS file should be named <code>style.css</code>.</li>
+        <li>Zip the entire theme directory.</li>
+        <li>Upload the zip file using the theme upload form.</li>
+    </ol>
+    <p>That's it! Your theme should now be available for use in HackPlanet.</p>
+</div>
+{% endblock %}

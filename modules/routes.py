@@ -39,17 +39,18 @@ from modules.forms import (
     UserPasswordForm, UserDetailForm, EditProfileForm, NewsletterForm, WhitelistForm, EditUserForm, ChallengeForm,
     UserManagementForm, CsrfProtectForm, LoginForm, ResetPasswordRequestForm, RegistrationForm, HostForm,
     CreateUserForm, UserPreferencesForm, InviteForm, CsrfForm, LabForm, FlagSubmissionForm, ChallengeSubmissionForm,
-    QuizForm, QuestionForm, FlagForm, CourseForm
+    QuizForm, QuestionForm, FlagForm, CourseForm, ThemeUploadForm
 )
 
 from modules.models import (
-    User, Whitelist, UserPreference, GlobalSettings, InviteToken, Lab, Challenge, Host, 
+    User, Whitelist, UserPreference, GlobalSettings, InviteToken, Lab, Challenge, Host,
     Flag, UserProgress, FlagsObtained, ChallengesObtained, Quiz, Question, UserQuizProgress, UserQuestionProgress, Course
 )
 from modules.utilities import (
     admin_required, _authenticate_and_redirect, square_image, send_email, send_password_reset_email, 
 )
 from modules.azure_utils import get_vm_status, check_azure_authentication, get_azure_cli_path
+from modules.theme_manager import ThemeManager
 import logging
 
 bp = Blueprint('main', __name__)
@@ -2273,6 +2274,59 @@ def delete_course(course_id):
     db.session.commit()
     flash('Course deleted successfully.', 'success')
     return redirect(url_for('main.studyroom_manager'))
+
+@bp.route('/admin/themes', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def manage_themes():
+    form = ThemeUploadForm()
+    theme_manager = ThemeManager(current_app)
+
+    if form.validate_on_submit():
+        theme_zip = form.theme_zip.data
+        try:
+            theme_data = theme_manager.upload_theme(theme_zip)
+            if theme_data:
+                flash(f"Theme '{theme_data['name']}' uploaded successfully!", 'success')
+            else:
+                flash("Theme upload failed. Please check the error messages.", 'error')
+        except ValueError as e:
+            flash(str(e), 'error')
+        except Exception as e:
+            flash(f"An unexpected error occurred: {str(e)}", 'error')
+        return redirect(url_for('main.manage_themes'))
+
+    installed_themes = theme_manager.get_installed_themes()
+    default_theme = theme_manager.get_default_theme()
+    return render_template('admin/admin_manage_themes.html', form=form, themes=installed_themes, default_theme=default_theme)
+
+@bp.route('/admin/themes/readme')
+@login_required
+@admin_required
+def theme_readme():
+    return render_template('admin/readme_theme.html')
+
+@bp.route('/admin/themes/delete/<theme_name>', methods=['POST'])
+@login_required
+@admin_required
+def delete_theme(theme_name):
+    theme_manager = ThemeManager(current_app)
+    try:
+        theme_manager.delete_theme(theme_name)
+        flash(f"Theme '{theme_name}' deleted successfully!", 'success')
+    except ValueError as e:
+        flash(str(e), 'error')
+    except Exception as e:
+        flash(f"An unexpected error occurred: {str(e)}", 'error')
+    return redirect(url_for('main.manage_themes'))
+
+@bp.context_processor
+def inject_current_theme():
+    if current_user.is_authenticated and current_user.preferences:
+        current_theme = current_user.preferences.theme or 'default'
+    else:
+        current_theme = 'default'
+    return dict(current_theme=current_theme)
 
 
 @bp.route('/ctf/study_room')

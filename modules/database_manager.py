@@ -45,9 +45,6 @@ class DatabaseManager:
         finally:
             self.engine.dispose()
 
-
-
-
     def add_used_by_column_to_invite_tokens(self):
         add_column_sql = """
         ALTER TABLE invite_tokens
@@ -59,6 +56,22 @@ class DatabaseManager:
                 connection.execute(text(add_column_sql))
                 connection.commit()
             print("Column 'used_by' successfully added to the 'invite_tokens' table.")
+        except Exception as e:
+            print(f"An error occurred: {e}")
+        finally:
+            self.engine.dispose()
+
+    def add_theme_column_to_user_preferences(self):
+        add_column_sql = """
+        ALTER TABLE user_preferences
+        ADD COLUMN IF NOT EXISTS theme VARCHAR(50) DEFAULT 'default';
+        """
+        print("Adding 'theme' column to user_preferences table")
+        try:
+            with self.engine.connect() as connection:
+                connection.execute(text(add_column_sql))
+                connection.commit()
+            print("Column 'theme' successfully added to the 'user_preferences' table.")
         except Exception as e:
             print(f"An error occurred: {e}")
         finally:
