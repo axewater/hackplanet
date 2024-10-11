@@ -2333,7 +2333,7 @@ def user_theme_preferences():
         form.theme.data = current_user.preferences.theme
     else:
         form.theme.data = 'default'
-    return render_template('user/theme_preferences.html', form=form)
+    return render_template('site/theme_preferences.html', form=form)
 
 @bp.route('/admin/themes/delete/<theme_name>', methods=['POST'])
 @login_required

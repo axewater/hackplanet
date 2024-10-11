@@ -1,6 +1,18 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
+
 {% block content %}
-<div class="container mt-5">
+{% with messages = get_flashed_messages() %}
+{% if messages %}
+<div>
+    {% for message in messages %}
+    <div class="alert alert-info" role="alert">{{ message }}</div>
+    {% endfor %}
+</div>
+{% endif %}
+{% endwith %}
+<div class="container">
+
+    <div class="glass-panel">
     <div class="row">
         <div class="col-lg-8">
             <div class="card shadow-lg">
