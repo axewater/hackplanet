@@ -1,0 +1,115 @@
+/* Modern Dark Theme for Blitz */
+body {
+    background-color: #121212;
+    color: #e0e0e0;
+    font-family: 'Roboto', sans-serif;
+    background-image: url('/static/themes/Blitz/images/theme.jpg'); 
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+/* Navbar Styling */
+.sidebar {
+    background-color: #1e1e1e;
+    border-right: 1px solid #333;
+}
+
+.sidebar-link {
+    color: #b0b0b0;
+    transition: all 0.3s ease;
+}
+
+.sidebar-link:hover {
+    background-color: #2c2c2c;
+    color: #ffffff;
+}
+
+/* Content Area */
+.glass-panel {
+    background-color: rgba(30, 30, 30, 0.8);
+    backdrop-filter: blur(10px);
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6 {
+    color: #ffffff;
+}
+
+/* Buttons */
+.btn-primary {
+    background-color: #3700B3;
+    border-color: #3700B3;
+}
+
+.btn-primary:hover {
+    background-color: #6200EE;
+    border-color: #6200EE;
+}
+
+/* Cards */
+.card {
+    background-color: #1e1e1e;
+    border: 1px solid #333;
+}
+
+.card-header {
+    background-color: #2c2c2c;
+    border-bottom: 1px solid #333;
+}
+
+/* Forms */
+.form-control {
+    background-color: #2c2c2c;
+    border: 1px solid #444;
+    color: #e0e0e0;
+}
+
+.form-control:focus {
+    background-color: #333;
+    border-color: #6200EE;
+    box-shadow: 0 0 0 0.2rem rgba(98, 0, 238, 0.25);
+}
+
+/* Tables */
+.table {
+    color: #e0e0e0;
+}
+
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: #1e1e1e;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #3700B3;
+    border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #6200EE;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+    }
+    
+    .content {
+        margin-left: 0;
+    }
+}
+

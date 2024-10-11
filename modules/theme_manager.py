@@ -105,3 +105,18 @@ class ThemeManager:
 
         UserPreference.query.filter_by(theme=theme_name).update({'theme': 'default'})
         db.session.commit()
+
+    def get_theme_data(self, theme_name):
+        if theme_name == 'default':
+            return self.default_theme
+
+        theme_path = os.path.join(self.theme_folder, secure_filename(theme_name))
+        json_path = os.path.join(theme_path, 'theme.json')
+
+        if not os.path.exists(json_path):
+            return None
+
+        with open(json_path, 'r') as json_file:
+            theme_data = json.load(json_file)
+
+        return theme_data

@@ -39,7 +39,7 @@ from modules.forms import (
     UserPasswordForm, UserDetailForm, EditProfileForm, NewsletterForm, WhitelistForm, EditUserForm, ChallengeForm,
     UserManagementForm, CsrfProtectForm, LoginForm, ResetPasswordRequestForm, RegistrationForm, HostForm,
     CreateUserForm, UserPreferencesForm, InviteForm, CsrfForm, LabForm, FlagSubmissionForm, ChallengeSubmissionForm,
-    QuizForm, QuestionForm, FlagForm, CourseForm, ThemeUploadForm
+    QuizForm, QuestionForm, FlagForm, CourseForm, ThemeUploadForm, UserThemePreferencesForm
 )
 
 from modules.models import (
@@ -2306,6 +2306,29 @@ def manage_themes():
 def theme_readme():
     return render_template('admin/readme_theme.html')
 
+@bp.route('/user/theme_preferences', methods=['GET', 'POST'])
+@login_required
+def user_theme_preferences():
+    form = UserThemePreferencesForm()
+    theme_manager = ThemeManager(current_app)
+    installed_themes = theme_manager.get_installed_themes()
+    form.theme.choices = [(theme['name'], theme['name']) for theme in installed_themes]
+
+    if form.validate_on_submit():
+        if not current_user.preferences:
+            current_user.preferences = UserPreference(user_id=current_user.id)
+            db.session.add(current_user.preferences)
+        current_user.preferences.theme = form.theme.data
+        db.session.commit()
+        flash('Theme preferences updated successfully!', 'success')
+        return redirect(url_for('main.user_theme_preferences'))
+
+    if current_user.preferences:
+        form.theme.data = current_user.preferences.theme
+    else:
+        form.theme.data = 'default'
+    return render_template('user/theme_preferences.html', form=form)
+
 @bp.route('/admin/themes/delete/<theme_name>', methods=['POST'])
 @login_required
 @admin_required
@@ -2322,11 +2345,17 @@ def delete_theme(theme_name):
 
 @bp.context_processor
 def inject_current_theme():
-    if current_user.is_authenticated and current_user.preferences:
-        current_theme = current_user.preferences.theme or 'default'
-    else:
-        current_theme = 'default'
-    return dict(current_theme=current_theme)
+    current_theme = 'default'
+    if current_user.is_authenticated:
+        if current_user.preferences:
+            current_theme = current_user.preferences.theme or 'default'
+        else:
+            current_user.preferences = UserPreference(user_id=current_user.id)
+            db.session.add(current_user.preferences)
+            db.session.commit()
+    theme_manager = ThemeManager(current_app)
+    theme_data = theme_manager.get_theme_data(current_theme)
+    return dict(current_theme=current_theme, theme_data=theme_data)
 
 
 @bp.route('/ctf/study_room')

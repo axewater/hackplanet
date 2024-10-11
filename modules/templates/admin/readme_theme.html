@@ -1,5 +1,19 @@
 {% extends "base.html" %}
 {% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/admin/admin_manage_themes.css') }}">
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+    <div class="flash-messages">
+        {% for category, message in messages %}
+            <div class="alert alert-{{ category }}" role="alert">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+{% endif %}
+{% endwith %}
+<div class="container">
+    <div class="glass-panel">
 <div class="container">
     <h1>How to Create a Theme for HackPlanet</h1>
     <p>Creating a theme for HackPlanet is easy. Follow these steps:</p>

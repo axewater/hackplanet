@@ -62,6 +62,7 @@ class User(db.Model):
     invite_quota = db.Column(db.Integer, default=0)
     invited_by = Column(String(36), ForeignKey('users.user_id'), nullable=True)
     score_total = db.Column(db.Integer, default=0)
+    preferences = db.relationship('UserPreference', uselist=False, back_populates='user', cascade='all, delete-orphan')
     
     def set_password(self, password):
         self.password_hash = ph.hash(password)
@@ -122,7 +123,11 @@ class UserPreference(db.Model):
     default_sort_order = db.Column(db.String(4), default='asc')
     theme = db.Column(db.String(50), default='default')
 
-    user = db.relationship('User', backref=db.backref('preferences', uselist=False))
+    user = db.relationship('User', back_populates='preferences')
+
+    def __init__(self, user_id, theme='default'):
+        self.user_id = user_id
+        self.theme = theme
 
 class GlobalSettings(db.Model):
     __tablename__ = 'global_settings'
