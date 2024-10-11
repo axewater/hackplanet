@@ -60,7 +60,7 @@ class DatabaseManager:
             print(f"An error occurred: {e}")
         finally:
             self.engine.dispose()
-
+    
     def add_theme_column_to_user_preferences(self):
         add_column_sql = """
         ALTER TABLE user_preferences
@@ -76,3 +76,4 @@ class DatabaseManager:
             print(f"An error occurred: {e}")
         finally:
             self.engine.dispose()
+
