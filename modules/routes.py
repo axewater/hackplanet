@@ -1729,12 +1729,17 @@ def user_details(user_id):
     # Calculate total score using the new method
     total_score = user.calculate_total_score()
     
+    # Fetch inviter's username
+    inviter = User.query.filter_by(user_id=user.invited_by).first() if user.invited_by else None
+    inviter_username = inviter.name if inviter else 'N/A'
+    
     # Prepare user data
     user_data = {
         'id': user.id,
         'name': user.name,
         'avatarpath': user.avatarpath,
-        'score_total': total_score
+        'score_total': total_score,
+        'inviter_username': inviter_username
     }
     
     # Fetch quiz results
