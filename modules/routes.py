@@ -1650,16 +1650,22 @@ def hacking_labs():
     labs_without_hosts = []
 
     for lab in labs:
-        if len(lab.hosts) == 0:
+        if not lab.hosts:
             labs_without_hosts.append(lab)
         else:
-            # Fetch the latest status for each host
             for host in lab.hosts:
                 host.status = Host.query.get(host.id).status
                 
-                # Check if user has completed flags for this host
-                user_flag = FlagsObtained.query.filter_by(user_id=current_user.id, flag_id=Flag.query.filter_by(host_id=host.id, type='user').first().id).first() if host.flags else None
-                root_flag = FlagsObtained.query.filter_by(user_id=current_user.id, flag_id=Flag.query.filter_by(host_id=host.id, type='root').first().id).first() if host.flags else None
+                # Safely check for user and root flags
+                user_flag = None
+                root_flag = None
+                if host.flags:
+                    user_flag_obj = Flag.query.filter_by(host_id=host.id, type='user').first()
+                    root_flag_obj = Flag.query.filter_by(host_id=host.id, type='root').first()
+                    if user_flag_obj:
+                        user_flag = FlagsObtained.query.filter_by(user_id=current_user.id, flag_id=user_flag_obj.id).first()
+                    if root_flag_obj:
+                        root_flag = FlagsObtained.query.filter_by(user_id=current_user.id, flag_id=root_flag_obj.id).first()
                 
                 host.user_flag_completed = user_flag is not None
                 host.root_flag_completed = root_flag is not None

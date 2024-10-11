@@ -11,7 +11,6 @@
 {% endif %}
 {% endwith %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/file_manager.css') }}">
-<link rel="stylesheet" href="{{ url_for('static', filename='css/extra.css') }}">
 <div class="container">
 
     <div class="glass-panel">
@@ -64,23 +63,27 @@
                             <p>Difficulty: {{ host.difficulty }} {% if host.difficulty == 1 %}😊{% elif host.difficulty == 2 %}🙂{% elif host.difficulty == 3 %}😐{% elif host.difficulty == 4 %}😕{% elif host.difficulty == 5 %}😟{% elif host.difficulty == 6 %}😦{% elif host.difficulty == 7 %}😧{% elif host.difficulty == 8 %}😨{% elif host.difficulty == 9 %}😰{% elif host.difficulty == 10 %}😱{% endif %}</p>
                             <p>Status: <span class="status-indicator {{ 'online' if host.status else 'offline' }}" style="color: {{ '#28a745' if host.status else '#dc3545' }};">{{ 'Online' if host.status else 'Offline' }}</span></p>
                             <a href="{{ url_for('main.host_details', host_id=host.id) }}" class="btn btn-info">Host Details</a>
-
+        
                             <div class="host-inputarea">
                                 {% if host.name != 'kalismurf' %}
-                                <div class="flag-input-container">
-                                    <input type="text" id="user-flag-{{ host.id }}" placeholder="Enter User Flag" class="flag-input" {% if host.user_flag_completed %}style="display: none;"{% endif %}>
-                                    <button type="button" class="btn btn-success" onclick="submitFlag('{{ host.id }}', 'user')" {% if host.user_flag_completed %}disabled{% endif %}>
-                                        {% if host.user_flag_completed %}User Flag Hacked{% else %}Submit User Flag{% endif %}
-                                    </button>
-                                </div>
-                                <div class="flag-input-container">
-                                    <input type="text" id="root-flag-{{ host.id }}" placeholder="Enter Root Flag" class="flag-input" {% if host.root_flag_completed %}style="display: none;"{% endif %}>
-                                    <button type="button" class="btn btn-danger" onclick="submitFlag('{{ host.id }}', 'root')" {% if host.root_flag_completed %}disabled{% endif %}>
-                                        {% if host.root_flag_completed %}Root Flag Hacked{% else %}Submit Root Flag{% endif %}
-                                    </button>
-                                </div>
-                                {% if host.user_flag_completed and host.root_flag_completed %}
-                                <div class="completed-overlay">PWNED!</div>
+                                {% if host.flags %}
+                                    <div class="flag-input-container">
+                                        <input type="text" id="user-flag-{{ host.id }}" placeholder="Enter User Flag" class="flag-input" {% if host.user_flag_completed %}style="display: none;"{% endif %}>
+                                        <button type="button" class="btn btn-success" onclick="submitFlag('{{ host.id }}', 'user')" {% if host.user_flag_completed %}disabled{% endif %}>
+                                            {% if host.user_flag_completed %}User Flag Hacked{% else %}Submit User Flag{% endif %}
+                                        </button>
+                                    </div>
+                                    <div class="flag-input-container">
+                                        <input type="text" id="root-flag-{{ host.id }}" placeholder="Enter Root Flag" class="flag-input" {% if host.root_flag_completed %}style="display: none;"{% endif %}>
+                                        <button type="button" class="btn btn-danger" onclick="submitFlag('{{ host.id }}', 'root')" {% if host.root_flag_completed %}disabled{% endif %}>
+                                            {% if host.root_flag_completed %}Root Flag Hacked{% else %}Submit Root Flag{% endif %}
+                                        </button>
+                                    </div>
+                                    {% if host.user_flag_completed and host.root_flag_completed %}
+                                    <div class="completed-overlay">PWNED!</div>
+                                    {% endif %}
+                                {% else %}
+                                    <p>No flags available for this host.</p>
                                 {% endif %}
                                 {% else %}
                                 <div class="kalismurf-credentials">

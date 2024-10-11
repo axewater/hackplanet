@@ -1,6 +1,5 @@
 {% extends "base.html" %}
 {% block content %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/extra.css') }}">
 {% with messages = get_flashed_messages(with_categories=true) %}
 {% if messages %}
 <div>
