@@ -1,7 +1,11 @@
 /* Add your custom styles here */
 body {
+    background-image: url('/static/newstyle/hackplanet_backdrop.jpg'); 
+    background-size: cover;
+    background-repeat: no-repeat;
+
     font-family: Arial, sans-serif;
-    background-color: #f0f0f0;
+    color: white;
 }
 
 .container {
@@ -389,14 +393,7 @@ body {
     margin-bottom: 30px;
 }
 
-body {
-    background-image: url('/static/newstyle/hackplanet_backdrop.jpg'); 
-    background-size: cover;
-    background-repeat: no-repeat;
 
-    font-family: Arial, sans-serif;
-    color: white;
-}
 
 
 .menu-logo-image {
