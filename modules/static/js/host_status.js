@@ -57,11 +57,41 @@ document.addEventListener('DOMContentLoaded', function() {
             .catch(error => {
                 console.error('Error fetching host status:', error);
             });
-    }
-
-    // Update status immediately and then every 30 seconds
-    loops++;
-    console.log(`Loop number: ${loops}`);
-    updateHostStatus();
-    setInterval(updateHostStatus, 30000);
-});
+        }
+    
+        // Update status immediately and then every 30 seconds
+        loops++;
+        console.log(`Loop number: ${loops}`);
+        updateHostStatus();
+        setInterval(updateHostStatus, 30000);
+    
+        // VPN control functionality
+        function manageVPN(labId, action) {
+            fetch('/manage_vpn', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify({ lab_id: labId, action: action })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === "success") {
+                    console.log(data.message);
+                    updateHostStatus(); // Update status after VPN action
+                } else {
+                    console.error("Error managing VPN:", data.message);
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    
+        document.addEventListener('click', function(event) {
+            if (event.target.classList.contains('start-vpn')) {
+                manageVPN(event.target.dataset.labId, 'start');
+            } else if (event.target.classList.contains('stop-vpn')) {
+                manageVPN(event.target.dataset.labId, 'stop');
+            }
+        });
+    });

@@ -41,10 +41,15 @@
                     {% endif %}
                     {% if lab.vpn_file %}
                     <a href="{{ '/static/library/labfiles/' + lab.vpn_file }}" class="download-button btn btn-primary">Download Lab Access</a>
-                    <a href="{{ url_for('main.vpn_management', lab_id=lab.id) }}" class="btn btn-secondary">VPN Management</a>
                     {% endif %}
                     <p>{{ lab.description }}</p>
                     <p>VPN Status: <span class="vpn-status-indicator" data-agent-id="{{ lab.vpn_server }}">Loading...</span></p>
+                    {% if lab.vpn_server %}
+                    <div class="vpn-controls">
+                        <button class="btn btn-success start-vpn" data-lab-id="{{ lab.id }}">Start VPN</button>
+                        <button class="btn btn-danger stop-vpn" data-lab-id="{{ lab.id }}">Stop VPN</button>
+                    </div>
+                    {% endif %}
 
                 <div class="hosts">
                     {% if lab in labs_without_hosts %}
