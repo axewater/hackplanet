@@ -79,6 +79,22 @@
     object-fit: cover;
 }
 
+.status-indicator {
+    font-weight: bold;
+}
+
+.status-indicator[data-status="Online"] {
+    color: #28a745;
+}
+
+.status-indicator[data-status="Offline"] {
+    color: #dc3545;
+}
+
+.status-indicator[data-status="Unknown"] {
+    color: #ffc107;
+}
+
 .labschip {
     display: inline-block;
     padding: 10px 20px;
