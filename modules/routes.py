@@ -2384,3 +2384,38 @@ def course_details(course_id):
 @login_required
 def view_course_material(filename):
     return send_from_directory(current_app.config['UPLOAD_FOLDER'], 'studyfiles/' + filename)
+
+
+@bp.route('/api/host_status')
+@login_required
+def host_status():
+    hpagent_url = current_app.config['HPAGENT_API_URL']
+    hpagent_api_key = current_app.config['HPAGENT_API_KEY']
+    
+    try:
+        headers = {'Authorization': f'Bearer {hpagent_api_key}'}
+        response = requests.get(hpagent_url, headers=headers)
+        response.raise_for_status()
+        api_response = response.json()
+        print(f'AgentHP API Response: {api_response}')
+        
+        # Process the API response to match agent_id with host.name
+        hosts = Host.query.all()
+        processed_hosts = []
+        for host in hosts:
+            matching_agent = next((agent for agent in api_response['hosts'] if agent['agent_id'].lower() == host.name.lower()), None)
+            if matching_agent:
+                processed_hosts.append({
+                    'agent_id': host.name,
+                    'status': matching_agent['status']
+                })
+            else:
+                processed_hosts.append({
+                    'agent_id': host.name,
+                    'status': 'Unknown'
+                })
+        
+        return jsonify({'hosts': processed_hosts})
+    except requests.RequestException as e:
+        print(str(e))
+        return jsonify({'error': str(e)}), 500

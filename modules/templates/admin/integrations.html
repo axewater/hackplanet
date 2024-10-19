@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <!-- Flash Messages Section -->
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        {% for message in messages %}
+          <div class="flash-message">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <!-- Integration Features Section -->
+    <section>
+      <div class="glass-panel">
+        <h2>Integration Features</h2>
+        
+        <table class="table table-striped">
+          <thead>
+            <tr>
+              <th>Integration</th>
+              <th>Value</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>HPAgent URL</td>
+              <td>{{ hpagent_url }}</td>
+            </tr>
+            <tr>
+              <td>HPAgent API Key</td>
+              <td>{{ hpagent_api_key }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div> 
+    </section>
+
+    <!-- API Results Section -->
+    <section>
+      <div class="glass-panel">
+        <h2>API Results</h2>
+        {% if api_results.error %}
+          <div class="alert alert-danger">API ERROR: {{ api_results.error }}</div>
+        {% else %}
+          <pre>{{ api_results | tojson(indent=2) }}</pre>
+        {% endif %}
+      </div>
+    </section>
+{% endblock %}

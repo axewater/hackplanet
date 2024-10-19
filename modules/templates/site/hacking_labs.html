@@ -11,6 +11,8 @@
 {% endif %}
 {% endwith %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/file_manager.css') }}">
+<script src="{{ url_for('static', filename='js/host_status.js') }}"></script>
+
 <div class="container">
 
     <div class="glass-panel">
@@ -61,7 +63,7 @@
                             </div>
                             <p>IP Address: {{ host.ip }}</p>
                             <p>Difficulty: {{ host.difficulty }} {% if host.difficulty == 1 %}😊{% elif host.difficulty == 2 %}🙂{% elif host.difficulty == 3 %}😐{% elif host.difficulty == 4 %}😕{% elif host.difficulty == 5 %}😟{% elif host.difficulty == 6 %}😦{% elif host.difficulty == 7 %}😧{% elif host.difficulty == 8 %}😨{% elif host.difficulty == 9 %}😰{% elif host.difficulty == 10 %}😱{% endif %}</p>
-                            <p>Status: <span class="status-indicator {{ 'online' if host.status else 'offline' }}" style="color: {{ '#28a745' if host.status else '#dc3545' }};">{{ 'Online' if host.status else 'Offline' }}</span></p>
+                            <p>Status: <span class="status-indicator" data-agent-id="{{ host.name }}">Loading...</span></p>
                             <a href="{{ url_for('main.host_details', host_id=host.id) }}" class="btn btn-info">Host Details</a>
         
                             <div class="host-inputarea">

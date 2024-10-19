@@ -10,6 +10,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from config import Config
 from modules.routes_site import site_bp
+from modules.routes_integrations import int_bp
 
 from urllib.parse import urlparse
 from flask_caching import Cache
@@ -67,7 +68,7 @@ def create_app():
         db.create_all()
     app.register_blueprint(routes.bp)
     app.register_blueprint(site_bp)
-
+    app.register_blueprint(int_bp)
     return app
 
 
