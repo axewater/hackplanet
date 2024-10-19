@@ -14,8 +14,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.log('Received host status data:', data);
                 if (data.hosts) {
                     data.hosts.forEach(host => {
-                        console.log(`Processing host_id: ${host.agent_id}, Status: ${host.status}`);
-                        const statusElement = document.querySelector(`.status-indicator[data-agent-id="${host.agent_id}"], .vpn-status-indicator[data-agent-id="${host.agent_id}"]`);
+                        console.log(`Processing host_id: ${host.agent_id}, Status: ${host.status}, Is VPN: ${host.is_vpn}`);
+                        const selector = host.is_vpn ? `.vpn-status-indicator[data-agent-id="${host.agent_id}"]` : `.status-indicator[data-agent-id="${host.agent_id}"]`;
+                        const statusElement = document.querySelector(selector);
                         if (statusElement) {
                             let status = host.status;
                             let color;
@@ -36,6 +37,15 @@ document.addEventListener('DOMContentLoaded', function() {
                             statusElement.textContent = status;
                             statusElement.style.color = color;
                             console.log(`Updated status for agent_id: ${host.agent_id} to ${status}`);
+                            
+                            // Update VPN status in the lab section if it's a VPN server
+                            if (host.is_vpn) {
+                                const labVpnStatus = document.querySelector(`.lab-vpn-status[data-lab-id="${host.lab_id}"]`);
+                                if (labVpnStatus) {
+                                    labVpnStatus.textContent = status;
+                                    labVpnStatus.style.color = color;
+                                }
+                            }
                         } else {
                             console.warn(`No status element found for agent_id: ${host.agent_id}`);
                         }

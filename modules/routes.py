@@ -2398,8 +2398,13 @@ def host_status():
         response.raise_for_status()
         api_response = response.json()
         print(f'AgentHP API Response: {api_response}')
-        print(f'VPN servers in labs: {[lab.vpn_server for lab in Lab.query.all()]}')
-        # Process the API response to match agent_id with host.name
+        
+        # Get all labs and their VPN servers
+        labs = Lab.query.all()
+        vpn_servers = {lab.vpn_server: lab.id for lab in labs if lab.vpn_server}
+        print(f'VPN servers in labs: {list(vpn_servers.keys())}')
+        
+        # Process the API response to match agent_id with host.name and include VPN servers
         hosts = Host.query.all()
         processed_hosts = []
         for host in hosts:
@@ -2407,12 +2412,32 @@ def host_status():
             if matching_agent:
                 processed_hosts.append({
                     'agent_id': host.name,
-                    'status': matching_agent['status']
+                    'status': matching_agent['status'],
+                    'is_vpn': False
                 })
             else:
                 processed_hosts.append({
                     'agent_id': host.name,
-                    'status': 'Unknown'
+                    'status': 'Unknown',
+                    'is_vpn': False
+                })
+        
+        # Add VPN servers to the processed_hosts list
+        for vpn_server, lab_id in vpn_servers.items():
+            matching_agent = next((agent for agent in api_response['hosts'] if agent['agent_id'].lower() == vpn_server.lower()), None)
+            if matching_agent:
+                processed_hosts.append({
+                    'agent_id': vpn_server,
+                    'status': matching_agent['status'],
+                    'is_vpn': True,
+                    'lab_id': lab_id
+                })
+            else:
+                processed_hosts.append({
+                    'agent_id': vpn_server,
+                    'status': 'Unknown',
+                    'is_vpn': True,
+                    'lab_id': lab_id
                 })
         
         return jsonify({'hosts': processed_hosts})
