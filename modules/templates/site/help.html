@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/help.css') }}">
 {% with messages = get_flashed_messages() %}
 {% if messages %}
 <div>
@@ -16,33 +17,33 @@
     <div class="row">
         <div class="col-lg-8">
             <div class="card shadow-lg">
-                <div class="card-header bg-primary text-white">
+                <div class="card-header bg-success text-white">
                     <h2 class="mb-0">HackPlanet.EU Help Center</h2>
                 </div>
                 <div class="card-body">
-                    <h3 class="card-title">Getting Started</h3>
+                    <h3 class="card-title text-success">Getting Started</h3>
                     <ul class="list-group list-group-flush mb-4">
-                        <li class="list-group-item">Each LAB is a separate network with machines you can hack.</li>
-                        <li class="list-group-item">To access each LAB, download and use the provided OpenVPN connection file.</li>
-                        <li class="list-group-item">Submit flags to check your progress and earn points.</li>
-                        <li class="list-group-item">Check the leaderboards to see how you rank among other participants.</li>
-                        <li class="list-group-item">Manage VMs by starting and stopping them, including the VPN server.</li>
+                        <li class="list-group-item bg-light">Each LAB is a separate network with machines you can hack.</li>
+                        <li class="list-group-item bg-light">To access each LAB, download and use the provided OpenVPN connection file.</li>
+                        <li class="list-group-item bg-light">Submit flags to check your progress and earn points.</li>
+                        <li class="list-group-item bg-light">Check the leaderboards to see how you rank among other participants.</li>
+                        <li class="list-group-item bg-light">Manage VMs by starting and stopping them, including the VPN server.</li>
                     </ul>
 
-                    <h3 class="card-title">Rules of Engagement</h3>
+                    <h3 class="card-title text-success">Rules of Engagement</h3>
                     <ul class="list-group list-group-flush mb-4">
-                        <li class="list-group-item">Brute force password cracking is never the intended solution. You may try, but it's likely not the correct path.</li>
-                        <li class="list-group-item">Do not attack the VPN server or the HackPlanet.eu webserver.</li>
-                        <li class="list-group-item">Do not attack or disrupt other participants.</li>
-                        <li class="list-group-item">Once you gain root access, do not delete flags. Please clean up exploit-related files when finished to prevent spoilers.</li>
-                        <li class="list-group-item">If a host becomes unresponsive, contact support for a reboot/rebuild.</li>
+                        <li class="list-group-item bg-light">Brute force password cracking is never the intended solution. You may try, but it's likely not the correct path.</li>
+                        <li class="list-group-item bg-light">Do not attack the VPN server or the HackPlanet.eu webserver.</li>
+                        <li class="list-group-item bg-light">Do not attack or disrupt other participants.</li>
+                        <li class="list-group-item bg-light">Once you gain root access, do not delete flags. Please clean up exploit-related files when finished to prevent spoilers.</li>
+                        <li class="list-group-item bg-light">If a host becomes unresponsive, contact support for a reboot/rebuild.</li>
                     </ul>
 
-                    <h3 class="card-title">Technical Details</h3>
+                    <h3 class="card-title text-success">Technical Details</h3>
                     <ul class="list-group list-group-flush">
-                        <li class="list-group-item">The VPN uses a TUN interface, making it incompatible with nmap under Windows.</li>
-                        <li class="list-group-item">A Kali Linux host is available inside each LAB network for all HackPlanet users.</li>
-                        <li class="list-group-item">The VPN server should always be running if you want to connect to the lab.</li>
+                        <li class="list-group-item bg-light">The VPN uses a TUN interface, making it incompatible with nmap under Windows.</li>
+                        <li class="list-group-item bg-light">A Kali Linux host is available inside each LAB network for all HackPlanet users.</li>
+                        <li class="list-group-item bg-light">The VPN server should always be running if you want to connect to the lab.</li>
                     </ul>
                 </div>
             </div>
