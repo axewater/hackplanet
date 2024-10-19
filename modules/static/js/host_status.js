@@ -89,9 +89,19 @@ document.addEventListener('DOMContentLoaded', function() {
     
         document.addEventListener('click', function(event) {
             if (event.target.classList.contains('start-vpn')) {
+                updateVpnStatus(event.target.dataset.labId, 'Starting');
                 manageVPN(event.target.dataset.labId, 'start');
             } else if (event.target.classList.contains('stop-vpn')) {
+                updateVpnStatus(event.target.dataset.labId, 'Stopping');
                 manageVPN(event.target.dataset.labId, 'stop');
             }
         });
+
+        function updateVpnStatus(labId, status) {
+            const statusElement = document.querySelector(`.vpn-status-indicator[data-agent-id="${labId}"]`);
+            if (statusElement) {
+                statusElement.textContent = status;
+                statusElement.style.color = status === 'Starting' ? '#ffc107' : '#dc3545';
+            }
+        }
     });
