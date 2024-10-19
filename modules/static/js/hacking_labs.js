@@ -59,11 +59,11 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
     
-        // Update status immediately and then every 30 seconds
+        // Update status immediately and then every 10 seconds
         loops++;
         console.log(`Loop number: ${loops}`);
         updateHostStatus();
-        setInterval(updateHostStatus, 30000);
+        setInterval(updateHostStatus, 10000);
     
         // VPN control functionality
         function manageVPN(labId, action) {
@@ -79,7 +79,7 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(data => {
                 if (data.status === "success") {
                     console.log(data.message);
-                    updateHostStatus(); // Update status after VPN action
+                    // updateHostStatus(); // Update status after VPN action
                 } else {
                     console.error("Error managing VPN:", data.message);
                 }
@@ -89,19 +89,11 @@ document.addEventListener('DOMContentLoaded', function() {
     
         document.addEventListener('click', function(event) {
             if (event.target.classList.contains('start-vpn')) {
-                updateVpnStatus(event.target.dataset.labId, 'Starting');
+                
                 manageVPN(event.target.dataset.labId, 'start');
             } else if (event.target.classList.contains('stop-vpn')) {
-                updateVpnStatus(event.target.dataset.labId, 'Stopping');
+                
                 manageVPN(event.target.dataset.labId, 'stop');
             }
         });
-
-        function updateVpnStatus(labId, status) {
-            const statusElement = document.querySelector(`.vpn-status-indicator[data-agent-id="${labId}"]`);
-            if (statusElement) {
-                statusElement.textContent = status;
-                statusElement.style.color = status === 'Starting' ? '#ffc107' : '#dc3545';
-            }
-        }
     });

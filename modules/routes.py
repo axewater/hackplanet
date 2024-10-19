@@ -2036,6 +2036,7 @@ def delete_question(question_id):
         return redirect(url_for('main.quiz_manager'))
     
     
+
 @bp.route('/manage_vm', methods=['POST'])
 @login_required
 def manage_vm():
