@@ -2048,20 +2048,6 @@ def manage_vm():
     az_cli_path = get_azure_cli_path()
     try:
         output = ""
-        # if action == 'status':
-        #     print(f"Executing VM status command for {vm_id}")
-        #     result = subprocess.run([az_cli_path, 'vm', 'get-instance-view', '--ids', vm_id, '--query', '{name:name, powerState:instanceView.statuses[1].displayStatus, osType:storageProfile.osDisk.osType}'], capture_output=True, text=True)
-        #     if result.returncode == 0:
-        #         vm_info = json.loads(result.stdout)
-        #         output = f"VM Name: {vm_info['name']}, Power State: {vm_info['powerState']}, OS Type: {vm_info['osType']}"
-                
-        #         # Update the database with the VM status
-        #         host = Host.query.filter_by(azure_vm_id=vm_id).first()
-        #         if host:
-        #             host.status = vm_info['powerState'].lower() == 'vm running'
-        #             db.session.commit()
-        #     else:
-        #         raise Exception(f"Error fetching VM status: {result.stderr}")
         if action == 'start':
             print(f"Executing VM start command for {vm_id}")
             result = subprocess.run([az_cli_path, 'vm', 'start', '--ids', vm_id], capture_output=True, text=True)
@@ -2140,7 +2126,6 @@ def manage_vpn():
         print(f"Detailed error while managing VPN: {e}")
         return jsonify({"status": "error", "message": str(e)}), 400
     
-# Remove the vpn_management route as it's no longer needed
 
 @bp.route('/admin/flag_manager')
 @login_required
