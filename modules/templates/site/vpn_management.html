@@ -16,7 +16,6 @@
         <h2>Lab : {{ lab.name }}</h2>
         <a href="{{ url_for('main.hacking_labs') }}" class="btn btn-secondary">Back to Hacking Labs</a>
         <div class="vpn-controls">
-            <button id="status-btn" class="btn btn-info" onclick="performAction('status')">Check Status</button>
             <button id="start-btn" class="btn btn-success" onclick="performAction('start')">Start VPN</button>
             <button id="stop-btn" class="btn btn-danger" onclick="performAction('stop')">Stop VPN</button>
         </div>

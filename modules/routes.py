@@ -49,7 +49,7 @@ from modules.models import (
 from modules.utilities import (
     admin_required, _authenticate_and_redirect, square_image, send_email, send_password_reset_email, 
 )
-from modules.azure_utils import get_vm_status, check_azure_authentication, get_azure_cli_path
+from modules.azure_utils import check_azure_authentication, get_azure_cli_path
 from modules.theme_manager import ThemeManager
 import logging
 
@@ -2048,21 +2048,21 @@ def manage_vm():
     az_cli_path = get_azure_cli_path()
     try:
         output = ""
-        if action == 'status':
-            print(f"Executing VM status command for {vm_id}")
-            result = subprocess.run([az_cli_path, 'vm', 'get-instance-view', '--ids', vm_id, '--query', '{name:name, powerState:instanceView.statuses[1].displayStatus, osType:storageProfile.osDisk.osType}'], capture_output=True, text=True)
-            if result.returncode == 0:
-                vm_info = json.loads(result.stdout)
-                output = f"VM Name: {vm_info['name']}, Power State: {vm_info['powerState']}, OS Type: {vm_info['osType']}"
+        # if action == 'status':
+        #     print(f"Executing VM status command for {vm_id}")
+        #     result = subprocess.run([az_cli_path, 'vm', 'get-instance-view', '--ids', vm_id, '--query', '{name:name, powerState:instanceView.statuses[1].displayStatus, osType:storageProfile.osDisk.osType}'], capture_output=True, text=True)
+        #     if result.returncode == 0:
+        #         vm_info = json.loads(result.stdout)
+        #         output = f"VM Name: {vm_info['name']}, Power State: {vm_info['powerState']}, OS Type: {vm_info['osType']}"
                 
-                # Update the database with the VM status
-                host = Host.query.filter_by(azure_vm_id=vm_id).first()
-                if host:
-                    host.status = vm_info['powerState'].lower() == 'vm running'
-                    db.session.commit()
-            else:
-                raise Exception(f"Error fetching VM status: {result.stderr}")
-        elif action == 'start':
+        #         # Update the database with the VM status
+        #         host = Host.query.filter_by(azure_vm_id=vm_id).first()
+        #         if host:
+        #             host.status = vm_info['powerState'].lower() == 'vm running'
+        #             db.session.commit()
+        #     else:
+        #         raise Exception(f"Error fetching VM status: {result.stderr}")
+        if action == 'start':
             print(f"Executing VM start command for {vm_id}")
             result = subprocess.run([az_cli_path, 'vm', 'start', '--ids', vm_id], capture_output=True, text=True)
             if result.returncode == 0:
@@ -2075,19 +2075,12 @@ def manage_vm():
             result = subprocess.run([az_cli_path, 'vm', 'stop', '--ids', vm_id], capture_output=True, text=True)
             if result.returncode == 0:
                 host = Host.query.filter_by(azure_vm_id=vm_id).first()
-                if host:
-                    host.status = False
-                    db.session.commit()
+                db.session.commit()
         else:
             print(f"Invalid action received: {action}")
             raise ValueError("Invalid action")
-        
         if result.returncode != 0:
-            if action == 'status':
-                raise Exception(f"Error fetching VM status: {result.stderr}")
-            else:
-                raise Exception(f"Error performing {action} on VM: {result.stderr}")
-        
+            raise Exception(f"Error performing {action} on VM: {result.stderr}")
         if not output:
             output = f"Successfully performed {action} on VM: {vm_id}"
         print(output)
@@ -2097,17 +2090,6 @@ def manage_vm():
         print(f"Error managing VM: {e}")
         return jsonify({"status": "error", "message": str(e)}), 400
 
-@bp.route('/update_host_status', methods=['POST'])
-@login_required
-def update_host_status():
-    host_id = request.form.get('host_id')
-    status = request.form.get('status') == 'true'
-    host = Host.query.get(host_id)
-    if host:
-        host.status = status
-        db.session.commit()
-        return jsonify({"status": "success", "message": "Host status updated successfully"})
-    return jsonify({"status": "error", "message": "Host not found"}), 404
 
 @bp.route('/manage_vpn', methods=['POST'])
 @login_required

@@ -4,20 +4,14 @@ $(document).ready(function() {
     }
 
     function disableButtons() {
-        $('#start-btn, #stop-btn, #status-btn').prop('disabled', true);
+        $('#start-btn, #stop-btn').prop('disabled', true);
     }
 
     function enableButtons() {
-        $('#start-btn, #stop-btn, #status-btn').prop('disabled', false);
+        $('#start-btn, #stop-btn').prop('disabled', false);
     }
 
-    function updateStatusDisplay(status) {
-        var statusText = status ? 'Online' : 'Offline';
-        $('#status-display').text(statusText);
-        $('#status-display').removeClass('text-success text-danger');
-        $('#status-display').addClass(status ? 'text-success' : 'text-danger');
-    }
-
+    
     function performAction(action) {
         disableButtons();
         $('#loading').show();
@@ -37,19 +31,8 @@ $(document).ready(function() {
             success: function(response) {
                 $('#loading').hide();
                 if (response.status === "success") {
-                    if (action === "status") {
-                        $('#status-result').text(response.message);
-                        var isRunning = response.message.toLowerCase().includes('vm running');
-                        updateStatusDisplay(isRunning);
-                        // Update the database status
-                        updateDatabaseStatus(isRunning);
-                    } else {
-                        $('#result').html("<p>" + response.message + "</p>");
-                        updateStatusDisplay(action === 'start');
-                        // Update the database status
-                        updateDatabaseStatus(action === 'start');
                     }
-                } else {
+                else {
                     $('#result').html("<p>Error: " + response.message + "</p>");
                 }
                 enableButtons();
@@ -64,27 +47,6 @@ $(document).ready(function() {
 
     $('#start-btn').click(function() { performAction('start'); });
     $('#stop-btn').click(function() { performAction('stop'); });
-    $('#status-btn').click(function() { performAction('status'); });
+    
     $('#refresh-btn').click(function() { location.reload(); });
-
-    function updateDatabaseStatus(status) {
-        $.ajax({
-            url: "/update_host_status",
-            type: "POST",
-            data: {
-                host_id: $('#host_id').val(),
-                status: status,
-                csrf_token: getCsrfToken()
-            },
-            headers: {
-                'X-CSRFToken': getCsrfToken()
-            },
-            success: function(response) {
-                console.log("Database status updated successfully");
-            },
-            error: function(xhr, status, error) {
-                console.error("Error updating database status:", error);
-            }
-        });
-    }
 });
