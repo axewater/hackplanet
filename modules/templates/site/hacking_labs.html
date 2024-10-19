@@ -44,7 +44,7 @@
                     <a href="{{ url_for('main.vpn_management', lab_id=lab.id) }}" class="btn btn-secondary">VPN Management</a>
                     {% endif %}
                     <p>{{ lab.description }}</p>
-                
+                    <p>VPN Status: <span class="vpn-status-indicator" data-agent-id="{{ lab.vpn_server }}">Loading...</span></p>
 
                 <div class="hosts">
                     {% if lab in labs_without_hosts %}
@@ -62,7 +62,7 @@
                                 <img src="{{ '/static/library/images/hosts/' + host.image_url }}" alt="{{ host.name }}" class="host-image">
                             </div>
                             <p>IP Address: {{ host.ip }}</p>
-                            <p>Difficulty: {{ host.difficulty }} {% if host.difficulty == 1 %}😊{% elif host.difficulty == 2 %}🙂{% elif host.difficulty == 3 %}😐{% elif host.difficulty == 4 %}😕{% elif host.difficulty == 5 %}😟{% elif host.difficulty == 6 %}😦{% elif host.difficulty == 7 %}😧{% elif host.difficulty == 8 %}😨{% elif host.difficulty == 9 %}😰{% elif host.difficulty == 10 %}😱{% endif %}</p>
+                            <p>Difficulty: {{ host.difficulty }} {% if host.difficulty == 1 %}?{% elif host.difficulty == 2 %}?{% elif host.difficulty == 3 %}?{% elif host.difficulty == 4 %}?{% elif host.difficulty == 5 %}?{% elif host.difficulty == 6 %}?{% elif host.difficulty == 7 %}?{% elif host.difficulty == 8 %}?{% elif host.difficulty == 9 %}?{% elif host.difficulty == 10 %}?{% endif %}</p>
                             <p>Status: <span class="status-indicator" data-agent-id="{{ host.name }}">Loading...</span></p>
                             <a href="{{ url_for('main.host_details', host_id=host.id) }}" class="btn btn-info">Host Details</a>
         

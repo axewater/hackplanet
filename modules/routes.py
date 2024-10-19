@@ -2398,7 +2398,7 @@ def host_status():
         response.raise_for_status()
         api_response = response.json()
         print(f'AgentHP API Response: {api_response}')
-        
+        print(f'VPN servers in labs: {[lab.vpn_server for lab in Lab.query.all()]}')
         # Process the API response to match agent_id with host.name
         hosts = Host.query.all()
         processed_hosts = []
