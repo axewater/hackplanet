@@ -281,7 +281,6 @@ def register():
                 email_verification_token=s.dumps(form.email.data, salt='email-confirm'),
                 token_creation_time=datetime.utcnow(),
                 created=datetime.utcnow(),
-                invited_by=invite.creator_user_id if invite else None
             )
             user.set_password(form.password.data)
             db.session.add(user)
@@ -291,7 +290,6 @@ def register():
             if invite:
                 print(f"Found valid invite: {invite.token}, expires at: {invite.expires_at}, used: {invite.used}")
                 invite.used = True
-                invite.used_by = user.user_id
                 db.session.commit()
             else:
                 print("No valid invite found or invite expired/used.")
@@ -418,9 +416,6 @@ def invites():
         return redirect(url_for('main.invites'))
 
     invites = InviteToken.query.filter_by(creator_user_id=current_user.user_id).all()
-    for invite in invites:
-        if invite.used_by:
-            invite.used_by_user = User.query.filter_by(user_id=invite.used_by).first()
     current_invites_count = len([invite for invite in invites if not invite.used])
     remaining_invites = max(0, current_user.invite_quota - current_invites_count)
 
@@ -1736,17 +1731,13 @@ def user_details(user_id):
     # Calculate total score using the new method
     total_score = user.calculate_total_score()
     
-    # Fetch inviter's username
-    inviter = User.query.filter_by(user_id=user.invited_by).first() if user.invited_by else None
-    inviter_username = inviter.name if inviter else 'N/A'
-    
+
     # Prepare user data
     user_data = {
         'id': user.id,
         'name': user.name,
         'avatarpath': user.avatarpath,
         'score_total': total_score,
-        'inviter_username': inviter_username
     }
     
     # Fetch quiz results
