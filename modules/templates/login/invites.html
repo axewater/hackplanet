@@ -34,9 +34,7 @@
             <div>
                 Invite Link: <span class="text-primary">{{ url_for('main.register', token=invite.token, _external=True) }}</span><br>
                 Status: <strong>{{ "Used" if invite.used else "Pending" }}</strong><br>
-                {% if invite.used %}
-                    Used by: <strong>{{ invite.used_by_user.name if invite.used_by_user else 'Unknown' }}</strong><br>
-                {% endif %}
+
                 Expires in: 
                 {% set seconds_remaining = (invite.expires_at - datetime.utcnow()).total_seconds() %}
                 {% if seconds_remaining > 0 and not invite.used %}
