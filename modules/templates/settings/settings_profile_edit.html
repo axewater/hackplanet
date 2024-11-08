@@ -23,6 +23,8 @@
                 {% set thumbnail_path = avatarpath | replace('.', '_thumbnail.') %}
                 <img src="{{ url_for('static', filename=thumbnail_path) if thumbnail_path else url_for('static', filename='nothumbnail.jpg') }}" alt="User Thumbnail" class="img-thumbnail" width="50" height="50">
             </div>
+            <br>
+            <input class="btn btn-primary" type="submit" value="Save Profile" style="width: 90%;">
         </div>
         <div class="col-md-8">
             <div class="content-restricted-textblock" style="background-color: rgba(255, 255, 255, 0.8); padding: 20px; border-radius: 15px; color: #333;">
@@ -73,7 +75,7 @@
                         {{ form.avatar(class="form-control") }}
                     </div>
 
-                    <input class="btn btn-primary" type="submit" value="Save Profile">
+
                 </form>
             </div>
         </div>
