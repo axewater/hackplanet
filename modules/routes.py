@@ -528,8 +528,22 @@ def settings_profile_edit():
     form = EditProfileForm()
 
     if form.validate_on_submit():
-        file = form.avatar.data
-        if file:
+        avatar_source = form.avatar_source.data
+        
+        if avatar_source == 'gallery' and form.gallery_avatar.data:
+            # Using gallery avatar
+            selected_avatar = form.gallery_avatar.data.replace('\\', '/')
+            gallery_path = 'library/avatars_users/gallery/' + selected_avatar
+            
+            # Update user's avatar path to point to the gallery image
+            current_user.avatarpath = gallery_path
+            db.session.commit()
+            flash('Avatar updated successfully!', 'success')
+            return redirect(url_for('main.settings_profile_edit'))
+            
+        elif avatar_source == 'custom' and form.avatar.data:
+            # Handle custom avatar upload
+            file = form.avatar.data
             # Ensure UPLOAD_FOLDER exists
             upload_folder = os.path.join(current_app.config['UPLOAD_FOLDER'], 'avatars_users')
             if not os.path.exists(upload_folder):

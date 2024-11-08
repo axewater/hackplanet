@@ -50,10 +50,28 @@ class WhitelistForm(FlaskForm):
     submit = SubmitField('Add to Whitelist')
 
 class EditProfileForm(FlaskForm):
-    avatar = FileField('Profile Avatar', validators=[
+    avatar_source = RadioField('Avatar Source', choices=[
+        ('gallery', 'Choose from Gallery'),
+        ('custom', 'Upload Custom Avatar')
+    ], default='custom')
+    avatar = FileField('Custom Avatar', validators=[
         FileAllowed(['jpg', 'png'], 'Images only!')
     ])
-    
+    gallery_avatar = SelectField('Gallery Avatar', choices=[], validators=[Optional()])
+
+    def __init__(self, *args, **kwargs):
+        super(EditProfileForm, self).__init__(*args, **kwargs)
+        self.gallery_avatar.choices = self.get_gallery_choices()
+
+    def get_gallery_choices(self):
+        gallery_path = os.path.join(current_app.config['UPLOAD_FOLDER'], 'avatars_users', 'gallery')
+        if not os.path.exists(gallery_path):
+            return [('', 'No gallery avatars available')]
+        # Filter out thumbnail files and only include .jpg files
+        avatars = [f for f in os.listdir(gallery_path) 
+                  if f.lower().endswith('.jpg') and '_thumbnail' not in f]
+        # Convert paths to use forward slashes
+        return [('', 'Select an avatar')] + [(f.replace('\\', '/'), f) for f in sorted(avatars)]
 
 class InviteForm(FlaskForm):
     email = StringField('Email', validators=[DataRequired(), Email(message='Invalid email.')], render_kw={"placeholder": "Enter email to invite"})

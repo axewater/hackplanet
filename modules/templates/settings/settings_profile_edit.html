@@ -29,11 +29,102 @@
         <div class="col-md-8">
             <form method="POST" enctype="multipart/form-data">
                 {{ form.hidden_tag() }}
+                
                 <div class="mb-3">
+                    {{ form.avatar_source.label(class="form-label") }}
+                    <div class="btn-group" role="group">
+                        {% for subfield in form.avatar_source %}
+                        <div class="form-check form-check-inline">
+                            {{ subfield(class="btn-check") }}
+                            {{ subfield.label(class="btn btn-outline-primary") }}
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div id="gallerySection" class="mb-3" style="display: none;">
+                    {{ form.gallery_avatar.label(class="form-label") }}
+                    {{ form.gallery_avatar(class="form-select") }}
+                    
+                    <div class="gallery-preview mt-3">
+                        <div class="row">
+                            {% for value, label in form.gallery_avatar.choices[1:] %}
+                            <div class="col-md-4 mb-3">
+                                <div class="gallery-item" data-value="{{ value }}">
+                                    <img src="{{ url_for('static', filename='library/avatars_users/gallery/' + value.replace('\\', '/')) }}" 
+                                         class="img-thumbnail" alt="{{ label }}">
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <div id="customSection" class="mb-3">
                     {{ form.avatar.label(class="form-label") }}
                     {{ form.avatar(class="form-control") }}
                 </div>
+
                 <input class="btn btn-primary" type="submit" value="Save Profile">
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const avatarSource = document.getElementsByName('avatar_source');
+            const gallerySection = document.getElementById('gallerySection');
+            const customSection = document.getElementById('customSection');
+            const galleryItems = document.querySelectorAll('.gallery-item');
+            const gallerySelect = document.getElementById('gallery_avatar');
+
+            function updateSections(value) {
+                if (value === 'gallery') {
+                    gallerySection.style.display = 'block';
+                    customSection.style.display = 'none';
+                } else {
+                    gallerySection.style.display = 'none';
+                    customSection.style.display = 'block';
+                }
+            }
+
+            avatarSource.forEach(radio => {
+                radio.addEventListener('change', (e) => {
+                    updateSections(e.target.value);
+                });
+            });
+
+            galleryItems.forEach(item => {
+                item.addEventListener('click', () => {
+                    const value = item.dataset.value;
+                    gallerySelect.value = value;
+                    galleryItems.forEach(i => i.classList.remove('selected'));
+                    item.classList.add('selected');
+                });
+            });
+
+            // Initialize sections based on default selection
+            updateSections(document.querySelector('input[name="avatar_source"]:checked').value);
+        });
+    </script>
+
+    <style>
+        .gallery-item {
+            cursor: pointer;
+            transition: transform 0.2s;
+            border: 2px solid transparent;
+        }
+        .gallery-item:hover {
+            transform: scale(1.05);
+        }
+        .gallery-item.selected {
+            border-color: #007bff;
+        }
+        .gallery-item img {
+            width: 100%;
+            height: auto;
+        }
+    </style>
             </form>
         </div>
     </div>
