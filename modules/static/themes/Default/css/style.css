@@ -14,7 +14,6 @@ body {
     padding: 20px;
 }
 
-/* Leaderboard styles */
 .leaderboard-table {
     width: 100%;
     border-collapse: collapse;
@@ -25,14 +24,8 @@ body {
     transition: background-color 0.3s, transform 0.2s;
 }
 
-.leaderboard-row:hover {
-    background-color: rgba(245, 245, 245, 0.8);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
 .leaderboard-username {
-    font-size: 1.2em;
+    font-size: 1.8em;  /* Increased from 1.2em to 1.8em */
     font-weight: bold;
 }
 
@@ -40,7 +33,6 @@ body {
     text-decoration: none;
     color: inherit;
 }
-
 
 
 .float-end {
