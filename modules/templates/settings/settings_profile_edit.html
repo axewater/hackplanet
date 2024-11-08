@@ -1,6 +1,10 @@
 {% extends "base.html" %}
 
 {% block content %}
+<!-- Add CSS and JavaScript includes -->
+<link rel="stylesheet" href="{{ url_for('static', filename='css/profile_editor.css') }}">
+<script src="{{ url_for('static', filename='js/profile_editor.js') }}"></script>
+
 <div class="container">
     <div class="mb-3">
         {% with messages = get_flashed_messages() %}
@@ -24,7 +28,7 @@
                 <img src="{{ url_for('static', filename=thumbnail_path) if thumbnail_path else url_for('static', filename='nothumbnail.jpg') }}" alt="User Thumbnail" class="img-thumbnail" width="50" height="50">
             </div>
             <br>
-            <input class="btn btn-primary" type="submit" value="Save Profile" style="width: 90%;">
+            <button id="saveProfile" class="btn btn-primary" style="width: 90%;">Save Profile</button>
         </div>
         <div class="col-md-8">
             <div class="content-restricted-textblock" style="background-color: rgba(255, 255, 255, 0.8); padding: 20px; border-radius: 15px; color: #333;">
@@ -81,59 +85,5 @@
         </div>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const avatarSource = document.getElementsByName('avatar_source');
-            const gallerySection = document.getElementById('gallerySection');
-            const customSection = document.getElementById('customSection');
-            const galleryItems = document.querySelectorAll('.gallery-item');
-            const gallerySelect = document.getElementById('gallery_avatar');
-
-            function updateSections(value) {
-                if (value === 'gallery') {
-                    gallerySection.style.display = 'block';
-                    customSection.style.display = 'none';
-                } else {
-                    gallerySection.style.display = 'none';
-                    customSection.style.display = 'block';
-                }
-            }
-
-            avatarSource.forEach(radio => {
-                radio.addEventListener('change', (e) => {
-                    updateSections(e.target.value);
-                });
-            });
-
-            galleryItems.forEach(item => {
-                item.addEventListener('click', () => {
-                    const value = item.dataset.value;
-                    gallerySelect.value = value;
-                    galleryItems.forEach(i => i.classList.remove('selected'));
-                    item.classList.add('selected');
-                });
-            });
-
-            updateSections(document.querySelector('input[name="avatar_source"]:checked').value);
-        });
-    </script>
-
-    <style>
-        .gallery-item {
-            cursor: pointer;
-            transition: transform 0.2s;
-            border: 2px solid transparent;
-        }
-        .gallery-item:hover {
-            transform: scale(1.05);
-        }
-        .gallery-item.selected {
-            border-color: #007bff;
-        }
-        .gallery-item img {
-            width: 100%;
-            height: auto;
-        }
-    </style>
 </div>
 {% endblock %}

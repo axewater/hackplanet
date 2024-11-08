@@ -16,12 +16,7 @@ from werkzeug.urls import url_parse
 from werkzeug.utils import secure_filename
 from PIL import Image
 from io import BytesIO
-
 from werkzeug.security import generate_password_hash, check_password_hash
-
-
-
-
 from modules import db, mail, cache
 from functools import wraps
 from uuid import uuid4
@@ -30,7 +25,6 @@ from PIL import Image as PILImage
 from PIL import ImageOps
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 from authlib.jose import jwt
-
 from urllib.parse import unquote
 
 

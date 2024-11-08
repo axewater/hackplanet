@@ -1,0 +1,35 @@
+.gallery-item {
+    cursor: pointer;
+    transition: transform 0.2s;
+    border: 2px solid transparent;
+}
+
+.gallery-item:hover {
+    transform: scale(1.05);
+}
+
+.gallery-item.selected {
+    border-color: #007bff;
+}
+
+.gallery-item img {
+    width: 100%;
+    height: auto;
+}
+
+.profile_avatar img {
+    max-width: 90%;
+    max-height: 90%;
+    border-radius: 10px;
+}
+
+.profile_avatar_thumb img {
+    width: 50px;
+    height: 50px;
+    border-radius: 5px;
+}
+
+.gallery-preview {
+    max-height: 400px;
+    overflow-y: auto;
+}
