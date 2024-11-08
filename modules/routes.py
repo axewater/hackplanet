@@ -927,6 +927,12 @@ def admin_dashboard():
     pass
     return render_template('admin/admin_dashboard.html')
 
+@bp.route('/admin/messaging')
+@login_required
+@admin_required
+def messaging():
+    return render_template('admin/messaging.html')
+
 @bp.route('/admin/file_manager')
 @login_required
 @admin_required
