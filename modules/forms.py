@@ -53,7 +53,7 @@ class EditProfileForm(FlaskForm):
     avatar_source = RadioField('Avatar Source', choices=[
         ('gallery', 'Choose from Gallery'),
         ('custom', 'Upload Custom Avatar')
-    ], default='custom')
+    ], default='gallery')
     avatar = FileField('Custom Avatar', validators=[
         FileAllowed(['jpg', 'png'], 'Images only!')
     ])
