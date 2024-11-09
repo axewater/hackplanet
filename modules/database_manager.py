@@ -77,3 +77,18 @@ class DatabaseManager:
         finally:
             self.engine.dispose()
 
+    def add_muted_column_to_message_read_status(self):
+        add_column_sql = """
+        ALTER TABLE message_read_status
+        ADD COLUMN IF NOT EXISTS muted BOOLEAN DEFAULT FALSE;
+        """
+        print("Adding 'muted' column to message_read_status table")
+        try:
+            with self.engine.connect() as connection:
+                connection.execute(text(add_column_sql))
+                connection.commit()
+            print("Column 'muted' successfully added to the 'message_read_status' table.")
+        except Exception as e:
+            print(f"An error occurred: {e}")
+        finally:
+            self.engine.dispose()

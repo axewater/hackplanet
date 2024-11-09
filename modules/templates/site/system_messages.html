@@ -1,0 +1,144 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="glass-panel">
+        <h1>System Messages</h1>
+        
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <div class="alert alert-info">
+                {% for message in messages %}
+                    {{ message }}
+                {% endfor %}
+            </div>
+        {% endif %}
+        {% endwith %}
+
+        <div class="system-messages">
+            {% if system_messages %}
+                {% for message in system_messages %}
+                    <div class="card mb-3 message-card {% if message.is_read %}message-read{% endif %}" 
+                         data-message-id="{{ message.id }}">
+                        <div class="card-header d-flex justify-content-between align-items-center 
+                                    bg-{{ message.type }}{% if message.type == 'info' %} text-dark{% else %} text-white{% endif %}">
+                            <span>{{ message.type | title }}</span>
+                            <small>{{ message.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</small>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text">{{ message.contents }}</p>
+                            <div class="message-actions">
+                                <button class="btn btn-sm {% if message.is_read %}btn-secondary toggle-read{% else %}btn-primary toggle-read{% endif %}"
+                                        onclick="toggleMessageRead({{ message.id }})">
+                                    {% if message.is_read %}Mark as Unread{% else %}Mark as Read{% endif %}
+                                </button>
+                                <button class="btn btn-sm btn-danger mute-message" 
+                                        onclick="muteMessage({{ message.id }})">
+                                    Hide Message
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="alert alert-info">No system messages available.</div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+function toggleMessageRead(messageId) {
+    fetch(`/toggle_message_read/${messageId}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token() }}'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            const messageCard = document.querySelector(`.message-card[data-message-id="${messageId}"]`);
+            const toggleButton = messageCard.querySelector('.toggle-read');
+            
+            if (data.is_read) {
+                messageCard.classList.add('message-read');
+                toggleButton.textContent = 'Mark as Unread';
+                toggleButton.classList.replace('btn-primary', 'btn-secondary');
+            } else {
+                messageCard.classList.remove('message-read');
+                toggleButton.textContent = 'Mark as Read';
+                toggleButton.classList.replace('btn-secondary', 'btn-primary');
+            }
+            
+            // Update unread count in sidebar
+            updateUnreadCount(data.unread_count);
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+
+function muteMessage(messageId) {
+    if (confirm('Are you sure you want to hide this message? This action cannot be undone.')) {
+        fetch(`/mute_message/${messageId}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token() }}'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const messageCard = document.querySelector(`.message-card[data-message-id="${messageId}"]`);
+                messageCard.remove();
+                updateUnreadCount(data.unread_count);
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+}
+
+function updateUnreadCount(count) {
+    const badge = document.querySelector('#unreadMessageCount');
+    if (badge) {
+        if (count > 0) {
+            badge.textContent = count;
+            badge.style.display = 'inline';
+        } else {
+            badge.style.display = 'none';
+        }
+    }
+}
+</script>
+
+<style>
+.message-card {
+    transition: background-color 0.3s ease;
+}
+
+.message-card.message-read {
+    background-color: #f8f9fa;
+}
+
+.message-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.card-header {
+    font-weight: bold;
+}
+
+.bg-flag_win { background-color: #28a745; }
+.bg-flag_fail { background-color: #dc3545; }
+.bg-challenge_win { background-color: #17a2b8; }
+.bg-challenge_fail { background-color: #ffc107; }
+.bg-info { background-color: #0dcaf0; }
+.bg-warning { background-color: #ffc107; }
+.bg-error { background-color: #dc3545; }
+.bg-success { background-color: #28a745; }
+</style>
+{% endblock %}

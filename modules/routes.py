@@ -3,7 +3,7 @@ import sys,ast, uuid, json, random, requests, html, os, re, shutil, traceback, t
 from threading import Thread
 import subprocess, mimetypes
 from config import Config
-from flask import Flask, render_template, flash, redirect, url_for, request, Blueprint, jsonify, session, abort, current_app, send_from_directory, send_file
+from flask import Flask, render_template, flash, redirect, url_for, request, Blueprint, jsonify, session, abort, current_app, send_from_directory, send_file, make_response
 from flask import copy_current_request_context, g
 from flask_login import current_user, login_user, logout_user, login_required
 from flask_wtf import FlaskForm, Form
@@ -20,7 +20,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from modules import db, mail, cache
 from functools import wraps
 from uuid import uuid4
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from PIL import Image as PILImage
 from PIL import ImageOps
 from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
@@ -37,11 +37,12 @@ from modules.forms import (
 from modules.models import (
     User, Whitelist, UserPreference, GlobalSettings, InviteToken, Lab, Challenge, Host,
     Flag, UserProgress, FlagsObtained, ChallengesObtained, Quiz, Question, UserQuizProgress, UserQuestionProgress, Course,
-    SystemMessage
+    SystemMessage, message_read_status
 )
 from modules.utilities import (
     admin_required, _authenticate_and_redirect, square_image, send_email, send_password_reset_email, 
 )
+from feedgen.feed import FeedGenerator
 from modules.azure_utils import check_azure_authentication, get_azure_cli_path
 from modules.theme_manager import ThemeManager
 import logging
@@ -2374,6 +2375,126 @@ def inject_current_theme():
     theme_data = theme_manager.get_theme_data(current_theme)
     return dict(current_theme=current_theme, theme_data=theme_data)
 
+@bp.context_processor
+def utility_processor():
+    def get_unread_message_count():
+        if current_user.is_authenticated:
+            return SystemMessage.query.filter(
+                ~SystemMessage.read_by.contains(current_user)
+            ).count()
+        return 0
+    return dict(get_unread_message_count=get_unread_message_count)
+
+@bp.route('/system_messages')
+@login_required
+def system_messages():
+    messages = SystemMessage.query.filter(
+        ~db.session.query(message_read_status).filter(
+            message_read_status.c.user_id == current_user.id,
+            message_read_status.c.message_id == SystemMessage.id,
+            message_read_status.c.muted == True,
+            message_read_status.c.user_id == current_user.id,
+            message_read_status.c.message_id == SystemMessage.id,
+            message_read_status.c.muted == True
+        ).exists()
+    ).order_by(SystemMessage.created_at.desc()).all()
+
+    for message in messages:
+        message.is_read = message.is_read_by(current_user)
+
+    return render_template('site/system_messages.html', system_messages=messages)
+
+@bp.route('/toggle_message_read/<int:message_id>', methods=['POST'])
+@login_required
+def toggle_message_read(message_id):
+    message = SystemMessage.query.get_or_404(message_id)
+    is_read = message.is_read_by(current_user)
+    
+    if is_read:
+        message.read_by.remove(current_user)
+    else:
+        message.mark_as_read(current_user)
+    
+    db.session.commit()
+    
+    unread_count = SystemMessage.query.filter(
+        ~SystemMessage.read_by.contains(current_user)
+    ).count()
+    
+    return jsonify({
+        'success': True,
+        'is_read': not is_read,
+        'unread_count': unread_count
+    })
+
+@bp.route('/mute_message/<int:message_id>', methods=['POST'])
+@login_required
+def mute_message(message_id):
+    message = SystemMessage.query.get_or_404(message_id)
+    # Check if an entry already exists
+    existing_entry = db.session.query(message_read_status).filter_by(
+        user_id=current_user.id,
+        message_id=message_id
+    ).first()
+
+    try:
+        if existing_entry:
+            # Update existing entry
+            db.session.execute(
+                message_read_status.update().where(
+                    (message_read_status.c.user_id == current_user.id) &
+                    (message_read_status.c.message_id == message_id)
+                ).values(muted=True)
+            )
+        else:
+            # Create new entry
+            db.session.execute(
+                message_read_status.insert().values(
+                    user_id=current_user.id,
+                    message_id=message_id,
+                    muted=True
+                )
+            )
+        db.session.commit()
+        
+        unread_count = SystemMessage.query.filter(
+            ~SystemMessage.read_by.contains(current_user)
+        ).count()
+        
+        return jsonify({
+            'success': True,
+            'unread_count': unread_count
+        })
+    except Exception as e:
+        # Log the exception or handle it accordingly
+        return jsonify({
+            'success': False,
+            'message': str(e)
+        })
+
+
+@bp.route('/rss')
+def system_messages_feed():
+    fg = FeedGenerator()
+    fg.title('HackPlanet.EU')
+    fg.description('Flags and challenge wins from all players')
+    fg.link(href=request.url_root)
+    fg.language('en')
+
+    messages = SystemMessage.query.order_by(SystemMessage.created_at.desc()).limit(50).all()
+
+    for message in messages:
+        fe = fg.add_entry()
+        fe.id(message.uuid)
+        fe.title(f'{message.type.capitalize()} Message')
+        fe.description(message.contents)
+        # Use datetime.now(timezone.utc) for proper timezone awareness
+        aware_datetime = datetime.now(timezone.utc)
+        fe.pubDate(aware_datetime)
+
+    response = make_response(fg.rss_str())
+    response.headers.set('Content-Type', 'application/rss+xml')
+    return response
 
 @bp.route('/ctf/study_room')
 @login_required

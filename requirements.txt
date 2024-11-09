@@ -31,3 +31,4 @@ typing_extensions
 sqlalchemy_utils
 azure-identity
 azure-mgmt-compute
+feedgen

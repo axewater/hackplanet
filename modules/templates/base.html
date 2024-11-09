@@ -4,6 +4,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta charset="utf-8">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <link rel="alternate" type="application/rss+xml" title="System Messages RSS Feed" href="{{ url_for('main.system_messages_feed') }}">
 
     <title>HackPlanet.EU</title>
     {% block styles %}
@@ -86,6 +87,17 @@
             <a href="{{ url_for('main.leaderboard') }}" class="sidebar-link">
                 <i class="fas fa-trophy"></i>
                 <span class="link-text">Leaderboard</span>
+            </a>
+
+            <a href="{{ url_for('main.system_messages') }}" class="sidebar-link">
+                <i class="fas fa-bell"></i>
+                <span class="link-text">Messages</span>
+                {% if current_user.is_authenticated %}
+                    {% set unread_count = get_unread_message_count() %}
+                    {% if unread_count > 0 %}
+                        <span id="unreadMessageCount" class="badge bg-danger">{{ unread_count }}</span>
+                    {% endif %}
+                {% endif %}
             </a>
 
             {% if show_help_button %}

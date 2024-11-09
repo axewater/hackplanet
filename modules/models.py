@@ -354,6 +354,14 @@ class Course(db.Model):
     def tag_list(self):
         return [tag.strip() for tag in self.tags.split(',')] if self.tags else []
 
+# Association table for message read status
+message_read_status = db.Table('message_read_status',
+    db.Column('user_id', db.Integer, db.ForeignKey('users.id'), primary_key=True),
+    db.Column('message_id', db.Integer, db.ForeignKey('system_messages.id'), primary_key=True),
+    db.Column('read_at', db.DateTime, nullable=True),
+    db.Column('muted', db.Boolean, default=False, nullable=False)  # Added mute flag
+)
+
 class SystemMessage(db.Model):
     __tablename__ = 'system_messages'
 
@@ -362,6 +370,12 @@ class SystemMessage(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     type = db.Column(db.String(128), nullable=False)
     contents = db.Column(db.Text, nullable=False)
+    
+    # Add relationship to track which users have read the message
+    read_by = db.relationship('User', 
+                            secondary=message_read_status,
+                            lazy='dynamic',
+                            backref=db.backref('read_messages', lazy='dynamic'))
 
     def __init__(self, type, contents):
         self.uuid = str(uuid4())  # Generate a new UUID for each instance
@@ -370,3 +384,31 @@ class SystemMessage(db.Model):
 
     def __repr__(self):
         return f"<SystemMessage id={self.id}, type={self.type}, created_at={self.created_at}, uuid={self.uuid}>"
+
+    def mark_as_read(self, user):
+        """Mark the message as read by a specific user"""
+        if user not in self.read_by:
+            self.read_by.append(user)
+            db.session.execute(
+                message_read_status.update().
+                where(
+                    (message_read_status.c.user_id == user.id) &
+                    (message_read_status.c.message_id == self.id)
+                ).
+                values(read_at=datetime.utcnow())
+            )
+
+    def is_read_by(self, user):
+        """Check if the message has been read by a specific user"""
+        return self.read_by.filter_by(id=user.id).first() is not None
+
+    def get_read_time(self, user):
+        """Get the timestamp when the user read the message"""
+        result = db.session.execute(
+            db.select([message_read_status.c.read_at]).
+            where(
+                (message_read_status.c.user_id == user.id) &
+                (message_read_status.c.message_id == self.id)
+            )
+        ).first()
+        return result[0] if result else None
