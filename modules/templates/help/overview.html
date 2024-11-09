@@ -1,41 +1,7 @@
-{% extends 'base.html' %}
-{% block content %}
-<div class="container">
-    <div class="glass-panel">
-        <h1 class="text-center mb-4">HackPlanet.EU Help Center</h1>
-        
-        <div class="d-flex flex-column align-items-center">
-            <div class="mb-3 w-100">
-                <a href="{{ url_for('main.help_getting_started') }}" class="btn btn-lg btn-block btn-outline-primary">
-                    <i class="fas fa-rocket"></i> Getting Started
-                </a>
-            </div>
-            <div class="mb-3 w-100">
-                <a href="{{ url_for('main.help_ctf_challenges') }}" class="btn btn-lg btn-block btn-outline-success">
-                    <i class="fas fa-flag"></i> CTF Challenges
-                </a>
-            </div>
-            <div class="mb-3 w-100">
-                <a href="{{ url_for('main.help_labs') }}" class="btn btn-lg btn-block btn-outline-warning">
-                    <i class="fas fa-server"></i> Hacking Labs
-                </a>
-            </div>
-            <div class="mb-3 w-100">
-                <a href="{{ url_for('main.help_study_room') }}" class="btn btn-lg btn-block btn-outline-info">
-                    <i class="fas fa-book"></i> Study Room
-                </a>
-            </div>
-            <div class="mb-3 w-100">
-                <a href="{{ url_for('main.help_scoring') }}" class="btn btn-lg btn-block btn-outline-secondary">
-                    <i class="fas fa-trophy"></i> Scoring & Leaderboards
-                </a>
-            </div>
-            <div class="mb-3 w-100">
-                <a href="{{ url_for('main.help_platform_features') }}" class="btn btn-lg btn-block btn-outline-danger">
-                    <i class="fas fa-cogs"></i> Platform Features
-                </a>
-            </div>
-        </div>
-    </div>
+{% extends 'help/base_help.html' %}
+{% block help_content %}
+<h1 class="text-center mb-4">HackPlanet.EU Help Center</h1>
+<div class="d-flex flex-column align-items-center">
+    <p>Select a help topic from the navigation menu to learn more about our platform.</p>
 </div>
 {% endblock %}
