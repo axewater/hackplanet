@@ -29,7 +29,17 @@
             <tbody>
                 {% for user in users %}
                 <tr class="leaderboard-row" onclick="window.location='{{ url_for('main.user_details', user_id=user['id']) }}'">
-                    <td class="align-middle">{{ loop.index }}</td>
+                    <td class="align-middle text-center">
+                        {% if loop.index == 1 %}
+                            <span class="rank-1">{{ loop.index }}</span>
+                        {% elif loop.index == 2 %}
+                            <span class="rank-2">{{ loop.index }}</span>
+                        {% elif loop.index == 3 %}
+                            <span class="rank-3">{{ loop.index }}</span>
+                        {% else %}
+                            {{ loop.index }}
+                        {% endif %}
+                    </td>
                     <td class="align-middle">
                         <img src="{{ url_for('static', filename=user['avatarpath']) }}" alt="Avatar" style="width: 75px; height: 75px; border-radius: 50%;">
                     </td>

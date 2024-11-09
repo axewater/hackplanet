@@ -37,6 +37,29 @@ body {
     font-weight: bold;
 }
 
+/* Top 3 rank styling */
+.rank-1 {
+    color: gold;
+    font-size: 24px;
+    font-weight: bold;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);  /* Shadow with 50% black opacity */
+}
+
+.rank-2 {
+    color: silver;
+    font-size: 22px;
+    font-weight: bold;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.rank-3 {
+    color: #cd7f32;  /* Bronze color */
+    font-size: 20px;
+    font-weight: bold;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+
 .leaderboard-link {
     text-decoration: none;
     color: inherit;
