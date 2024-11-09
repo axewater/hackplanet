@@ -2599,6 +2599,11 @@ def view_course_material(filename):
     return send_from_directory(current_app.config['UPLOAD_FOLDER'], 'studyfiles/' + filename)
 
 
+@bp.route('/help')
+@login_required
+def help_page():
+    return render_template('site/help.html')
+
 @bp.route('/api/host_status')
 @login_required
 def host_status():
