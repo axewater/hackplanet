@@ -16,133 +16,144 @@
     </div>
     
     <div class="container">
-        <div class="row row-cols-1 row-cols-md-3 g-4">
-            <!-- Server Management -->
-            <div class="col">
-                <a href="{{ url_for('main.manage_settings') }}" class="btn btn-info dashboard-button">
-                    <i class="fas fa-cogs dashboard-icon"></i>
-                    Server Settings
-                </a>
+        <!-- Server Management Section -->
+        <div class="admin-section">
+            <h3><i class="fas fa-server"></i> Server Management</h3>
+            <div class="admin-buttons">
+                <div class="admin-button-item">
+                    <a href="{{ url_for('main.manage_settings') }}" class="btn btn-circle">
+                        <i class="fas fa-cogs"></i>
+                    </a>
+                    <span class="button-label">Settings</span>
+                </div>
+                {% if enable_server_status %}
+                <div class="admin-button-item">
+                    <a href="{{ url_for('main.admin_status_page') }}" class="btn btn-circle">
+                        <i class="fas fa-info"></i>
+                    </a>
+                    <span class="button-label">Server Info</span>
+                </div>
+                {% endif %}
+                <div class="admin-button-item">
+                    <a href="{{ url_for('main.admin_help') }}" class="btn btn-circle">
+                        <i class="fas fa-question-circle"></i>
+                    </a>
+                    <span class="button-label">Admin Help</span>
+                </div>
             </div>
-            {% if enable_server_status %}
-            <div class="col">
-                <a href="{{ url_for('main.admin_status_page') }}" class="btn btn-warning dashboard-button">
-                    <i class="fas fa-info dashboard-icon"></i>
-                    Server Info
-                </a>
-            </div>
-            {% endif %}
-            <div class="col">
-                <a href="{{ url_for('main.admin_help') }}" class="btn btn-secondary dashboard-button">
-                    <i class="fas fa-question-circle dashboard-icon"></i>
-                    Admin Help
-                </a>
-            </div>
+        </div>
 
-            <!-- User Management -->
-            <div class="col">
-                <a href="{{ url_for('main.usermanager') }}" class="btn btn-success dashboard-button">
-                    <i class="fas fa-users-cog dashboard-icon"></i>
-                    User Manager
-                </a>
+        <!-- User Management Section -->
+        <div class="admin-section">
+            <h3><i class="fas fa-users"></i> User Management</h3>
+            <div class="admin-buttons">
+                <div class="admin-button-item">
+                    <a href="{{ url_for('main.usermanager') }}" class="btn btn-circle">
+                        <i class="fas fa-users-cog"></i>
+                    </a>
+                    <span class="button-label">User Manager</span>
+                </div>
+                <div class="admin-button-item">
+                    <a href="{{ url_for('main.whitelist') }}" class="btn btn-circle">
+                        <i class="fas fa-user-shield"></i>
+                    </a>
+                    <span class="button-label">Whitelist</span>
+                </div>
+                <div class="admin-button-item">
+                    <a href="{{ url_for('main.manage_invites') }}" class="btn btn-circle">
+                        <i class="fas fa-envelope-open-text"></i>
+                    </a>
+                    <span class="button-label">Invites</span>
+                </div>
             </div>
-            <div class="col">
-                <a href="{{ url_for('main.whitelist') }}" class="btn btn-dark dashboard-button">
-                    <i class="fas fa-user-shield dashboard-icon"></i>
-                    Whitelist Manager
-                </a>
-            </div>
-            <div class="col">
-                <a href="{{ url_for('main.manage_invites') }}" class="btn btn-green dashboard-button">
-                    <i class="fas fa-envelope-open-text dashboard-icon"></i>
-                    Invite Manager
-                </a>
-            </div>
+        </div>
 
-            <!-- Content Management -->
-            <div class="col">
-                <a href="{{ url_for('main.lab_manager') }}" class="btn btn-primary dashboard-button">
-                    <i class="fas fa-flask dashboard-icon"></i>
-                    Lab Manager
-                </a>
+        <!-- Content Management Section -->
+        <div class="admin-section">
+            <h3><i class="fas fa-folder"></i> Content Management</h3>
+            <div class="admin-buttons">
+                <div class="admin-button-item">
+                    <a href="{{ url_for('main.lab_manager') }}" class="btn btn-circle">
+                        <i class="fas fa-flask"></i>
+                    </a>
+                    <span class="button-label">Labs</span>
+                </div>
+                <div class="admin-button-item">
+                    <a href="{{ url_for('main.challenge_manager') }}" class="btn btn-circle">
+                        <i class="fas fa-flag"></i>
+                    </a>
+                    <span class="button-label">Challenges</span>
+                </div>
+                <div class="admin-button-item">
+                    <a href="{{ url_for('main.quiz_manager') }}" class="btn btn-circle">
+                        <i class="fas fa-question"></i>
+                    </a>
+                    <span class="button-label">Quizzes</span>
+                </div>
             </div>
-            <div class="col">
-                <a href="{{ url_for('main.challenge_manager') }}" class="btn btn-primary dashboard-button">
-                    <i class="fas fa-cog dashboard-icon"></i>
-                    Challenge Manager
-                </a>
-            </div>
-            <div class="col">
-                <a href="{{ url_for('main.quiz_manager') }}" class="btn btn-primary dashboard-button">
-                    <i class="fas fa-question-circle dashboard-icon"></i>
-                    Quiz Manager
-                </a>
-            </div>
+        </div>
 
-            <!-- Additional Management -->
-            <div class="col">
-                <a href="{{ url_for('main.host_manager') }}" class="btn btn-secondary dashboard-button">
-                    <i class="fas fa-server dashboard-icon"></i>
-                    Host Manager
-                </a>
+        <!-- System Tools Section -->
+        <div class="admin-section">
+            <h3><i class="fas fa-tools"></i> System Tools</h3>
+            <div class="admin-buttons">
+                <div class="admin-button-item">
+                    <a href="{{ url_for('main.file_manager') }}" class="btn btn-circle">
+                        <i class="fas fa-file-alt"></i>
+                    </a>
+                    <span class="button-label">Files</span>
+                </div>
+                <div class="admin-button-item">
+                    <a href="{{ url_for('main.messaging') }}" class="btn btn-circle">
+                        <i class="fas fa-envelope"></i>
+                    </a>
+                    <span class="button-label">Messages</span>
+                </div>
+                <div class="admin-button-item">
+                    <a href="{{ url_for('main.rss_config') }}" class="btn btn-circle">
+                        <i class="fas fa-rss"></i>
+                    </a>
+                    <span class="button-label">RSS</span>
+                </div>
             </div>
-            <div class="col">
-                <a href="{{ url_for('main.flag_manager') }}" class="btn btn-primary dashboard-button">
-                    <i class="fas fa-flag dashboard-icon"></i>
-                    Flag Manager
-                </a>
-            </div>
-            <div class="col">
-                <a href="{{ url_for('main.studyroom_manager') }}" class="btn btn-success dashboard-button">
-                    <i class="fas fa-book-reader dashboard-icon"></i>
-                    StudyRoom Manager
-                </a>
-            </div>
-            <div class="col">
-                <a href="{{ url_for('main.file_manager') }}" class="btn btn-info dashboard-button">
-                    <i class="fas fa-file-alt dashboard-icon"></i>
-                    File Manager
-                </a>
-            </div>
+        </div>
 
-            <div class="col">
-                <a href="{{ url_for('main.manage_themes') }}" class="btn btn-primary dashboard-button">
-                    <i class="fas fa-paint-brush dashboard-icon"></i>
-                    Theme Manager
-                </a>
+        <!-- Theme & UI Section -->
+        <div class="admin-section">
+            <h3><i class="fas fa-paint-brush"></i> Theme & UI</h3>
+            <div class="admin-buttons">
+                <div class="admin-button-item">
+                    <a href="{{ url_for('main.manage_themes') }}" class="btn btn-circle">
+                        <i class="fas fa-palette"></i>
+                    </a>
+                    <span class="button-label">Themes</span>
+                </div>
             </div>
+        </div>
 
-            <div class="col">
-                <a href="{{ url_for('main.messaging') }}" class="btn btn-info dashboard-button">
-                    <i class="fas fa-envelope dashboard-icon"></i>
-                    Messaging
-                </a>
+        <!-- Monitoring & Reports Section -->
+        <div class="admin-section">
+            <h3><i class="fas fa-chart-line"></i> Monitoring & Reports</h3>
+            <div class="admin-buttons">
+                {% if enable_newsletter %}
+                <div class="admin-button-item">
+                    <a href="{{ url_for('main.newsletter') }}" class="btn btn-circle">
+                        <i class="fas fa-newspaper"></i>
+                    </a>
+                    <span class="button-label">Newsletter</span>
+                </div>
+                {% endif %}
+                <div class="admin-button-item">
+                    <a href="https://hpagent.hackplanet.eu" class="btn btn-circle">
+                        <i class="fas fa-eye"></i>
+                    </a>
+                    <span class="button-label">Monitoring</span>
+                </div>
             </div>
-
-            <div class="col">
-                <a href="{{ url_for('main.rss_config') }}" class="btn btn-warning dashboard-button">
-                    <i class="fas fa-rss dashboard-icon"></i>
-                    RSS Config
-                </a>
-            </div>
-
-            <div class="col">
-                <a href="https://hpagent.hackplanet.eu" class="btn btn-success dashboard-button">
-                    <i class="fas fa-eye dashboard-icon"></i>
-                    Monitoring
-                </a>
-            </div>
-
-
-
-            {% if enable_newsletter %}
-            <div class="col">
-                <a href="{{ url_for('main.newsletter') }}" class="btn btn-dark dashboard-button">
-                    <i class="fas fa-envelope dashboard-icon"></i>
-                    Newsletter
-                </a>
-            </div>
-            {% endif %}
+        </div>
+    </div>
+</div>
+        
         </div>
     </div>
 </div>
