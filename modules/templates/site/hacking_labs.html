@@ -31,39 +31,34 @@
             </div>
         {% else %}
             {% for lab in labs %}
-            <div class="lab">
-                <h2>{{ lab.name }}</h2>
-                <div class="lab-content">
-                    <div class="lab-description">
-                        <p>{{ lab.description }}</p>
-                        <p>VPN Status: <span class="vpn-status-indicator" data-agent-id="{{ lab.vpn_server }}">Loading...</span></p>
-                        {% if lab.vpn_server %}
-                            <button class="btn btn-success start-vpn" data-lab-id="{{ lab.id }}">Start VPN</button>
-                            <button class="btn btn-danger stop-vpn" data-lab-id="{{ lab.id }}">Stop VPN</button>
-                        {% endif %}
-                        {% if lab.vpn_file %}
-                            <a href="{{ '/static/library/labfiles/' + lab.vpn_file }}" class="download-button btn btn-primary">Download VPN Access</a>
-                        {% endif %}
+            <div class="hackplanet_titles">
+                <div class="lab">
+                    <h2>{{ lab.name }}</h2>
+                    <div class="lab-content">
+                        <div class="lab-description">
+                            <p>{{ lab.description }}</p>
+                            <p>VPN Status: <span class="vpn-status-indicator" data-agent-id="{{ lab.vpn_server }}">Loading...</span></p>
+                            {% if lab.vpn_server %}
+                                <button class="btn btn-success start-vpn" data-lab-id="{{ lab.id }}">Start VPN</button>
+                                <button class="btn btn-danger stop-vpn" data-lab-id="{{ lab.id }}">Stop VPN</button>
+                            {% endif %}
+                            {% if lab.vpn_file %}
+                                <a href="{{ '/static/library/labfiles/' + lab.vpn_file }}" class="download-button btn btn-primary">Download VPN Access</a>
+                            {% endif %}
+                        </div>
+                        <div class="lab-image-container">
+                            {% if lab.image %}
+                            <img src="{{ url_for('static', filename='library/images/labs/' + lab.image) }}" alt="{{ lab.name }}" class="lab-image">
+                            {% endif %}
+                        </div>
                     </div>
-                    <div class="lab-image-container">
-                        {% if lab.image %}
-                        <img src="{{ url_for('static', filename='library/images/labs/' + lab.image) }}" alt="{{ lab.name }}" class="lab-image">
-                        {% endif %}
-                    </div>
+                    <script>
+                        const labVpnServer = "{{ lab.vpn_server }}"
+                    </script>
+
+
                 </div>
-                <script>
-                    const labVpnServer = "{{ lab.vpn_server }}"
-                </script>
-                {% if lab.vpn_server %}
-                    <button class="btn btn-success start-vpn" data-lab-id="{{ lab.id }}">Start VPN</button>
-                    <button class="btn btn-danger stop-vpn" data-lab-id="{{ lab.id }}">Stop VPN</button>
-                {% endif %}
-                {% if lab.vpn_file %}
-                    <a href="{{ '/static/library/labfiles/' + lab.vpn_file }}" class="download-button btn btn-primary">Download VPN Access</a>
-                {% endif %}
-
             </div>
-
                 <div class="hosts">
                     {% if lab in labs_without_hosts %}
                         <div class="alert alert-warning" role="alert">

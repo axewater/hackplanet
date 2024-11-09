@@ -327,7 +327,8 @@ body {
     padding: 20px;
     border-radius: 15px;
     margin-bottom: 20px;
-    text-align: center;
+
+
 }
 
 
@@ -1270,6 +1271,7 @@ form select {
 
 .lab-image-container {
     flex: 0 0 300px;
+
 }
 
 .lab-image {
@@ -1277,6 +1279,8 @@ form select {
     height: auto;
     border-radius: 10px;
     margin-bottom: 10px;
+    box-shadow: 0 5px 4px rgb(5, 5, 5);
+
 }
 
 .hosts {
@@ -1362,9 +1366,6 @@ form select {
 
 .download-button {
     color: #ffffff;
-    padding: 10px 20px;
-    border-radius: 15px;
-    margin-left: 20px;
     cursor: pointer;
 }
 
