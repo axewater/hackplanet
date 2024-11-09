@@ -17,14 +17,29 @@
                     <li>Special events</li>
                 </ul>
                 
-                <h4>Leaderboard Categories</h4>
+                <h4>Leaderboard Features</h4>
                 <ul>
-                    <li>Overall Score</li>
-                    <li>Monthly Rankings</li>
-                    <li>Challenge-specific Rankings</li>
+                    <li>Overall Score Rankings</li>
+                    <li>Customizable Avatar Display</li>
+                    <li>Real-time Updates</li>
+                </ul>
+
+                <h4>Profile Customization</h4>
+                <p>You can customize your avatar that appears on the leaderboard by:</p>
+                <ul>
+                    <li>Selecting from the gallery of pre-made avatars</li>
+                    <li>Uploading your own custom avatar image</li>
+                    <li>Managing your profile settings in the Profile section</li>
                 </ul>
                 
-                <a href="{{ url_for('main.leaderboard') }}" class="btn btn-secondary mt-3">View Leaderboard</a>
+                <div class="mt-4">
+                    <h4>Quick Navigation</h4>
+                    <div class="btn-group" role="group" aria-label="Navigation Buttons">
+                        <a href="{{ url_for('main.settings_profile_edit') }}" class="btn btn-primary">Edit Profile</a>
+                        <a href="{{ url_for('main.user_details', user_id=current_user.id) }}" class="btn btn-info">View Profile</a>
+                        <a href="{{ url_for('main.leaderboard') }}" class="btn btn-success">Leaderboard</a>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
