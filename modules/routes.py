@@ -524,6 +524,12 @@ def settings_profile_edit():
     if form.validate_on_submit():
         avatar_source = form.avatar_source.data
         
+        # Handle background selection
+        if form.background.data:
+            if not current_user.preferences:
+                current_user.preferences = UserPreference(user_id=current_user.id)
+            current_user.preferences.background_id = int(form.background.data)
+        
         if avatar_source == 'gallery' and form.gallery_avatar.data:
             # Using gallery avatar
             selected_avatar = form.gallery_avatar.data.replace('\\', '/')

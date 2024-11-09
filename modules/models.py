@@ -167,6 +167,8 @@ class UserPreference(db.Model):
     default_sort = db.Column(db.String(50), default='name')
     default_sort_order = db.Column(db.String(4), default='asc')
     theme = db.Column(db.String(50), default='default')
+    background_id = db.Column(db.Integer, db.ForeignKey('profile_backgrounds.id'), nullable=True)
+    background = db.relationship('ProfileBackground', backref=db.backref('users', lazy=True))
 
     user = db.relationship('User', back_populates='preferences')
 

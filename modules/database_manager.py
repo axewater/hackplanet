@@ -108,3 +108,41 @@ class DatabaseManager:
             print(f"An error occurred: {e}")
         finally:
             self.engine.dispose()
+
+    def create_profile_backgrounds_table(self):
+        create_table_sql = """
+        CREATE TABLE IF NOT EXISTS profile_backgrounds (
+            id SERIAL PRIMARY KEY,
+            filename VARCHAR(256) NOT NULL UNIQUE,
+            display_name VARCHAR(128),
+            enabled BOOLEAN DEFAULT TRUE,
+            date_added TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+            "order" INTEGER DEFAULT 0
+        );
+        """
+        print("Creating profile_backgrounds table if it doesn't exist")
+        try:
+            with self.engine.connect() as connection:
+                connection.execute(text(create_table_sql))
+                connection.commit()
+            print("Table 'profile_backgrounds' successfully created.")
+        except Exception as e:
+            print(f"An error occurred: {e}")
+        finally:
+            self.engine.dispose()
+
+    def add_background_id_to_user_preferences(self):
+        add_column_sql = """
+        ALTER TABLE user_preferences
+        ADD COLUMN IF NOT EXISTS background_id INTEGER REFERENCES profile_backgrounds(id);
+        """
+        print("Adding background_id column to user_preferences table")
+        try:
+            with self.engine.connect() as connection:
+                connection.execute(text(add_column_sql))
+                connection.commit()
+            print("Column 'background_id' successfully added to the 'user_preferences' table.")
+        except Exception as e:
+            print(f"An error occurred: {e}")
+        finally:
+            self.engine.dispose()

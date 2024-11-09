@@ -84,6 +84,17 @@ class EditProfileForm(FlaskForm):
         FileAllowed(['jpg', 'png'], 'Images only!')
     ])
     gallery_avatar = SelectField('Gallery Avatar', choices=[], validators=[Optional()])
+    background = SelectField('Profile Background', choices=[], validators=[Optional()])
+
+    def __init__(self, *args, **kwargs):
+        super(EditProfileForm, self).__init__(*args, **kwargs)
+        self.gallery_avatar.choices = self.get_gallery_choices()
+        self.background.choices = self.get_background_choices()
+
+    def get_background_choices(self):
+        from modules.models import ProfileBackground
+        backgrounds = ProfileBackground.query.filter_by(enabled=True).order_by(ProfileBackground.order).all()
+        return [('', 'Select a background')] + [(str(bg.id), bg.display_name or bg.filename) for bg in backgrounds]
 
     def __init__(self, *args, **kwargs):
         super(EditProfileForm, self).__init__(*args, **kwargs)
