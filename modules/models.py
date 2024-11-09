@@ -353,3 +353,19 @@ class Course(db.Model):
     @property
     def tag_list(self):
         return [tag.strip() for tag in self.tags.split(',')] if self.tags else []
+
+class SystemMessage(db.Model):
+    __tablename__ = 'system_messages'
+
+    id = db.Column(db.Integer, primary_key=True)
+    uuid = db.Column(db.String(36), unique=True, nullable=False, default=str(uuid4()))
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    type = db.Column(db.String(128), nullable=False)
+    contents = db.Column(db.Text, nullable=False)
+
+    def __init__(self, type, contents):
+        self.type = type
+        self.contents = contents
+
+    def __repr__(self):
+        return f"<SystemMessage id={self.id}, type={self.type}, created_at={self.created_at}, uuid={self.uuid}>"
