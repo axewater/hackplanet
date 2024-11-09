@@ -182,6 +182,7 @@ body {
     white-space: nowrap;
     vertical-align: baseline;
     border-radius: 0.25rem;
+    margin-left: 5px;
 }
 
 .bg-danger {
@@ -306,9 +307,7 @@ body {
     width: 30%;
 }
 
-.badge {
-    font-size: 0.9em;
-}
+
 
 .btn-lg {
     padding: 15px 30px;
