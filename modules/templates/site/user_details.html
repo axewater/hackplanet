@@ -1,6 +1,35 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<style>
+.user-profile-container {
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    padding: 20px;
+    min-height: 100vh;
+    position: relative;
+}
+
+.user-profile-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 0;
+}
+
+.glass-panel {
+    position: relative;
+    z-index: 1;
+}
+</style>
+
+<div class="user-profile-container" 
+     style="background-image: url('{{ url_for('static', filename='images/profilebackdrops/' + (user.preferences.background.filename if user.preferences and user.preferences.background else 'default_profile_background.jpg')) }}');">
 {% with messages = get_flashed_messages() %}
 {% if messages %}
 <div>

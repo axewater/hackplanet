@@ -515,6 +515,30 @@ def delete_avatar(avatar_path):
     return redirect(url_for('main.bot_generator'))
 
 
+
+@bp.route('/settings/settings_backdrop', methods=['GET', 'POST'])
+@login_required
+def settings_backdrop():
+    form = CsrfForm()
+    backgrounds = ProfileBackground.query.filter_by(enabled=True).order_by(ProfileBackground.order).all()
+    current_backdrop_id = current_user.preferences.background_id if current_user.preferences else None
+    
+    if form.validate_on_submit():
+        background_id = request.form.get('background_id')
+        if background_id:
+            if not current_user.preferences:
+                current_user.preferences = UserPreference(user_id=current_user.id)
+            current_user.preferences.background_id = int(background_id)
+            db.session.commit()
+            flash('Background updated successfully!', 'success')
+            return redirect(url_for('main.settings_backdrop'))
+    
+    return render_template('settings/settings_backdrop.html', 
+                         backgrounds=backgrounds,
+                         current_backdrop_id=current_backdrop_id,
+                         form=form)
+
+
 @bp.route('/settings_profile_edit', methods=['GET', 'POST'])
 @login_required
 def settings_profile_edit():
