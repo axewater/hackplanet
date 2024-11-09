@@ -35,7 +35,7 @@ from modules.forms import (
 )
 
 from modules.models import (
-    User, Whitelist, UserPreference, GlobalSettings, InviteToken, Lab, Challenge, Host,
+    User, Whitelist, UserPreference, GlobalSettings, InviteToken, Lab, Challenge, Host, RSSConfig,
     Flag, UserProgress, FlagsObtained, ChallengesObtained, Quiz, Question, UserQuizProgress, UserQuestionProgress, Course,
     SystemMessage, message_read_status
 )
@@ -2478,44 +2478,54 @@ def mute_message(message_id):
 @admin_required
 def rss_config():
     form = RSSConfigForm()
-    settings = GlobalSettings.query.first()
+    config = RSSConfig.query.first()
     
     if form.validate_on_submit():
-        if not settings:
-            settings = GlobalSettings(settings={})
-            db.session.add(settings)
-        
-        settings.settings.update({
-            'feed_title': form.feed_title.data,
-            'feed_description': form.feed_description.data,
-            'feed_limit': form.feed_limit.data,
-            'enable_flag_wins': form.enable_flag_wins.data,
-            'enable_challenge_wins': form.enable_challenge_wins.data,
-            'enable_quiz_completions': form.enable_quiz_completions.data
-        })
-        db.session.commit()
-        flash('RSS feed settings updated successfully!', 'success')
-        return redirect(url_for('main.rss_config'))
+        try:
+            if not config:
+                config = RSSConfig()
+                db.session.add(config)
+            
+            # Update config with form data
+            config.feed_title = form.feed_title.data
+            config.feed_description = form.feed_description.data
+            config.feed_limit = form.feed_limit.data
+            config.enable_flag_wins = form.enable_flag_wins.data
+            config.enable_challenge_wins = form.enable_challenge_wins.data
+            config.enable_quiz_completions = form.enable_quiz_completions.data
+
+            # Ensure we're committing the changes
+            db.session.commit()
+            cache.delete('global_settings')  # Clear the cache
+            flash('RSS feed settings updated successfully!', 'success')
+            return redirect(url_for('main.rss_config'))
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error saving settings: {str(e)}', 'error')
+            return redirect(url_for('main.rss_config'))
     
-    if request.method == 'GET' and settings:
-        form.feed_title.data = settings.settings.get('feed_title', 'HackPlanet.EU')
-        form.feed_description.data = settings.settings.get('feed_description', 'Flags and challenge wins from all players')
-        form.feed_limit.data = settings.settings.get('feed_limit', 50)
-        form.enable_flag_wins.data = settings.settings.get('enable_flag_wins', True)
-        form.enable_challenge_wins.data = settings.settings.get('enable_challenge_wins', True)
-        form.enable_quiz_completions.data = settings.settings.get('enable_quiz_completions', True)
+    # Pre-populate form with existing settings
+    if request.method == 'GET' and config:
+        form.feed_title.data = config.feed_title
+        form.feed_description.data = config.feed_description
+        form.feed_limit.data = config.feed_limit
+        form.enable_flag_wins.data = config.enable_flag_wins
+        form.enable_challenge_wins.data = config.enable_challenge_wins
+        form.enable_quiz_completions.data = config.enable_quiz_completions
     
-    current_settings = settings.settings if settings else {}
-    return render_template('admin/rss_config.html', form=form, current_settings=current_settings)
+    return render_template('admin/rss_config.html', form=form, current_settings=config)
 
 @bp.route('/rss')
 def system_messages_feed():
-    settings = GlobalSettings.query.first()
-    feed_settings = settings.settings if settings else {}
+    config = RSSConfig.query.first()
+    if not config:
+        config = RSSConfig()  # Use default values
+        db.session.add(config)
+        db.session.commit()
     
     fg = FeedGenerator()
-    fg.title(feed_settings.get('feed_title', 'HackPlanet.EU'))
-    fg.description(feed_settings.get('feed_description', 'Flags and challenge wins from all players'))
+    fg.title(config.feed_title)
+    fg.description(config.feed_description or 'Flags and challenge wins from all players')
     fg.link(href=request.url_root)
     fg.language('en')
 

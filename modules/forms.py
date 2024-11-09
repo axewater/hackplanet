@@ -19,9 +19,15 @@ from wtforms.fields import URLField, DateField
 from urllib.parse import urlparse
 
 class RSSConfigForm(FlaskForm):
-    feed_title = StringField('Feed Title', validators=[DataRequired(), Length(max=128)])
-    feed_description = TextAreaField('Feed Description', validators=[Optional(), Length(max=256)])
-    feed_limit = IntegerField('Feed Item Limit', validators=[DataRequired(), NumberRange(min=1, max=100)], default=50)
+    feed_title = StringField('Feed Title', validators=[DataRequired(), Length(max=128)], 
+                           render_kw={"placeholder": "Enter feed title"})
+    feed_description = TextAreaField('Feed Description', 
+                                   validators=[Optional(), Length(max=256)],
+                                   render_kw={"placeholder": "Enter feed description"})
+    feed_limit = IntegerField('Feed Item Limit', 
+                            validators=[DataRequired(), NumberRange(min=1, max=100)], 
+                            default=50,
+                            render_kw={"placeholder": "Enter item limit (1-100)"})
     enable_flag_wins = BooleanField('Show Flag Wins', default=True)
     enable_challenge_wins = BooleanField('Show Challenge Wins', default=True)
     enable_quiz_completions = BooleanField('Show Quiz Completions', default=True)

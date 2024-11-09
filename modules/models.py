@@ -40,7 +40,21 @@ class JSONEncodedDict(TypeDecorator):
                 return {}
         return value
 
+class RSSConfig(db.Model):
+    __tablename__ = 'rss_config'
+    id = db.Column(db.Integer, primary_key=True)
+    feed_title = db.Column(db.String(128), nullable=False, default='HackPlanet.EU')
+    feed_description = db.Column(db.String(256), nullable=True)
+    feed_limit = db.Column(db.Integer, nullable=False, default=50)
+    enable_flag_wins = db.Column(db.Boolean, default=True)
+    enable_challenge_wins = db.Column(db.Boolean, default=True)
+    enable_quiz_completions = db.Column(db.Boolean, default=True)
+    last_updated = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
+    def __repr__(self):
+        return f'<RSSConfig id={self.id}, title={self.feed_title}>'
+    
+    
 class User(db.Model):
     __tablename__ = 'users'
 

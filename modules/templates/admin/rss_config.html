@@ -5,7 +5,17 @@
     <div class="hackplanet_titles">
         <h1>RSS Feed Configuration</h1>
     </div>
-    
+    <div class="mb-3">
+        {% with messages = get_flashed_messages() %}
+        {% if messages %}
+        <div>
+            {% for message in messages %}
+            <div class="alert alert-info" role="alert">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
+    </div>
     <div class="container">
         <div class="card">
             <div class="card-header">
