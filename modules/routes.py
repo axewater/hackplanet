@@ -1595,6 +1595,7 @@ def submit_flag():
         if not flag:
             return jsonify({'success': False, 'message': 'Invalid flag submission'}), 400
 
+        host = Host.query.get(host_id)
         if flag.uuid == submitted_flag:
             # Check if the user has already obtained this flag
             existing_flag = FlagsObtained.query.filter_by(user_id=current_user.id, flag_id=flag.id).first()
@@ -1608,7 +1609,7 @@ def submit_flag():
             # Create system message for flag completion
             host = Host.query.get(host_id)
             message_content = f"User {current_user.name} obtained {flag_type} flag on host {host.name}"
-            system_message = SystemMessage(type='success', contents=message_content)
+            system_message = SystemMessage(type='flag_win', contents=message_content)
             db.session.add(system_message)
 
             # Update user's score (redundant now)
@@ -1617,6 +1618,11 @@ def submit_flag():
 
             return jsonify({'success': True, 'message': 'Flag submitted successfully!', 'new_score': current_user.score_total}), 200
         else:
+            # Create system message for failed attempt
+            message_content = f"User {current_user.name} failed {flag_type} flag attempt on host {host.name}"
+            system_message = SystemMessage(type='flag_fail', contents=message_content)
+            db.session.add(system_message)
+            db.session.commit()
             return jsonify({'success': False, 'message': 'Incorrect flag'}), 400
 
     except Exception as e:
@@ -1655,7 +1661,7 @@ def submit_challenge_flag():
 
             # Create system message for challenge completion
             message_content = f"User {current_user.name} completed challenge {challenge.name}"
-            system_message = SystemMessage(type='success', contents=message_content)
+            system_message = SystemMessage(type='challenge_win', contents=message_content)
             db.session.add(system_message)
 
             db.session.commit()
@@ -1670,6 +1676,11 @@ def submit_challenge_flag():
                 'points_earned': challenge.point_value
             }), 200
         else:
+            # Create system message for failed attempt
+            message_content = f"User {current_user.name} failed attempt on challenge {challenge.name}"
+            system_message = SystemMessage(type='challenge_fail', contents=message_content)
+            db.session.add(system_message)
+            db.session.commit()
             return jsonify({'success': False, 'message': 'Incorrect flag'}), 400
 
     except Exception as e:
