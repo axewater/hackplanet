@@ -31,6 +31,7 @@ class RSSConfigForm(FlaskForm):
     enable_flag_wins = BooleanField('Show Flag Wins', default=True)
     enable_challenge_wins = BooleanField('Show Challenge Wins', default=True)
     enable_quiz_completions = BooleanField('Show Quiz Completions', default=True)
+    enable_information_messages = BooleanField('Show Information Messages', default=True)
     submit = SubmitField('Save RSS Configuration')
 
 class SystemMessageForm(FlaskForm):

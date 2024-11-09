@@ -2493,6 +2493,7 @@ def rss_config():
             config.enable_flag_wins = form.enable_flag_wins.data
             config.enable_challenge_wins = form.enable_challenge_wins.data
             config.enable_quiz_completions = form.enable_quiz_completions.data
+            config.enable_information_messages = form.enable_information_messages.data or False
 
             # Ensure we're committing the changes
             db.session.commit()
@@ -2512,6 +2513,7 @@ def rss_config():
         form.enable_flag_wins.data = config.enable_flag_wins
         form.enable_challenge_wins.data = config.enable_challenge_wins
         form.enable_quiz_completions.data = config.enable_quiz_completions
+        form.enable_information_messages.data = config.enable_information_messages
     
     return render_template('admin/rss_config.html', form=form, current_settings=config)
 
@@ -2530,7 +2532,19 @@ def system_messages_feed():
     fg.link(href=request.url_root)
     fg.language('en')
 
-    messages = SystemMessage.query.order_by(SystemMessage.created_at.desc()).limit(50).all()
+    # Build query based on configuration
+    query = SystemMessage.query
+
+    if not config.enable_flag_wins:
+        query = query.filter(SystemMessage.type != 'flag_win')
+    if not config.enable_challenge_wins:
+        query = query.filter(SystemMessage.type != 'challenge_win')
+    if not config.enable_quiz_completions:
+        query = query.filter(SystemMessage.type != 'quiz_completion')
+    if not config.enable_information_messages:
+        query = query.filter(SystemMessage.type != 'info')
+
+    messages = query.order_by(SystemMessage.created_at.desc()).limit(config.feed_limit).all()
 
     for message in messages:
         fe = fg.add_entry()

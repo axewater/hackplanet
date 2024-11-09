@@ -66,6 +66,13 @@
                         </div>
                     </div>
 
+                    <div class="mb-3">
+                        <div class="form-check">
+                            {{ form.enable_information_messages(class="form-check-input") }}
+                            {{ form.enable_information_messages.label(class="form-check-label") }}
+                        </div>
+                    </div>
+
                     {{ form.submit(class="btn btn-primary") }}
                 </form>
             </div>
@@ -85,6 +92,7 @@
                     <li>Flag Wins: {{ 'Enabled' if current_settings.enable_flag_wins else 'Disabled' }}</li>
                     <li>Challenge Wins: {{ 'Enabled' if current_settings.enable_challenge_wins else 'Disabled' }}</li>
                     <li>Quiz Completions: {{ 'Enabled' if current_settings.enable_quiz_completions else 'Disabled' }}</li>
+                    <li>Information Messages: {{ 'Enabled' if current_settings.enable_information_messages else 'Disabled' }}</li>
                 </ul>
             </div>
         </div>

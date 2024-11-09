@@ -49,6 +49,7 @@ class RSSConfig(db.Model):
     enable_flag_wins = db.Column(db.Boolean, default=True)
     enable_challenge_wins = db.Column(db.Boolean, default=True)
     enable_quiz_completions = db.Column(db.Boolean, default=True)
+    enable_information_messages = db.Column(db.Boolean, default=True, nullable=False)
     last_updated = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     def __repr__(self):

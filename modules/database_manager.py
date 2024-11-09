@@ -92,3 +92,19 @@ class DatabaseManager:
             print(f"An error occurred: {e}")
         finally:
             self.engine.dispose()
+
+    def add_enable_information_messages_column(self):
+        add_column_sql = """
+        ALTER TABLE rss_config
+        ADD COLUMN IF NOT EXISTS enable_information_messages BOOLEAN DEFAULT TRUE;
+        """
+        print("Adding 'enable_information_messages' column to rss_config table")
+        try:
+            with self.engine.connect() as connection:
+                connection.execute(text(add_column_sql))
+                connection.commit()
+            print("Column 'enable_information_messages' successfully added to the 'rss_config' table.")
+        except Exception as e:
+            print(f"An error occurred: {e}")
+        finally:
+            self.engine.dispose()

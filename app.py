@@ -12,5 +12,6 @@ if __name__ == '__main__':
     db_manager.add_solution_column_if_not_exists()
     db_manager.add_theme_column_to_user_preferences()
     db_manager.add_muted_column_to_message_read_status()
+    db_manager.add_enable_information_messages_column()
     
     app.run(host="0.0.0.0", debug=True, port=5003)
