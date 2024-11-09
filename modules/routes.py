@@ -35,7 +35,7 @@ from modules.forms import (
 )
 
 from modules.models import (
-    User, Whitelist, UserPreference, GlobalSettings, InviteToken, Lab, Challenge, Host, RSSConfig,
+    User, Whitelist, UserPreference, GlobalSettings, InviteToken, Lab, Challenge, Host, RSSConfig, ProfileBackground,
     Flag, UserProgress, FlagsObtained, ChallengesObtained, Quiz, Question, UserQuizProgress, UserQuestionProgress, Course,
     SystemMessage, message_read_status
 )
@@ -926,6 +926,7 @@ def update_invites():
 def admin_dashboard():
     pass
     return render_template('admin/admin_dashboard.html')
+
 
 @bp.route('/admin/messaging', methods=['GET', 'POST'])
 @login_required
@@ -2748,3 +2749,45 @@ def host_status():
     except requests.RequestException as e:
         print(str(e))
         return jsonify({'error': str(e)}), 500
+    
+    
+@bp.route('/admin/backgrounds')
+@login_required
+@admin_required
+def manage_backgrounds():
+    # Scan the backgrounds directory
+    backgrounds_dir = os.path.join(current_app.static_folder, 'images', 'profilebackdrops')
+    if not os.path.exists(backgrounds_dir):
+        os.makedirs(backgrounds_dir)
+    
+    # Get all JPG files
+    jpg_files = [f for f in os.listdir(backgrounds_dir) if f.lower().endswith('.jpg')]
+    
+    # Sync with database
+    for jpg_file in jpg_files:
+        if not ProfileBackground.query.filter_by(filename=jpg_file).first():
+            new_background = ProfileBackground(
+                filename=jpg_file,
+                display_name=jpg_file.replace('.jpg', '').replace('_', ' ').title()
+            )
+            db.session.add(new_background)
+    
+    # Remove entries for files that no longer exist
+    for background in ProfileBackground.query.all():
+        if background.filename not in jpg_files:
+            db.session.delete(background)
+    
+    db.session.commit()
+    
+    # Get all backgrounds ordered by order field
+    backgrounds = ProfileBackground.query.order_by(ProfileBackground.order).all()
+    return render_template('admin/admin_manage_backgrounds.html', backgrounds=backgrounds)
+
+@bp.route('/admin/toggle_background/<int:background_id>', methods=['POST'])
+@login_required
+@admin_required
+def toggle_background(background_id):
+    background = ProfileBackground.query.get_or_404(background_id)
+    background.enabled = not background.enabled
+    db.session.commit()
+    return jsonify({'success': True})

@@ -16,6 +16,18 @@ from uuid import uuid4
 from datetime import datetime
 from enum import Enum as PyEnum
 
+class ProfileBackground(db.Model):
+    __tablename__ = 'profile_backgrounds'
+    id = db.Column(db.Integer, primary_key=True)
+    filename = db.Column(db.String(256), nullable=False, unique=True)
+    display_name = db.Column(db.String(128), nullable=True)
+    enabled = db.Column(db.Boolean, default=True)
+    date_added = db.Column(db.DateTime, default=datetime.utcnow)
+    order = db.Column(db.Integer, default=0)
+
+    def __repr__(self):
+        return f'<ProfileBackground {self.filename}>'
+
 
 ph = PasswordHasher()
 
@@ -361,15 +373,11 @@ class Course(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     purchase_url = db.Column(db.String(512), nullable=True)  # New field for purchase URL
-
     def __repr__(self):
         return f"<Course id={self.id}, name={self.name}>"
-
     @property
     def tag_list(self):
         return [tag.strip() for tag in self.tags.split(',')] if self.tags else []
-
-# Association table for message read status
 message_read_status = db.Table('message_read_status',
     db.Column('user_id', db.Integer, db.ForeignKey('users.id'), primary_key=True),
     db.Column('message_id', db.Integer, db.ForeignKey('system_messages.id'), primary_key=True),

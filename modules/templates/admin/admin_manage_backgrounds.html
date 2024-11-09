@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+    <div class="glass-panel">
+        <h1>Manage Profile Backgrounds</h1>
+        
+        <div class="row">
+            {% for background in backgrounds %}
+            <div class="col-md-4 mb-4">
+                <div class="card">
+                    <img src="{{ url_for('static', filename='images/profilebackdrops/' + background.filename) }}" 
+                         class="card-img-top" 
+                         alt="{{ background.display_name or background.filename }}">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ background.display_name or background.filename }}</h5>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" 
+                                   id="background-{{ background.id }}"
+                                   {% if background.enabled %}checked{% endif %}
+                                   onchange="toggleBackground({{ background.id }})">
+                            <label class="form-check-label" for="background-{{ background.id }}">
+                                Enabled
+                            </label>
+                        </div>
+                        <p class="card-text">
+                            <small class="text-muted">Added: {{ background.date_added.strftime('%Y-%m-%d') }}</small>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<script>
+function toggleBackground(backgroundId) {
+    fetch('/admin/toggle_background/' + backgroundId, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token() }}'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (!data.success) {
+            alert('Error updating background status');
+            // Reset the toggle if there was an error
+            document.getElementById('background-' + backgroundId).checked = !document.getElementById('background-' + backgroundId).checked;
+        }
+    });
+}
+</script>
+{% endblock %}
