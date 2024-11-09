@@ -5,7 +5,7 @@
 <link rel="stylesheet" href="{{ url_for('static', filename='css/profile_editor.css') }}">
 <script src="{{ url_for('static', filename='js/profile_editor.js') }}"></script>
 
-<div class="container">
+<div class="glass-panel">
     <div class="mb-3">
         {% with messages = get_flashed_messages() %}
         {% if messages %}
@@ -32,15 +32,7 @@
         </div>
         <div class="col-md-8">
             <div class="content-restricted-textblock" style="background-color: rgba(255, 255, 255, 0.8); padding: 20px; border-radius: 15px; color: #333;">
-                <h2 style="text-align: center; color: #000;">Hacker Profile</h2>
                 
-                <div style="background-color: #f8f9fa; padding: 15px; border-radius: 10px; margin-bottom: 20px;">
-                    <p><strong>Name:</strong> {{ current_user.name }}</p>
-                    <p><strong>Email:</strong> {{ current_user.email }}</p>
-                    <p><strong>About:</strong> {{ current_user.about }}</p>
-                    <p><strong>Invites:</strong> {{ current_user.invite_quota }}</p>
-                </div>
-
                 <form method="POST" enctype="multipart/form-data">
                     {{ form.hidden_tag() }}
                     
@@ -79,24 +71,7 @@
                         {{ form.avatar(class="form-control") }}
                     </div>
 
-                    <div class="mb-3">
-                        <h3>Profile Background</h3>
-                        {{ form.background.label(class="form-label") }}
-                        {{ form.background(class="form-select") }}
-                        
-                        <div class="background-preview mt-3" style="max-height: 400px; overflow-y: auto;">
-                            <div class="row" style="margin-right: 0;">
-                                {% for value, label in form.background.choices[1:] %}
-                                <div class="col-md-4 mb-3">
-                                    <div class="background-item" data-value="{{ value }}">
-                                        <img src="{{ url_for('static', filename='images/profilebackdrops/' + label) }}" 
-                                             class="img-thumbnail" alt="{{ label }}">
-                                    </div>
-                                </div>
-                                {% endfor %}
-                            </div>
-                        </div>
-                    </div>
+                   
 
                 </form>
             </div>
