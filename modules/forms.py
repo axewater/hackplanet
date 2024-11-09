@@ -18,6 +18,16 @@ from wtforms.widgets import ListWidget, CheckboxInput, TextArea
 from wtforms.fields import URLField, DateField
 from urllib.parse import urlparse
 
+class SystemMessageForm(FlaskForm):
+    type = SelectField('Message Type', choices=[
+        ('info', 'Information'),
+        ('warning', 'Warning'),
+        ('error', 'Error'),
+        ('success', 'Success')
+    ], validators=[DataRequired()])
+    contents = TextAreaField('Message Contents', validators=[DataRequired(), Length(max=1000)])
+    submit = SubmitField('Create Message')
+
 class LabForm(FlaskForm):
     name = StringField('Lab Name', validators=[DataRequired(), Length(max=128)])
     image = SelectField('Image', validators=[Optional()], choices=[])

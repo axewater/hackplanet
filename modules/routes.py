@@ -6,7 +6,7 @@ from config import Config
 from flask import Flask, render_template, flash, redirect, url_for, request, Blueprint, jsonify, session, abort, current_app, send_from_directory, send_file
 from flask import copy_current_request_context, g
 from flask_login import current_user, login_user, logout_user, login_required
-from flask_wtf import FlaskForm
+from flask_wtf import FlaskForm, Form
 from flask_mail import Message as MailMessage
 from wtforms.validators import DataRequired, Email, Length
 from sqlalchemy.exc import IntegrityError, OperationalError, SQLAlchemyError
@@ -27,18 +27,17 @@ from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
 from authlib.jose import jwt
 from urllib.parse import unquote
 
-
-
 from modules.forms import (
     UserPasswordForm, UserDetailForm, EditProfileForm, NewsletterForm, WhitelistForm, EditUserForm, ChallengeForm,
     UserManagementForm, CsrfProtectForm, LoginForm, ResetPasswordRequestForm, RegistrationForm, HostForm,
     CreateUserForm, UserPreferencesForm, InviteForm, CsrfForm, LabForm, FlagSubmissionForm, ChallengeSubmissionForm,
-    QuizForm, QuestionForm, FlagForm, CourseForm, ThemeUploadForm, UserThemePreferencesForm
+    QuizForm, QuestionForm, FlagForm, CourseForm, ThemeUploadForm, UserThemePreferencesForm, SystemMessageForm
 )
 
 from modules.models import (
     User, Whitelist, UserPreference, GlobalSettings, InviteToken, Lab, Challenge, Host,
-    Flag, UserProgress, FlagsObtained, ChallengesObtained, Quiz, Question, UserQuizProgress, UserQuestionProgress, Course
+    Flag, UserProgress, FlagsObtained, ChallengesObtained, Quiz, Question, UserQuizProgress, UserQuestionProgress, Course,
+    SystemMessage
 )
 from modules.utilities import (
     admin_required, _authenticate_and_redirect, square_image, send_email, send_password_reset_email, 
@@ -927,11 +926,33 @@ def admin_dashboard():
     pass
     return render_template('admin/admin_dashboard.html')
 
-@bp.route('/admin/messaging')
+@bp.route('/admin/messaging', methods=['GET', 'POST'])
 @login_required
 @admin_required
 def messaging():
-    return render_template('admin/messaging.html')
+    form = SystemMessageForm()
+    if form.validate_on_submit():
+        message = SystemMessage(
+            type=form.type.data,
+            contents=form.contents.data
+        )
+        db.session.add(message)
+        db.session.commit()
+        flash('System message created successfully!', 'success')
+        return redirect(url_for('main.messaging'))
+    
+    messages = SystemMessage.query.order_by(SystemMessage.created_at.desc()).all()
+    return render_template('admin/messaging.html', form=form, messages=messages)
+
+@bp.route('/admin/delete_message/<int:message_id>', methods=['POST'])
+@login_required
+@admin_required
+def delete_message(message_id):
+    message = SystemMessage.query.get_or_404(message_id)
+    db.session.delete(message)
+    db.session.commit()
+    flash('System message deleted successfully!', 'success')
+    return redirect(url_for('main.messaging'))
 
 @bp.route('/admin/file_manager')
 @login_required
