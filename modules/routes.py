@@ -1605,6 +1605,12 @@ def submit_flag():
             new_flag_obtained = FlagsObtained(user_id=current_user.id, flag_id=flag.id)
             db.session.add(new_flag_obtained)
 
+            # Create system message for flag completion
+            host = Host.query.get(host_id)
+            message_content = f"User {current_user.name} obtained {flag_type} flag on host {host.name}"
+            system_message = SystemMessage(type='success', contents=message_content)
+            db.session.add(system_message)
+
             # Update user's score (redundant now)
             current_user.score_total += flag.point_value
             db.session.commit()
@@ -1646,6 +1652,11 @@ def submit_challenge_flag():
             # Mark the challenge as completed
             existing_challenge.completed = True
             existing_challenge.completed_at = datetime.utcnow()
+
+            # Create system message for challenge completion
+            message_content = f"User {current_user.name} completed challenge {challenge.name}"
+            system_message = SystemMessage(type='success', contents=message_content)
+            db.session.add(system_message)
 
             db.session.commit()
 
