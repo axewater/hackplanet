@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const otherSubmitButton = document.querySelector(`button[onclick="submitFlag('${hostId}', '${otherFlagType}')"]`);
                 const otherFlagInput = document.getElementById(`${otherFlagType}-flag-${hostId}`);
                 if (otherSubmitButton && otherSubmitButton.disabled) {
-                    showCompletedBanner(hostId);
+                    showCompletedOverlay(hostId);
                     // Remove the other input field if both flags are completed
                     otherFlagInput.style.display = 'none';
                 }
@@ -71,6 +71,17 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
 
+
+    // Function to show completed overlay
+    function showCompletedOverlay(hostId) {
+        const host = document.querySelector(`.host[data-host-id="${hostId}"]`);
+        if (host) {
+            const overlay = document.createElement('div');
+            overlay.className = 'completed-overlay';
+            overlay.textContent = 'PWNED!';
+            host.appendChild(overlay);
+        }
+    }
 
     // Check for completed flags on page load
     document.querySelectorAll('.host').forEach(host => {
