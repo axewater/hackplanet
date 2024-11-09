@@ -22,10 +22,10 @@ def generate_historical_messages(dry_run=True):
         flag_achievements = FlagsObtained.query.all()
         for achievement in flag_achievements:
             try:
-                # Get related data
-                user = User.query.get(achievement.user_id)
-                flag = Flag.query.get(achievement.flag_id)
-                host = flag.host
+                # Get related data using Session.get()
+                user = db.session.get(User, achievement.user_id)
+                flag = db.session.get(Flag, achievement.flag_id)
+                host = flag.host if flag else None
                 
                 if not all([user, flag, host]):
                     print(f"Missing related data for flag achievement ID: {achievement.id}")
@@ -63,9 +63,9 @@ def generate_historical_messages(dry_run=True):
         challenge_achievements = ChallengesObtained.query.filter_by(completed=True).all()
         for achievement in challenge_achievements:
             try:
-                # Get related data
-                user = User.query.get(achievement.user_id)
-                challenge = Challenge.query.get(achievement.challenge_id)
+                # Get related data using Session.get()
+                user = db.session.get(User, achievement.user_id)
+                challenge = db.session.get(Challenge, achievement.challenge_id)
                 
                 if not all([user, challenge]):
                     print(f"Missing related data for challenge achievement ID: {achievement.id}")
