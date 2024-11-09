@@ -22,12 +22,25 @@
     <div class="glass-panel">
         <div class="chip">
             <h1>Hacker Profile: {{ user_data['name'] }}</h1>
+
         </div>
         <div class="row">
             <div class="col-md-4">
                 <img src="{{ url_for('static', filename=user_data['avatarpath']) }}" alt="Avatar" class="img-fluid rounded-circle mb-3" style="max-width: 200px;">
+
                 <div class="chip">
-                    <h3>{{ user_data['name'] }}</h3>
+                    <h3>{{ user_data['name'] }}                             {% set rank = user_data.get('rank', 0) %}
+                        {% if rank <= 3 %}
+                            <div class="trophy-container">
+                                {% if rank == 1 %}
+                                    <span class="trophy-icon gold"><i class="fas fa-trophy"></i></span>
+                                {% elif rank == 2 %}
+                                    <span class="trophy-icon silver"><i class="fas fa-trophy"></i></span>
+                                {% elif rank == 3 %}
+                                    <span class="trophy-icon bronze"><i class="fas fa-trophy"></i></span>
+                                {% endif %}
+                            </div>
+                        {% endif %}</h3>
                 </div>
                 <div class="dark-background p-3 mt-3">
                     <h4 class="text-light">Total Score:</h4>

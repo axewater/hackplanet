@@ -1774,6 +1774,11 @@ def user_progress():
 def user_details(user_id):
     user = User.query.get_or_404(user_id)
     
+    # Calculate user's rank
+    all_users = User.query.all()
+    sorted_users = sorted(all_users, key=lambda x: x.calculate_total_score(), reverse=True)
+    user_rank = next((i + 1 for i, u in enumerate(sorted_users) if u.id == user_id), 0)
+    
     # Fetch completed challenges with hint usage information
     completed_challenges = db.session.query(ChallengesObtained, Challenge).join(Challenge).filter(
         ChallengesObtained.user_id == user.id,
@@ -1796,6 +1801,7 @@ def user_details(user_id):
         'name': user.name,
         'avatarpath': user.avatarpath,
         'score_total': total_score,
+        'rank': user_rank,  # Add the user's rank to the data
     }
     
     # Fetch quiz results
