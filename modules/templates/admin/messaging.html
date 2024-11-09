@@ -39,9 +39,15 @@
                     <table class="table table-striped">
                         <thead>
                             <tr>
-                                <th>Type</th>
-                                <th>Contents</th>
-                                <th>Created</th>
+                                <th class="sortable" data-sort="type" style="cursor: pointer;">
+                                    Type <i class="fas fa-sort"></i>
+                                </th>
+                                <th class="sortable" data-sort="contents" style="cursor: pointer;">
+                                    Contents <i class="fas fa-sort"></i>
+                                </th>
+                                <th class="sortable" data-sort="created" data-default-sort="desc" style="cursor: pointer;">
+                                    Created <i class="fas fa-sort-down"></i>
+                                </th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -73,5 +79,89 @@
         </div>
     </div>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const table = document.querySelector('table');
+    const headers = table.querySelectorAll('th.sortable');
+    let currentSort = {
+        column: 'created',
+        direction: 'desc'
+    };
+
+    // Set initial sort state
+    headers.forEach(header => {
+        if (header.dataset.defaultSort) {
+            currentSort.column = header.dataset.sort;
+            currentSort.direction = header.dataset.defaultSort;
+            updateSortIcon(header, header.dataset.defaultSort);
+        }
+    });
+
+    headers.forEach(header => {
+        header.addEventListener('click', () => {
+            const column = header.dataset.sort;
+            const direction = currentSort.column === column && currentSort.direction === 'asc' ? 'desc' : 'asc';
+            
+            // Reset all sort icons
+            headers.forEach(h => {
+                h.querySelector('i').className = 'fas fa-sort';
+            });
+
+            // Update current sort icon
+            updateSortIcon(header, direction);
+
+            // Sort the table
+            sortTable(column, direction);
+
+            // Update current sort state
+            currentSort = { column, direction };
+        });
+    });
+
+    function updateSortIcon(header, direction) {
+        const icon = header.querySelector('i');
+        icon.className = `fas fa-sort-${direction === 'asc' ? 'up' : 'down'}`;
+    }
+
+    function sortTable(column, direction) {
+        const tbody = table.querySelector('tbody');
+        const rows = Array.from(tbody.querySelectorAll('tr'));
+
+        const sortedRows = rows.sort((a, b) => {
+            let aValue, bValue;
+
+            switch(column) {
+                case 'type':
+                    aValue = a.querySelector('td:first-child span').textContent;
+                    bValue = b.querySelector('td:first-child span').textContent;
+                    break;
+                case 'contents':
+                    aValue = a.querySelector('td:nth-child(2)').textContent;
+                    bValue = b.querySelector('td:nth-child(2)').textContent;
+                    break;
+                case 'created':
+                    aValue = new Date(a.querySelector('td:nth-child(3)').textContent);
+                    bValue = new Date(b.querySelector('td:nth-child(3)').textContent);
+                    break;
+                default:
+                    return 0;
+            }
+
+            if (direction === 'asc') {
+                return aValue > bValue ? 1 : -1;
+            } else {
+                return aValue < bValue ? 1 : -1;
+            }
+        });
+
+        // Clear and re-append sorted rows
+        while (tbody.firstChild) {
+            tbody.removeChild(tbody.firstChild);
+        }
+        sortedRows.forEach(row => tbody.appendChild(row));
+    }
+});
+</script>
 
 {% endblock %}
