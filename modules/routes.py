@@ -29,7 +29,7 @@ from urllib.parse import unquote
 
 from modules.forms import (
     UserPasswordForm, UserDetailForm, EditProfileForm, NewsletterForm, WhitelistForm, EditUserForm, ChallengeForm,
-    UserManagementForm, CsrfProtectForm, LoginForm, ResetPasswordRequestForm, RegistrationForm, HostForm,
+    UserManagementForm, CsrfProtectForm, LoginForm, ResetPasswordRequestForm, RegistrationForm, HostForm, RSSConfigForm,
     CreateUserForm, UserPreferencesForm, InviteForm, CsrfForm, LabForm, FlagSubmissionForm, ChallengeSubmissionForm,
     QuizForm, QuestionForm, FlagForm, CourseForm, ThemeUploadForm, UserThemePreferencesForm, SystemMessageForm
 )
@@ -2473,11 +2473,49 @@ def mute_message(message_id):
         })
 
 
+@bp.route('/admin/rss_config', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def rss_config():
+    form = RSSConfigForm()
+    settings = GlobalSettings.query.first()
+    
+    if form.validate_on_submit():
+        if not settings:
+            settings = GlobalSettings(settings={})
+            db.session.add(settings)
+        
+        settings.settings.update({
+            'feed_title': form.feed_title.data,
+            'feed_description': form.feed_description.data,
+            'feed_limit': form.feed_limit.data,
+            'enable_flag_wins': form.enable_flag_wins.data,
+            'enable_challenge_wins': form.enable_challenge_wins.data,
+            'enable_quiz_completions': form.enable_quiz_completions.data
+        })
+        db.session.commit()
+        flash('RSS feed settings updated successfully!', 'success')
+        return redirect(url_for('main.rss_config'))
+    
+    if request.method == 'GET' and settings:
+        form.feed_title.data = settings.settings.get('feed_title', 'HackPlanet.EU')
+        form.feed_description.data = settings.settings.get('feed_description', 'Flags and challenge wins from all players')
+        form.feed_limit.data = settings.settings.get('feed_limit', 50)
+        form.enable_flag_wins.data = settings.settings.get('enable_flag_wins', True)
+        form.enable_challenge_wins.data = settings.settings.get('enable_challenge_wins', True)
+        form.enable_quiz_completions.data = settings.settings.get('enable_quiz_completions', True)
+    
+    current_settings = settings.settings if settings else {}
+    return render_template('admin/rss_config.html', form=form, current_settings=current_settings)
+
 @bp.route('/rss')
 def system_messages_feed():
+    settings = GlobalSettings.query.first()
+    feed_settings = settings.settings if settings else {}
+    
     fg = FeedGenerator()
-    fg.title('HackPlanet.EU')
-    fg.description('Flags and challenge wins from all players')
+    fg.title(feed_settings.get('feed_title', 'HackPlanet.EU'))
+    fg.description(feed_settings.get('feed_description', 'Flags and challenge wins from all players'))
     fg.link(href=request.url_root)
     fg.language('en')
 

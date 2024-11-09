@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="admin-panel">
+    <div class="hackplanet_titles">
+        <h1>RSS Feed Configuration</h1>
+    </div>
+    
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">RSS Feed Settings</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="mb-3">
+                        {{ form.feed_title.label(class="form-label") }}
+                        {{ form.feed_title(class="form-control") }}
+                        {% if form.feed_title.errors %}
+                            {% for error in form.feed_title.errors %}
+                                <div class="invalid-feedback d-block">{{ error }}</div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form.feed_description.label(class="form-label") }}
+                        {{ form.feed_description(class="form-control") }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form.feed_limit.label(class="form-label") }}
+                        {{ form.feed_limit(class="form-control") }}
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="form-check">
+                            {{ form.enable_flag_wins(class="form-check-input") }}
+                            {{ form.enable_flag_wins.label(class="form-check-label") }}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="form-check">
+                            {{ form.enable_challenge_wins(class="form-check-input") }}
+                            {{ form.enable_challenge_wins.label(class="form-check-label") }}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="form-check">
+                            {{ form.enable_quiz_completions(class="form-check-input") }}
+                            {{ form.enable_quiz_completions.label(class="form-check-label") }}
+                        </div>
+                    </div>
+
+                    {{ form.submit(class="btn btn-primary") }}
+                </form>
+            </div>
+        </div>
+
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="mb-0">RSS Feed Information</h5>
+            </div>
+            <div class="card-body">
+                <p>RSS Feed URL: <code>{{ url_for('main.system_messages_feed', _external=True) }}</code></p>
+                <p>Current Settings:</p>
+                <ul>
+                    <li>Title: {{ current_settings.feed_title }}</li>
+                    <li>Description: {{ current_settings.feed_description }}</li>
+                    <li>Item Limit: {{ current_settings.feed_limit }}</li>
+                    <li>Flag Wins: {{ 'Enabled' if current_settings.enable_flag_wins else 'Disabled' }}</li>
+                    <li>Challenge Wins: {{ 'Enabled' if current_settings.enable_challenge_wins else 'Disabled' }}</li>
+                    <li>Quiz Completions: {{ 'Enabled' if current_settings.enable_quiz_completions else 'Disabled' }}</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
