@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+    <div class="glass-panel">
+        <h1 class="text-center mb-4">Hacking Labs Guide</h1>
+        
+        <div class="row">
+            <div class="col-md-8 offset-md-2">
+                <h3>Working with Labs</h3>
+                <p>Our hacking labs provide realistic environments for practicing penetration testing skills.</p>
+                
+                <h4>Lab Features</h4>
+                <ul>
+                    <li>Isolated network environments</li>
+                    <li>Multiple vulnerable machines</li>
+                    <li>VPN access</li>
+                    <li>Various difficulty levels</li>
+                </ul>
+                
+                <h4>Safety Guidelines</h4>
+                <ul>
+                    <li>Only attack machines within your assigned lab</li>
+                    <li>Don't share solutions or flags</li>
+                    <li>Report any technical issues to administrators</li>
+                </ul>
+                
+                <a href="{{ url_for('main.hacking_labs') }}" class="btn btn-warning mt-3">Access Labs</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

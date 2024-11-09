@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+    <div class="glass-panel">
+        <h1 class="text-center mb-4">Platform Features</h1>
+        
+        <div class="row">
+            <div class="col-md-8 offset-md-2">
+                <h3>Key Features</h3>
+                
+                <h4>User Profile</h4>
+                <ul>
+                    <li>Customize your avatar</li>
+                    <li>Track progress</li>
+                    <li>View achievements</li>
+                    <li>Manage account settings</li>
+                </ul>
+                
+                <h4>Communication</h4>
+                <ul>
+                    <li>System messages</li>
+                    <li>Progress notifications</li>
+                    <li>Achievement alerts</li>
+                </ul>
+                
+                <h4>Customization</h4>
+                <ul>
+                    <li>Theme selection</li>
+                    <li>Display preferences</li>
+                    <li>Notification settings</li>
+                </ul>
+                
+                <a href="{{ url_for('main.settings_profile_edit') }}" class="btn btn-danger mt-3">Manage Profile</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

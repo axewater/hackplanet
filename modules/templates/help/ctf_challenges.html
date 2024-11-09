@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+    <div class="glass-panel">
+        <h1 class="text-center mb-4">CTF Challenges</h1>
+        
+        <div class="row">
+            <div class="col-md-8 offset-md-2">
+                <h3>Understanding CTF Challenges</h3>
+                <p>Capture The Flag (CTF) challenges test your ability to find and obtain flags hidden within target systems. Each challenge requires different skills and approaches.</p>
+
+                <h4>Flag Locations</h4>
+                <p>In our hacking labs, there are two types of flags to find on each target host:</p>
+                <ul>
+                    <li><strong>User Flag:</strong> Located at:
+                        <ul>
+                            <li>Linux: <code>/home/user/userflag.txt</code></li>
+                            <li>Windows: <code>%username%/desktop/userflag.txt</code></li>
+                        </ul>
+                    </li>
+                    <li><strong>Root Flag:</strong> Located at:
+                        <ul>
+                            <li>Linux: <code>/root/rootflag.txt</code></li>
+                            <li>Windows: <code>users\administrator\desktop\rootflag.txt</code></li>
+                        </ul>
+                    </li>
+                </ul>
+
+                <h4>Flag Submission</h4>
+                <ul>
+                    <li>Submit flags through the web interface on the Hacking Labs page</li>
+                    <li>Each host has different point values for user and root flags</li>
+                    <li>Points are awarded immediately upon successful submission</li>
+                    <li>Higher difficulty hosts offer more points</li>
+                </ul>
+
+                <h4>Challenge Types</h4>
+                <ul>
+                    <li>Web Exploitation</li>
+                    <li>Cryptography</li>
+                    <li>Reverse Engineering</li>
+                    <li>Network Security</li>
+                    <li>Forensics</li>
+                </ul>
+
+                <div class="alert alert-info mt-4">
+                    <strong>Tip:</strong> Always start with enumeration and information gathering before attempting to obtain flags.
+                </div>
+                
+                <a href="{{ url_for('main.challenges') }}" class="btn btn-success mt-3">View Challenges</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

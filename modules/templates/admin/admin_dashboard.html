@@ -109,12 +109,15 @@
                     </a>
                     <span class="button-label">Messages</span>
                 </div>
+                {% if enable_newsletter %}
                 <div class="admin-button-item">
-                    <a href="{{ url_for('main.rss_config') }}" class="btn btn-circle">
-                        <i class="fas fa-rss"></i>
+                    <a href="{{ url_for('main.newsletter') }}" class="btn btn-circle">
+                        <i class="fas fa-newspaper"></i>
                     </a>
-                    <span class="button-label">RSS</span>
+                    <span class="button-label">Newsletter</span>
                 </div>
+                {% endif %}
+
             </div>
         </div>
 
@@ -135,14 +138,12 @@
         <div class="admin-section">
             <h3><i class="fas fa-chart-line"></i> Monitoring & Reports</h3>
             <div class="admin-buttons">
-                {% if enable_newsletter %}
                 <div class="admin-button-item">
-                    <a href="{{ url_for('main.newsletter') }}" class="btn btn-circle">
-                        <i class="fas fa-newspaper"></i>
+                    <a href="{{ url_for('main.rss_config') }}" class="btn btn-circle">
+                        <i class="fas fa-rss"></i>
                     </a>
-                    <span class="button-label">Newsletter</span>
+                    <span class="button-label">RSS</span>
                 </div>
-                {% endif %}
                 <div class="admin-button-item">
                     <a href="https://hpagent.hackplanet.eu" class="btn btn-circle">
                         <i class="fas fa-eye"></i>

@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+    <div class="glass-panel">
+        <h1 class="text-center mb-4">Getting Started with HackPlanet.EU</h1>
+        
+        <div class="row">
+            <div class="col-md-8 offset-md-2">
+                <h3>Welcome to HackPlanet.EU</h3>
+                <p>HackPlanet.EU is a cybersecurity learning platform designed to help you develop and test your hacking skills in a safe, legal environment.</p>
+                
+                <h4>Prerequisites</h4>
+                <ul>
+                    <li>A machine or virtual machine running Kali Linux</li>
+                    <li>OpenVPN client installed (for Hacking Labs access)</li>
+                    <li>Basic understanding of cybersecurity concepts</li>
+                </ul>
+
+                <h4>Getting Started Steps</h4>
+                <ul>
+                    <li><strong>Hacking Labs:</strong>
+                        <ul>
+                            <li>Install OpenVPN on your Kali Linux system</li>
+                            <li>Download the OVPN file from the Hacking Labs page</li>
+                            <li>Connect to the lab using OpenVPN</li>
+                            <li>Start exploring and hacking the lab machines</li>
+                        </ul>
+                    </li>
+                    <li><strong>Crypto Challenges:</strong>
+                        <ul>
+                            <li>Access the /ctf/challenges page</li>
+                            <li>No VPN connection required</li>
+                            <li>Download challenge files if provided</li>
+                            <li>Submit flags to earn points</li>
+                        </ul>
+                    </li>
+                    <li><strong>Quizzes:</strong>
+                        <ul>
+                            <li>One-time attempts only</li>
+                            <li>Points awarded for correct answers</li>
+                            <li>Review explanations after completion</li>
+                        </ul>
+                    </li>
+                </ul>
+
+                <div class="alert alert-info mt-4">
+                    <strong>Note:</strong> You can participate in Crypto Challenges and Quizzes without VPN access. Hacking Labs require VPN connection.
+                </div>
+                
+                <a href="{{ url_for('main.study_room') }}" class="btn btn-primary mt-3">Explore Study Room</a>
+                <a href="{{ url_for('main.help_page') }}" class="btn btn-secondary mt-3">Explore Help Section</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

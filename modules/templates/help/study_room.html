@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+    <div class="glass-panel">
+        <h1 class="text-center mb-4">Study Room Guide</h1>
+        
+        <div class="row">
+            <div class="col-md-8 offset-md-2">
+                <h3>Learning Resources</h3>
+                <p>The Study Room provides structured learning materials to help you develop your cybersecurity skills.</p>
+                
+                <h4>Available Resources</h4>
+                <ul>
+                    <li>Video tutorials</li>
+                    <li>Written guides</li>
+                    <li>Practice exercises</li>
+                    <li>Downloadable materials</li>
+                    <li>External course recommendations</li>
+                </ul>
+                
+                <h4>Using the Study Room</h4>
+                <ul>
+                    <li>Browse by category</li>
+                    <li>Filter by difficulty level</li>
+                    <li>Track your progress</li>
+                    <li>Access recommended learning paths</li>
+                </ul>
+                
+                <h4>Study Tips</h4>
+                <ul>
+                    <li>Start with fundamentals</li>
+                    <li>Practice regularly</li>
+                    <li>Take detailed notes</li>
+                    <li>Join study groups</li>
+                </ul>
+                
+                <a href="{{ url_for('main.study_room') }}" class="btn btn-info mt-3">Access Study Room</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
