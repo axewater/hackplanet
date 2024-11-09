@@ -26,7 +26,14 @@
         </div>
         <div class="row">
             <div class="col-md-4">
-                <img src="{{ url_for('static', filename=user_data['avatarpath']) }}" alt="Avatar" class="img-fluid rounded-circle mb-3" style="max-width: 200px;">
+                <div class="position-relative">
+                    <img src="{{ url_for('static', filename=user_data['avatarpath']) }}" alt="Avatar" class="img-fluid rounded-circle mb-3" style="max-width: 200px;">
+                    {% if current_user.id == user.id %}
+                        <a href="{{ url_for('main.settings_profile_edit') }}" class="btn btn-primary btn-sm position-absolute" style="top: 0; right: 0;">
+                            <i class="fas fa-edit"></i> Edit Avatar
+                        </a>
+                    {% endif %}
+                </div>
 
                 <div class="chip">
                     <h3>{{ user_data['name'] }}                             {% set rank = user_data.get('rank', 0) %}
