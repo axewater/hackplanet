@@ -5,6 +5,11 @@
     <div class="glass-panel">
         <h1>HackPlanet Messages</h1>
         
+        <div class="mb-3">
+            <button class="btn btn-primary" onclick="markAllAsRead()">Mark All as Read</button>
+            <button class="btn btn-danger" onclick="hideAllMessages()">Hide All Messages</button>
+        </div>
+        
         {% with messages = get_flashed_messages() %}
         {% if messages %}
             <div class="alert alert-info">
@@ -94,6 +99,55 @@ function muteMessage(messageId) {
                 const messageCard = document.querySelector(`.message-card[data-message-id="${messageId}"]`);
                 messageCard.remove();
                 updateUnreadCount(data.unread_count);
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+}
+
+function markAllAsRead() {
+    if (confirm('Mark all messages as read?')) {
+        fetch('/mark_all_messages_read', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token() }}'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.querySelectorAll('.message-card').forEach(card => {
+                    card.classList.add('message-read');
+                    const toggleButton = card.querySelector('.toggle-read');
+                    toggleButton.textContent = 'Mark as Unread';
+                    toggleButton.classList.replace('btn-primary', 'btn-secondary');
+                });
+                updateUnreadCount(0);
+                location.reload();
+            }
+        })
+        .catch(error => console.error('Error:', error));
+    }
+}
+
+function hideAllMessages() {
+    if (confirm('Hide all messages? This action cannot be undone.')) {
+        fetch('/hide_all_messages', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token() }}'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                document.querySelectorAll('.message-card').forEach(card => {
+                    card.remove();
+                });
+                updateUnreadCount(0);
+                location.reload();
             }
         })
         .catch(error => console.error('Error:', error));

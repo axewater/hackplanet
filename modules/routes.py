@@ -2479,6 +2479,56 @@ def mute_message(message_id):
         })
 
 
+@bp.route('/mark_all_messages_read', methods=['POST'])
+@login_required
+def mark_all_messages_read():
+    try:
+        messages = SystemMessage.query.all()
+        for message in messages:
+            if not message.is_read_by(current_user):
+                message.mark_as_read(current_user)
+        db.session.commit()
+        return jsonify({'success': True})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+@bp.route('/hide_all_messages', methods=['POST'])
+@login_required
+def hide_all_messages():
+    try:
+        messages = SystemMessage.query.all()
+        for message in messages:
+            # Check if entry exists
+            existing = db.session.query(message_read_status).filter_by(
+                user_id=current_user.id,
+                message_id=message.id
+            ).first()
+            
+            if existing:
+                # Update existing entry
+                db.session.execute(
+                    message_read_status.update().where(
+                        (message_read_status.c.user_id == current_user.id) &
+                        (message_read_status.c.message_id == message.id)
+                    ).values(muted=True)
+                )
+            else:
+                # Create new entry
+                db.session.execute(
+                    message_read_status.insert().values(
+                        user_id=current_user.id,
+                        message_id=message.id,
+                        muted=True
+                    )
+                )
+        db.session.commit()
+        return jsonify({'success': True})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+
 @bp.route('/admin/rss_config', methods=['GET', 'POST'])
 @login_required
 @admin_required
