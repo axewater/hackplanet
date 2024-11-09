@@ -358,12 +358,13 @@ class SystemMessage(db.Model):
     __tablename__ = 'system_messages'
 
     id = db.Column(db.Integer, primary_key=True)
-    uuid = db.Column(db.String(36), unique=True, nullable=False, default=str(uuid4()))
+    uuid = db.Column(db.String(36), unique=True, nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
     type = db.Column(db.String(128), nullable=False)
     contents = db.Column(db.Text, nullable=False)
 
     def __init__(self, type, contents):
+        self.uuid = str(uuid4())  # Generate a new UUID for each instance
         self.type = type
         self.contents = contents
 
