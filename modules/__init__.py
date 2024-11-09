@@ -14,12 +14,17 @@ from modules.routes_integrations import int_bp
 
 from urllib.parse import urlparse
 from flask_caching import Cache
-
+from flask_limiter import Limiter
+from flask_limiter.util import get_remote_address
 
 db = SQLAlchemy()
 login_manager = LoginManager()
 mail = Mail()
 cache = Cache(config={'CACHE_TYPE': 'simple'})
+limiter = Limiter(
+    key_func=get_remote_address,
+    storage_uri="memory://"
+)
 
 
 def check_postgres_port_open(host, port, retries=5, delay=2):
@@ -62,6 +67,7 @@ def create_app():
     mail.init_app(app)
     login_manager.login_view = 'main.login'
     cache.init_app(app)
+    limiter.init_app(app)
 
     with app.app_context():
         from . import routes, models

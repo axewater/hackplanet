@@ -17,7 +17,7 @@ from werkzeug.utils import secure_filename
 from PIL import Image
 from io import BytesIO
 from werkzeug.security import generate_password_hash, check_password_hash
-from modules import db, mail, cache
+from modules import db, mail, cache, limiter
 from functools import wraps
 from uuid import uuid4
 from datetime import datetime, timedelta, timezone
@@ -2516,6 +2516,7 @@ def rss_config():
     return render_template('admin/rss_config.html', form=form, current_settings=config)
 
 @bp.route('/rss')
+@limiter.limit("1 per minute", error_message="Please wait a minute before requesting the RSS feed again.")
 def system_messages_feed():
     config = RSSConfig.query.first()
     if not config:
