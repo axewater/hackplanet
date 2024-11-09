@@ -1,4 +1,11 @@
-/* Existing styles... */
+body {
+    background-image: url('/static/newstyle/hackplanet_backdrop.jpg'); 
+    background-size: cover;
+    background-repeat: no-repeat;
+
+    font-family: Arial, sans-serif;
+    color: white;
+}
 
 /* Admin Dashboard Specific Styles */
 .admin-section {
