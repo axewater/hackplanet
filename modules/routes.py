@@ -2740,10 +2740,10 @@ def check_leaderboard_position_change(user_id):
     user_position = next((i + 1 for i, u in enumerate(sorted_users) if u.id == user_id), 0)
     
     if user_position in [1, 2, 3]:
-        position_text = {1: "first", 2: "second", 3: "third"}[user_position]
+        position_text = {1: "🏆1st", 2: "🥈2nd", 3: "🥉3rd"}[user_position]
         user = User.query.get(user_id)
-        message_content = f"User {user.name} has moved into {position_text} position on the leaderboard!"
-        print(f"LEADERBOARD: {message_content}")  # Console logging
+        message_content = f"🎉 User {user.name} has moved into {position_text} position on the leaderboard! 🌟"
+        print(f"LEADERBOARD: {message_content}")
         
         # Create system message
         system_message = SystemMessage(type='leaderboard', contents=message_content)
@@ -2779,7 +2779,7 @@ def submit_flag():
 
             # Create system message for flag completion
             host = Host.query.get(host_id)
-            message_content = f"User {current_user.name} obtained {flag_type} flag on host {host.name}"
+            message_content = f"🚩 User {current_user.name} captured {flag_type} flag on host {host.name} 🎉"
             system_message = SystemMessage(type='flag_win', contents=message_content)
             db.session.add(system_message)
 
@@ -2791,7 +2791,7 @@ def submit_flag():
             return jsonify({'success': True, 'message': 'Flag submitted successfully!'}), 200
         else:
             # Create system message for failed attempt
-            message_content = f"User {current_user.name} failed {flag_type} flag attempt on host {host.name}"
+            message_content = f"⚠️ User {current_user.name} failed {flag_type} flag attempt on host {host.name} 🔄"
             system_message = SystemMessage(type='flag_fail', contents=message_content)
             db.session.add(system_message)
             db.session.commit()
@@ -2832,7 +2832,7 @@ def submit_challenge_flag():
             existing_challenge.completed_at = datetime.utcnow()
 
             # Create system message for challenge completion
-            message_content = f"User {current_user.name} completed challenge {challenge.name}"
+            message_content = f"🎯 User {current_user.name} completed challenge {challenge.name} 🎊"
             system_message = SystemMessage(type='challenge_win', contents=message_content)
             db.session.add(system_message)
 
@@ -2852,7 +2852,7 @@ def submit_challenge_flag():
             }), 200
         else:
             # Create system message for failed attempt
-            message_content = f"User {current_user.name} failed attempt on challenge {challenge.name}"
+            message_content = f"❌ User {current_user.name} failed attempt on challenge {challenge.name} 😅"
             system_message = SystemMessage(type='challenge_fail', contents=message_content)
             db.session.add(system_message)
             db.session.commit()
