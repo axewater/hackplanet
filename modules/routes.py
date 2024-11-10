@@ -2330,6 +2330,27 @@ def utility_processor():
         return 0
     return dict(get_unread_message_count=get_unread_message_count)
 
+@bp.route('/update_message_preference', methods=['POST'])
+@login_required
+def update_message_preference():
+    data = request.json
+    preference_type = data.get('preference_type')
+    value = data.get('value')
+
+    if not current_user.preferences:
+        current_user.preferences = UserPreference(user_id=current_user.id)
+        db.session.add(current_user.preferences)
+
+    if preference_type == 'leaderboard':
+        current_user.preferences.auto_read_leaderboard = value
+    elif preference_type == 'wins':
+        current_user.preferences.auto_read_wins = value
+    elif preference_type == 'information':
+        current_user.preferences.auto_read_information = value
+
+    db.session.commit()
+    return jsonify({'success': True})
+
 @bp.route('/system_messages')
 @login_required
 def system_messages():

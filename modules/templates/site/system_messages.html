@@ -9,6 +9,34 @@
             <button class="btn btn-primary" onclick="markAllAsRead()">Mark All as Read</button>
             <button class="btn btn-danger" onclick="hideAllMessages()">Hide All Messages</button>
         </div>
+
+        <div class="message-preferences mb-3">
+            <h4>Message Preferences</h4>
+            <div class="form-check">
+                <input type="checkbox" class="form-check-input" id="autoReadLeaderboard" 
+                       {% if current_user.preferences and current_user.preferences.auto_read_leaderboard %}checked{% endif %}
+                       onchange="updateMessagePreference('leaderboard')">
+                <label class="form-check-label" for="autoReadLeaderboard">
+                    Auto-read Leaderboard Messages
+                </label>
+            </div>
+            <div class="form-check">
+                <input type="checkbox" class="form-check-input" id="autoReadWins" 
+                       {% if current_user.preferences and current_user.preferences.auto_read_wins %}checked{% endif %}
+                       onchange="updateMessagePreference('wins')">
+                <label class="form-check-label" for="autoReadWins">
+                    Auto-read Flag & Challenge Win Messages
+                </label>
+            </div>
+            <div class="form-check">
+                <input type="checkbox" class="form-check-input" id="autoReadInformation" 
+                       {% if current_user.preferences and current_user.preferences.auto_read_information %}checked{% endif %}
+                       onchange="updateMessagePreference('information')">
+                <label class="form-check-label" for="autoReadInformation">
+                    Auto-read Information Messages
+                </label>
+            </div>
+        </div>
         
         {% with messages = get_flashed_messages() %}
         {% if messages %}
@@ -53,6 +81,27 @@
 </div>
 
 <script>
+function updateMessagePreference(type) {
+    fetch('/update_message_preference', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify({
+            preference_type: type,
+            value: document.getElementById(`autoRead${type.charAt(0).toUpperCase() + type.slice(1)}`).checked
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        }
+    })
+    .catch(error => console.error('Error:', error));
+}
+
 function toggleMessageRead(messageId) {
     fetch(`/toggle_message_read/${messageId}`, {
         method: 'POST',

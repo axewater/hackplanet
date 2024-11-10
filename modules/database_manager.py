@@ -132,16 +132,24 @@ class DatabaseManager:
             self.engine.dispose()
 
     def add_background_id_to_user_preferences(self):
-        add_column_sql = """
-        ALTER TABLE user_preferences
-        ADD COLUMN IF NOT EXISTS background_id INTEGER REFERENCES profile_backgrounds(id);
-        """
-        print("Adding background_id column to user_preferences table")
+        add_column_sql = [
+            """ALTER TABLE user_preferences 
+               ADD COLUMN IF NOT EXISTS background_id INTEGER REFERENCES profile_backgrounds(id);""",
+            """ALTER TABLE user_preferences 
+               ADD COLUMN IF NOT EXISTS auto_read_leaderboard BOOLEAN DEFAULT FALSE;""",
+            """ALTER TABLE user_preferences 
+               ADD COLUMN IF NOT EXISTS auto_read_wins BOOLEAN DEFAULT FALSE;""",
+            """ALTER TABLE user_preferences 
+               ADD COLUMN IF NOT EXISTS auto_read_information BOOLEAN DEFAULT FALSE;"""
+        ]
+        print("Adding background_id and message preferences columns to user_preferences table")
         try:
             with self.engine.connect() as connection:
-                connection.execute(text(add_column_sql))
+                # Execute each SQL statement separately
+                for sql in add_column_sql:
+                    connection.execute(text(sql))
                 connection.commit()
-            print("Column 'background_id' successfully added to the 'user_preferences' table.")
+            print("Columns successfully added to the 'user_preferences' table.")
         except Exception as e:
             print(f"An error occurred: {e}")
         finally:

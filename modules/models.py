@@ -169,6 +169,9 @@ class UserPreference(db.Model):
     theme = db.Column(db.String(50), default='default')
     background_id = db.Column(db.Integer, db.ForeignKey('profile_backgrounds.id'), nullable=True)
     background = db.relationship('ProfileBackground', backref=db.backref('users', lazy=True))
+    auto_read_leaderboard = db.Column(db.Boolean, default=False)
+    auto_read_wins = db.Column(db.Boolean, default=False)
+    auto_read_information = db.Column(db.Boolean, default=False)
 
     user = db.relationship('User', back_populates='preferences')
 
