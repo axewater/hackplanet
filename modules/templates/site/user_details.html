@@ -1,32 +1,10 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<style>
-.user-profile-container {
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    padding: 20px;
-    min-height: 100vh;
-    position: relative;
-}
-
-.user-profile-container::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    z-index: 0;
-}
-
-.glass-panel {
-    position: relative;
-    z-index: 1;
-}
-</style>
+<link rel="stylesheet" href="{{ url_for('static', filename='themes/default/css/user_details.css') }}">
+{% if current_theme and current_theme != 'default' %}
+<link rel="stylesheet" href="{{ url_for('static', filename='themes/' + current_theme + '/css/user_details.css') }}">
+{% endif %}
 
 <div class="user-profile-container" 
      style="background-image: url('{{ url_for('static', filename='images/profilebackdrops/' + (user.preferences.background.filename if user.preferences and user.preferences.background else 'default_profile_background.jpg')) }}');">
@@ -40,12 +18,7 @@
 {% endif %}
 {% endwith %}
 <style>
-    .hint-used {
-        background-color: #fff3cd;
-    }
-    .hint-used .badge {
-        color: #856404;
-    }
+
 </style>
 <div class="container">
     <div class="glass-panel">
@@ -53,6 +26,15 @@
             <h1>Hacker Profile: {{ user_data['name'] }}</h1>
 
         </div>
+        <div>
+            <a href="{{ url_for('main.leaderboard') }}" class="btn btn-primary mt-4">Back to Leaderboard</a>
+
+            <a href="{{ url_for('main.settings_backdrop') }}" class="btn btn-secondary btn-sm">
+                <i class="fas fa-image"></i> Change Background
+            </a>
+            
+        </div>
+
         <div class="row">
             <div class="col-md-4">
                 <div class="position-relative">
@@ -62,16 +44,14 @@
                             <a href="{{ url_for('main.settings_profile_edit') }}" class="btn btn-primary btn-sm mb-2">
                                 <i class="fas fa-edit"></i> Edit Avatar
                             </a>
-
                         </div>
                     {% endif %}
                 </div>
 
-                      
-                        {% set rank = user_data.get('rank', 0) %}
-                        {% if rank <= 3 %}
+                <div class="text-center">
+                    {% set rank = user_data.get('rank', 0) %}
+                    {% if rank <= 3 %}
                         <div class="chip">
-                            <h3>   
                             <div class="trophy-container">
                                 {% if rank == 1 %}
                                     <span class="trophy-icon gold"><i class="fas fa-trophy"></i></span>
@@ -82,14 +62,10 @@
                                 {% endif %}
                             </div>
                         </div>
-                        {% endif %}</h3>
-
+                        {% endif %}
+                    </div>
                 
-                <div>
-                    <a href="{{ url_for('main.settings_backdrop') }}" class="btn btn-secondary btn-sm">
-                        <i class="fas fa-image"></i> Change Background
-                    </a>
-                </div>
+
                 <div class="dark-background p-3 mt-3">
                     <h4 class="text-light">Total Score:</h4>
                     <h2 class="text-light">{{ user_data['score_total'] }}</h2>
@@ -170,7 +146,6 @@
                 </div>
             </div>
         </div>
-        <a href="{{ url_for('main.leaderboard') }}" class="btn btn-primary mt-4">Back to Leaderboard</a>
     </div>
 </div>
 {% endblock %}
