@@ -1611,115 +1611,6 @@ def quiz_results(quiz_id):
     
     return render_template('site/quiz_results.html', quiz=quiz, user_progress=user_progress)
 
-@bp.route('/submit_flag', methods=['POST'])
-@login_required
-def submit_flag():
-    data = request.json
-    host_id = data.get('host_id')
-    flag_type = data.get('flag_type')
-    submitted_flag = data.get('flag')
-
-    if not all([host_id, flag_type, submitted_flag]):
-        return jsonify({'success': False, 'message': 'Missing required parameters'}), 400
-
-    try:
-        flag = Flag.query.filter_by(host_id=host_id, type=flag_type).first()
-        if not flag:
-            return jsonify({'success': False, 'message': 'Invalid flag submission'}), 400
-
-        host = Host.query.get(host_id)
-        if flag.uuid == submitted_flag:
-            # Check if the user has already obtained this flag
-            existing_flag = FlagsObtained.query.filter_by(user_id=current_user.id, flag_id=flag.id).first()
-            if existing_flag:
-                return jsonify({'success': False, 'message': 'You have already obtained this flag'}), 400
-
-            # Create a new FlagsObtained record
-            new_flag_obtained = FlagsObtained(user_id=current_user.id, flag_id=flag.id)
-            db.session.add(new_flag_obtained)
-
-            # Create system message for flag completion
-            host = Host.query.get(host_id)
-            message_content = f"User {current_user.name} obtained {flag_type} flag on host {host.name}"
-            system_message = SystemMessage(type='flag_win', contents=message_content)
-            db.session.add(system_message)
-
-            # Update user's score (redundant now)
-            current_user.score_total += flag.point_value
-            db.session.commit()
-
-            return jsonify({'success': True, 'message': 'Flag submitted successfully!', 'new_score': current_user.score_total}), 200
-        else:
-            # Create system message for failed attempt
-            message_content = f"User {current_user.name} failed {flag_type} flag attempt on host {host.name}"
-            system_message = SystemMessage(type='flag_fail', contents=message_content)
-            db.session.add(system_message)
-            db.session.commit()
-            return jsonify({'success': False, 'message': 'Incorrect flag'}), 400
-
-    except Exception as e:
-        db.session.rollback()
-        print(f"Error submitting flag: {str(e)}")
-        return jsonify({'success': False, 'message': 'An error occurred while submitting the flag'}), 500
-
-@bp.route('/submit_challenge_flag', methods=['POST'])
-@login_required
-def submit_challenge_flag():
-    data = request.json
-    challenge_id = data.get('challenge_id')
-    submitted_flag = data.get('flag')
-
-    if not all([challenge_id, submitted_flag]):
-        return jsonify({'success': False, 'message': 'Missing required parameters'}), 400
-
-    try:
-        challenge = Challenge.query.get(challenge_id)
-        if not challenge:
-            return jsonify({'success': False, 'message': 'Invalid challenge'}), 400
-
-        if challenge.flag_uuid == submitted_flag:
-            # Check if the user has already completed this challenge
-            existing_challenge = ChallengesObtained.query.filter_by(user_id=current_user.id, challenge_id=challenge.id).first()
-            if existing_challenge:
-                if existing_challenge.completed:
-                    return jsonify({'success': False, 'message': 'You have already completed this challenge'}), 400
-            else:
-                existing_challenge = ChallengesObtained(user_id=current_user.id, challenge_id=challenge.id)
-                db.session.add(existing_challenge)
-
-            # Mark the challenge as completed
-            existing_challenge.completed = True
-            existing_challenge.completed_at = datetime.utcnow()
-
-            # Create system message for challenge completion
-            message_content = f"User {current_user.name} completed challenge {challenge.name}"
-            system_message = SystemMessage(type='challenge_win', contents=message_content)
-            db.session.add(system_message)
-
-            db.session.commit()
-
-            # Calculate the new total score
-            new_score = current_user.calculate_total_score()
-
-            return jsonify({
-                'success': True, 
-                'message': 'Challenge completed successfully!', 
-                'new_score': new_score,
-                'points_earned': challenge.point_value
-            }), 200
-        else:
-            # Create system message for failed attempt
-            message_content = f"User {current_user.name} failed attempt on challenge {challenge.name}"
-            system_message = SystemMessage(type='challenge_fail', contents=message_content)
-            db.session.add(system_message)
-            db.session.commit()
-            return jsonify({'success': False, 'message': 'Incorrect flag'}), 400
-
-    except Exception as e:
-        db.session.rollback()
-        print(f"Error submitting challenge flag: {str(e)}")
-        return jsonify({'success': False, 'message': 'An error occurred while submitting the flag'}), 500
-
 @bp.route('/ctf/hacking_labs')
 @login_required
 def hacking_labs():
@@ -2838,3 +2729,113 @@ def toggle_background(background_id):
     background.enabled = not background.enabled
     db.session.commit()
     return jsonify({'success': True})
+
+
+@bp.route('/submit_flag', methods=['POST'])
+@login_required
+def submit_flag():
+    data = request.json
+    host_id = data.get('host_id')
+    flag_type = data.get('flag_type')
+    submitted_flag = data.get('flag')
+
+    if not all([host_id, flag_type, submitted_flag]):
+        return jsonify({'success': False, 'message': 'Missing required parameters'}), 400
+
+    try:
+        flag = Flag.query.filter_by(host_id=host_id, type=flag_type).first()
+        if not flag:
+            return jsonify({'success': False, 'message': 'Invalid flag submission'}), 400
+
+        host = Host.query.get(host_id)
+        if flag.uuid == submitted_flag:
+            # Check if the user has already obtained this flag
+            existing_flag = FlagsObtained.query.filter_by(user_id=current_user.id, flag_id=flag.id).first()
+            if existing_flag:
+                return jsonify({'success': False, 'message': 'You have already obtained this flag'}), 400
+
+            # Create a new FlagsObtained record
+            new_flag_obtained = FlagsObtained(user_id=current_user.id, flag_id=flag.id)
+            db.session.add(new_flag_obtained)
+
+            # Create system message for flag completion
+            host = Host.query.get(host_id)
+            message_content = f"User {current_user.name} obtained {flag_type} flag on host {host.name}"
+            system_message = SystemMessage(type='flag_win', contents=message_content)
+            db.session.add(system_message)
+
+            # Update user's score (redundant now)
+            current_user.score_total += flag.point_value
+            db.session.commit()
+
+            return jsonify({'success': True, 'message': 'Flag submitted successfully!', 'new_score': current_user.score_total}), 200
+        else:
+            # Create system message for failed attempt
+            message_content = f"User {current_user.name} failed {flag_type} flag attempt on host {host.name}"
+            system_message = SystemMessage(type='flag_fail', contents=message_content)
+            db.session.add(system_message)
+            db.session.commit()
+            return jsonify({'success': False, 'message': 'Incorrect flag'}), 400
+
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error submitting flag: {str(e)}")
+        return jsonify({'success': False, 'message': 'An error occurred while submitting the flag'}), 500
+
+@bp.route('/submit_challenge_flag', methods=['POST'])
+@login_required
+def submit_challenge_flag():
+    data = request.json
+    challenge_id = data.get('challenge_id')
+    submitted_flag = data.get('flag')
+
+    if not all([challenge_id, submitted_flag]):
+        return jsonify({'success': False, 'message': 'Missing required parameters'}), 400
+
+    try:
+        challenge = Challenge.query.get(challenge_id)
+        if not challenge:
+            return jsonify({'success': False, 'message': 'Invalid challenge'}), 400
+
+        if challenge.flag_uuid == submitted_flag:
+            # Check if the user has already completed this challenge
+            existing_challenge = ChallengesObtained.query.filter_by(user_id=current_user.id, challenge_id=challenge.id).first()
+            if existing_challenge:
+                if existing_challenge.completed:
+                    return jsonify({'success': False, 'message': 'You have already completed this challenge'}), 400
+            else:
+                existing_challenge = ChallengesObtained(user_id=current_user.id, challenge_id=challenge.id)
+                db.session.add(existing_challenge)
+
+            # Mark the challenge as completed
+            existing_challenge.completed = True
+            existing_challenge.completed_at = datetime.utcnow()
+
+            # Create system message for challenge completion
+            message_content = f"User {current_user.name} completed challenge {challenge.name}"
+            system_message = SystemMessage(type='challenge_win', contents=message_content)
+            db.session.add(system_message)
+
+            db.session.commit()
+
+            # Calculate the new total score
+            new_score = current_user.calculate_total_score()
+
+            return jsonify({
+                'success': True, 
+                'message': 'Challenge completed successfully!', 
+                'new_score': new_score,
+                'points_earned': challenge.point_value
+            }), 200
+        else:
+            # Create system message for failed attempt
+            message_content = f"User {current_user.name} failed attempt on challenge {challenge.name}"
+            system_message = SystemMessage(type='challenge_fail', contents=message_content)
+            db.session.add(system_message)
+            db.session.commit()
+            return jsonify({'success': False, 'message': 'Incorrect flag'}), 400
+
+    except Exception as e:
+        db.session.rollback()
+        print(f"Error submitting challenge flag: {str(e)}")
+        return jsonify({'success': False, 'message': 'An error occurred while submitting the flag'}), 500
