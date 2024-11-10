@@ -24,14 +24,16 @@
     <div class="row">
         <div class="col-md-4">
             <div class="profile_avatar mb-3">
-                <img src="{{ url_for('static', filename=avatarpath) }}" alt="User Avatar" class="img-thumbnail">
+                <img src="{{ url_for('static', filename=avatarpath) }}" alt="User Avatar" class="rounded-circle" style="width: 200px; height: 200px; object-fit: cover;">
             </div>
             <div class="profile_avatar_thumb">
-                {% set thumbnail_path = avatarpath | replace('.', '_thumbnail.') %}
-                <img src="{{ url_for('static', filename=thumbnail_path) if thumbnail_path else url_for('static', filename='nothumbnail.jpg') }}" alt="User Thumbnail" class="img-thumbnail" width="50" height="50">
+                <img src="{{ url_for('static', filename=avatarpath) }}" alt="User Avatar" class="rounded-circle" style="width: 75px; height: 75px; object-fit: cover;">
             </div>
             <br>
             <button id="saveProfile" class="btn btn-primary" style="width: 90%;">Save Avatar</button>
+            <a href="{{ url_for('main.hacker_profile', user_id=current_user.id) }}" class="btn btn-secondary mt-2" style="width: 90%;">
+                <i class="fas fa-arrow-left"></i> Return to Profile
+            </a>
         </div>
         <div class="col-md-8">
             <div class="content-restricted-textblock" style="background-color: rgba(255, 255, 255, 0.8); padding: 20px; border-radius: 15px; color: #333;">
@@ -61,7 +63,7 @@
                                 <div class="col-md-4 mb-3">
                                     <div class="gallery-item" data-value="{{ value }}">
                                         <img src="{{ url_for('static', filename='library/avatars_users/gallery/' + value.replace('\\', '/')) }}" 
-                                             class="img-thumbnail" alt="{{ label }}">
+                                             class="rounded-circle" alt="{{ label }}">
                                     </div>
                                 </div>
                                 {% endfor %}

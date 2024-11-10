@@ -169,13 +169,16 @@ class UserPreference(db.Model):
     theme = db.Column(db.String(50), default='default')
     background_id = db.Column(db.Integer, db.ForeignKey('profile_backgrounds.id'), nullable=True)
     background = db.relationship('ProfileBackground', backref=db.backref('users', lazy=True))
-    auto_read_leaderboard = db.Column(db.Boolean, default=False)
-    auto_read_wins = db.Column(db.Boolean, default=False)
-    auto_read_information = db.Column(db.Boolean, default=False)
+    auto_read_leaderboard = db.Column(db.Boolean, default=False, nullable=False)
+    auto_read_wins = db.Column(db.Boolean, default=False, nullable=False)
+    auto_read_information = db.Column(db.Boolean, default=False, nullable=False)
 
     user = db.relationship('User', back_populates='preferences')
 
     def __init__(self, user_id, theme='default'):
+        self.auto_read_leaderboard = False
+        self.auto_read_wins = False
+        self.auto_read_information = False
         self.user_id = user_id
         self.theme = theme
 

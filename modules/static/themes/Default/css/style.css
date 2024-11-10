@@ -1006,14 +1006,14 @@ form select {
 .glass-panel-profile {
     display: flex;
     flex-direction: column;
-    background: rgba(0, 0, 0, 0.259);
+    min-width: 600px;
+    background: rgba(92, 91, 91, 0.145);
     backdrop-filter: blur(2px);
     border-radius: 15px;
     padding: 15px;
-    margin-bottom: 20px;
+    
     margin-top: 20px;
     grid-template-columns: auto 1fr auto;
-    gap: 10px;
     align-items: left;
     justify-content: space-between;
     

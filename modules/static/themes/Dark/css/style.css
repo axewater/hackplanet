@@ -908,14 +908,12 @@ form select {
     padding-bottom: 50px;
 
 
-
 }
-
-
 
 .glass-panel-profile {
     display: flex;
     flex-direction: column;
+    min-width: 800px;
     background: rgba(0, 0, 0, 0.9);
     backdrop-filter: blur(10px);
     border-radius: 15px;
