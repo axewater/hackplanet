@@ -2,6 +2,15 @@
 
 {% block content %}
 <div class="container">
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <div>
+        {% for message in messages %}
+        <div class="alert alert-info" role="alert">{{ message }}</div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    {% endwith %}
     <div class="glass-panel">
         <div class="hackplanet_titles">
             <h1>Choose Your Profile Background</h1>
