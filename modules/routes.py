@@ -1655,45 +1655,11 @@ def hacking_labs():
                            no_labs=no_labs, 
                            labs_without_hosts=labs_without_hosts)
 
-@bp.route('/ctf/user_progress')
-@login_required
-def user_progress():
-    # Fetch completed challenges with hint usage information
-    completed_challenges = db.session.query(ChallengesObtained, Challenge).join(Challenge).filter(ChallengesObtained.user_id == current_user.id).all()
-    
-    # Fetch obtained flags
-    obtained_flags = FlagsObtained.query.filter_by(user_id=current_user.id).all()
-    
-    # Fetch quiz progress
-    quiz_progress = UserQuizProgress.query.filter_by(user_id=current_user.id).all()
-    
-    # Calculate total score using the new method
-    total_score = current_user.calculate_total_score()
-    
-    # Fetch quiz results
-    quiz_results = []
-    for progress in quiz_progress:
-        quiz = Quiz.query.get(progress.quiz_id)
-        quiz_results.append({
-            'title': quiz.title,
-            'score': progress.score,
-            'total_points': sum(question.points for question in quiz.questions),
-            'completed': progress.completed,
-            'passed': progress.score >= quiz.min_score,
-            'min_score': quiz.min_score,
-            'completed_at': progress.completed_at.strftime('%Y-%m-%d %H:%M:%S') if progress.completed_at else 'Not completed'
-        })
-    
-    return render_template('site/user_progress.html', 
-                           completed_challenges=completed_challenges,
-                           obtained_flags=obtained_flags,
-                           quiz_progress=quiz_progress,
-                           quiz_results=quiz_results,
-                           total_score=total_score)
 
-@bp.route('/ctf/user_details/<int:user_id>')
+
+@bp.route('/hacker_profile/<int:user_id>')
 @login_required
-def user_details(user_id):
+def hacker_profile(user_id):
     user = User.query.get_or_404(user_id)
     
     # Calculate user's rank
@@ -1740,7 +1706,7 @@ def user_details(user_id):
             'min_score': quiz.min_score
         })
     
-    return render_template('site/user_details.html', 
+    return render_template('site/hacker_profile.html', 
                            user_data=user_data,
                            user=user,
                            completed_challenges=completed_challenges,

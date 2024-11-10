@@ -15,7 +15,7 @@
     <div class="glass-panel">
         <div class="hackplanet_titles">
 
-            <h1>HackPlanet.EU World Leaderboard</h1>
+            <h1>HackPlanet World Leaderboard</h1>
         </div>
         <table class="table table-striped leaderboard-table">
             <thead>
@@ -28,7 +28,7 @@
             </thead>
             <tbody>
                 {% for user in users %}
-                <tr class="leaderboard-row" onclick="window.location='{{ url_for('main.user_details', user_id=user['id']) }}'">
+                <tr class="leaderboard-row" onclick="window.location='{{ url_for('main.hacker_profile', user_id=user['id']) }}'">
                     <td class="align-middle text-center">
                         {% if loop.index == 1 %}
                             <span class="trophy-icon gold"><i class="fas fa-trophy"></i></span>
@@ -71,12 +71,7 @@
                 });
             });
         </script>
-    
-    <!-- New button to navigate to the progress page -->
-    <div class="text-center mt-4">
-        <a href="{{ url_for('main.user_progress') }}" class="btn btn-primary btn-lg">Your Progress</a>
-        <a href="{{ url_for('main.settings_profile_edit') }}" class="btn btn-primary btn-lg">Your Profile</a>
-    </div>
+
 </div>
 </div>
 {% endblock %}

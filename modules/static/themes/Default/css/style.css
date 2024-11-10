@@ -214,6 +214,21 @@ body {
     font-weight: bold;
 }
 
+/* Add explicit width for rank and avatar columns */
+.leaderboard-table th:nth-child(1),
+.leaderboard-table td:nth-child(1) {
+    width: 75px;
+    min-width: 75px;
+    max-width: 75px;
+}
+
+.leaderboard-table th:nth-child(2),
+.leaderboard-table td:nth-child(2) {
+    width: 75px;
+    min-width: 75px;
+    max-width: 75px;
+}
+
 .leaderboard-table tbody tr {
     background-color: #f9f9f9;
     border-radius: 10px;
@@ -221,7 +236,7 @@ body {
 
 .leaderboard-table tbody tr td {
     border: none;
-    padding: 15px;
+    
 }
 
 
@@ -404,21 +419,13 @@ body {
     color: #fff;
     font-weight: bold;
     text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-    background-color: #0a440f65;
+    background-color: #7c7c7c52;
     padding: 20px;
     border-radius: 15px;
-    margin-bottom: 20px;
     text-align: center;
-}
-
-
-.hackplanet_titles h1 {
-    color: #fff;
     font-size: 32px;
-    font-weight: bold;
-    margin: 0;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
+
 
 
 .quiz-score {
@@ -851,7 +858,7 @@ font-size: large;
     display: inline-block;
     padding: 10px 20px;
     border-radius: 25px;
-    background-color: #0a440f6e;
+    background-color: #4b4b4b6e;
     color: white;
     font-weight: bold;
     margin-bottom: 15px;
