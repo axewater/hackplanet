@@ -58,15 +58,20 @@
                 <div class="position-relative">
                     <img src="{{ url_for('static', filename=user_data['avatarpath']) }}" alt="Avatar" class="img-fluid rounded-circle mb-3" style="max-width: 200px;">
                     {% if current_user.id == user.id %}
-                        <a href="{{ url_for('main.settings_profile_edit') }}" class="btn btn-primary btn-sm position-absolute" style="top: 0; right: 0;">
-                            <i class="fas fa-edit"></i> Edit Avatar
-                        </a>
+                        <div class="position-absolute" style="top: 0; right: 0;">
+                            <a href="{{ url_for('main.settings_profile_edit') }}" class="btn btn-primary btn-sm mb-2">
+                                <i class="fas fa-edit"></i> Edit Avatar
+                            </a>
+
+                        </div>
                     {% endif %}
                 </div>
 
-                <div class="chip">
-                    <h3>{{ user_data['name'] }}                             {% set rank = user_data.get('rank', 0) %}
+                      
+                        {% set rank = user_data.get('rank', 0) %}
                         {% if rank <= 3 %}
+                        <div class="chip">
+                            <h3>   
                             <div class="trophy-container">
                                 {% if rank == 1 %}
                                     <span class="trophy-icon gold"><i class="fas fa-trophy"></i></span>
@@ -76,7 +81,14 @@
                                     <span class="trophy-icon bronze"><i class="fas fa-trophy"></i></span>
                                 {% endif %}
                             </div>
+                        </div>
                         {% endif %}</h3>
+
+                
+                <div>
+                    <a href="{{ url_for('main.settings_backdrop') }}" class="btn btn-secondary btn-sm">
+                        <i class="fas fa-image"></i> Change Background
+                    </a>
                 </div>
                 <div class="dark-background p-3 mt-3">
                     <h4 class="text-light">Total Score:</h4>
