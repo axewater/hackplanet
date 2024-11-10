@@ -87,7 +87,7 @@ class User(db.Model):
     password_reset_token = db.Column(db.String(256), nullable=True)
     token_creation_time = db.Column(db.DateTime, nullable=True)
     invite_quota = db.Column(db.Integer, default=0)
-    score_total = db.Column(db.Integer, default=0)
+    # score_total = db.Column(db.Integer, default=0)
     preferences = db.relationship('UserPreference', uselist=False, back_populates='user', cascade='all, delete-orphan')
     
     def set_password(self, password):
