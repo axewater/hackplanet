@@ -17,7 +17,10 @@
         {% endif %}
         {% endwith %}
     </div>
-    
+    <div class="hackplanet_titles">
+
+        <h1>Choose your Avatar</h1>
+    </div>
     <div class="row">
         <div class="col-md-4">
             <div class="profile_avatar mb-3">
@@ -28,7 +31,7 @@
                 <img src="{{ url_for('static', filename=thumbnail_path) if thumbnail_path else url_for('static', filename='nothumbnail.jpg') }}" alt="User Thumbnail" class="img-thumbnail" width="50" height="50">
             </div>
             <br>
-            <button id="saveProfile" class="btn btn-primary" style="width: 90%;">Save Profile</button>
+            <button id="saveProfile" class="btn btn-primary" style="width: 90%;">Save Avatar</button>
         </div>
         <div class="col-md-8">
             <div class="content-restricted-textblock" style="background-color: rgba(255, 255, 255, 0.8); padding: 20px; border-radius: 15px; color: #333;">

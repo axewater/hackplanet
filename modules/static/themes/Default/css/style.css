@@ -1003,11 +1003,11 @@ form select {
 
 
 
-.glass-panel-scanfolder {
+.glass-panel-profile {
     display: flex;
     flex-direction: column;
-    background: rgba(0, 0, 0, 0.9);
-    backdrop-filter: blur(10px);
+    background: rgba(0, 0, 0, 0.259);
+    backdrop-filter: blur(2px);
     border-radius: 15px;
     padding: 15px;
     margin-bottom: 20px;

@@ -21,7 +21,7 @@
 
 </style>
 <div class="container">
-    <div class="glass-panel">
+    <div class="glass-panel-profile">
         <div class="chip">
             <h1>Hacker Profile: {{ user_data['name'] }}</h1>
 
@@ -70,18 +70,17 @@
 
                 <div class="dark-background p-3 mt-3">
                     <h4 class="text-light">Total Score:</h4>
-                    <h2 class="text-light">{{ user_data['score_total'] }}</h2>
+                    <div class="progress mt-2">
+                        <div class="progress-bar" role="progressbar" style="width: {{ (user_data['score_total'] / 1000) * 100 }}%;" aria-valuenow="{{ user_data['score_total'] }}" aria-valuemin="0" aria-valuemax="1000">{{ user_data['score_total'] }} / 1000</div>
+                    </div>
                     {% if current_user.role == 'admin' %}
                         <p>Email: {{ user.email }}</p>
                         <p>User ID: {{ user.id }}</p>
                     {% endif %}
                     <p>Last Login: {{ user.lastlogin.strftime('%Y-%m-%d %H:%M:%S') }}</p>
-                    <p>Registered Date: {{ user.created.strftime('%Y-%m-%d %H:%M:%S') }}</p>
-                    <p>Invited By: {{ user_data['inviter_username'] }}</p>
+                    <p>Member Since: {{ user.created.strftime('%Y-%m-%d') }}</p>
         
-                    <div class="progress mt-2">
-                        <div class="progress-bar" role="progressbar" style="width: {{ (user_data['score_total'] / 1000) * 100 }}%;" aria-valuenow="{{ user_data['score_total'] }}" aria-valuemin="0" aria-valuemax="1000">{{ user_data['score_total'] }} / 1000</div>
-                    </div>
+
                 </div>
             </div>
             <div class="col-md-8">
