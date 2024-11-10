@@ -2731,6 +2731,25 @@ def toggle_background(background_id):
     return jsonify({'success': True})
 
 
+def check_leaderboard_position_change(user_id):
+    """Check if user has moved into top 3 positions and create system message if so."""
+    all_users = User.query.all()
+    sorted_users = sorted(all_users, key=lambda x: x.calculate_total_score(), reverse=True)
+    
+    # Find user's position
+    user_position = next((i + 1 for i, u in enumerate(sorted_users) if u.id == user_id), 0)
+    
+    if user_position in [1, 2, 3]:
+        position_text = {1: "first", 2: "second", 3: "third"}[user_position]
+        user = User.query.get(user_id)
+        message_content = f"User {user.name} has moved into {position_text} position on the leaderboard!"
+        print(f"LEADERBOARD: {message_content}")  # Console logging
+        
+        # Create system message
+        system_message = SystemMessage(type='leaderboard', contents=message_content)
+        db.session.add(system_message)
+        db.session.commit()
+
 @bp.route('/submit_flag', methods=['POST'])
 @login_required
 def submit_flag():
@@ -2764,11 +2783,12 @@ def submit_flag():
             system_message = SystemMessage(type='flag_win', contents=message_content)
             db.session.add(system_message)
 
-            # Update user's score (redundant now)
-            current_user.score_total += flag.point_value
             db.session.commit()
 
-            return jsonify({'success': True, 'message': 'Flag submitted successfully!', 'new_score': current_user.score_total}), 200
+            # Check for leaderboard position change
+            check_leaderboard_position_change(current_user.id)
+
+            return jsonify({'success': True, 'message': 'Flag submitted successfully!'}), 200
         else:
             # Create system message for failed attempt
             message_content = f"User {current_user.name} failed {flag_type} flag attempt on host {host.name}"
@@ -2817,6 +2837,9 @@ def submit_challenge_flag():
             db.session.add(system_message)
 
             db.session.commit()
+
+            # Check for leaderboard position change
+            check_leaderboard_position_change(current_user.id)
 
             # Calculate the new total score
             new_score = current_user.calculate_total_score()
