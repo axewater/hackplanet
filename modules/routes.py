@@ -2136,6 +2136,13 @@ def manage_vm():
     try:
         output = ""
         if action == 'start':
+            # Create system message for VM start
+            message = SystemMessage(
+                type='information',
+                contents=f"User {current_user.name} booting up host {vm_name}"
+            )
+            db.session.add(message)
+            db.session.commit()
             print(f"Executing VM start command for {vm_id}")
             result = subprocess.run([az_cli_path, 'vm', 'start', '--ids', vm_id], capture_output=True, text=True)
             if result.returncode == 0:
@@ -2147,8 +2154,17 @@ def manage_vm():
             print(f"Executing VM stop command for {vm_id}")
             result = subprocess.run([az_cli_path, 'vm', 'stop', '--ids', vm_id], capture_output=True, text=True)
             if result.returncode == 0:
-                host = Host.query.filter_by(azure_vm_id=vm_id).first()
+                # Create system message for VM stop
+                message = SystemMessage(
+                    type='information',
+                    contents=f"User {current_user.name} shutdown host {vm_name}"
+                )
+                db.session.add(message)
                 db.session.commit()
+                host = Host.query.filter_by(azure_vm_id=vm_id).first()
+                if host:
+                    host.status = False
+                    db.session.commit()
         else:
             print(f"Invalid action received: {action}")
             raise ValueError("Invalid action")
@@ -2162,6 +2178,7 @@ def manage_vm():
         print(f"Detailed error while managing VM: {e}")
         print(f"Error managing VM: {e}")
         return jsonify({"status": "error", "message": str(e)}), 400
+
 
 
 @bp.route('/manage_vpn', methods=['POST'])
