@@ -775,7 +775,7 @@ font-size: large;
 }
 
 .dark-background {
-    background-color: #1a1a1a;
+    background-color: #1a1a1a95;
     border-radius: 15px;
     color: white;
 }
