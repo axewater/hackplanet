@@ -3,9 +3,11 @@
 {% block content %}
 <div class="container">
     <div class="glass-panel">
-        <h1>Choose Your Profile Background</h1>
+        <div class="hackplanet_titles">
+            <h1>Choose Your Profile Background</h1>
+        </div>
         <p class="text-light mb-4">Select a background image for your profile page. The background will be displayed when other users view your profile.</p>
-
+        
         {% if backgrounds %}
         <div class="row">
             {% for bg in backgrounds %}
@@ -40,8 +42,9 @@
         {% endif %}
 
         <div class="mt-4">
-            <a href="{{ url_for('main.settings_profile_edit') }}" class="btn btn-secondary">
-                <i class="fas fa-arrow-left"></i> Back to Profile Settings
+            <a href="{{ url_for('main.hacker_profile', user_id=current_user.id) }}" class="btn btn-secondary">
+            
+                <i class="fas fa-arrow-left"></i> Back to Profile
             </a>
         </div>
     </div>
