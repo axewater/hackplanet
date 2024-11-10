@@ -266,19 +266,7 @@ class Flag(db.Model):
     def __repr__(self):
         return f"<Flag id={self.id}, type={self.type}, uuid={self.uuid}, point_value={self.point_value}>"
     
-class UserProgress(db.Model):
-    __tablename__ = 'user_progress'
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    score_total = db.Column(db.Integer, nullable=False, default=0)
-    user = db.relationship('User', backref=db.backref('progress', uselist=False))
 
-    def __init__(self, user_id, obtained_flags=None):
-        self.user_id = user_id
-        self.obtained_flags = obtained_flags or {}
-
-    def __repr__(self):
-        return f"<UserProgress id={self.id}, user_id={self.user_id}>"
 
 class FlagsObtained(db.Model):
     __tablename__ = 'flags_obtained'

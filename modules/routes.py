@@ -36,7 +36,7 @@ from modules.forms import (
 
 from modules.models import (
     User, Whitelist, UserPreference, GlobalSettings, InviteToken, Lab, Challenge, Host, RSSConfig, ProfileBackground,
-    Flag, UserProgress, FlagsObtained, ChallengesObtained, Quiz, Question, UserQuizProgress, UserQuestionProgress, Course,
+    Flag, FlagsObtained, ChallengesObtained, Quiz, Question, UserQuizProgress, UserQuestionProgress, Course,
     SystemMessage, message_read_status
 )
 from modules.utilities import (
