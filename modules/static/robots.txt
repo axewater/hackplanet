@@ -1,0 +1,9 @@
+User-agent: Googlebot
+Disallow: /api/
+
+User-agent: *
+Allow: /
+
+Sitemap: https://smurfsiem.hackplanet.eu/sitemap.xml
+Sitemap: https://smurfsoar.hackplanet.eu/sitemap.xml
+Sitemap: https://smurftip.hackplanet.eu/sitemap.xml

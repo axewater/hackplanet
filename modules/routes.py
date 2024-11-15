@@ -2708,6 +2708,11 @@ def manage_backgrounds():
     backgrounds = ProfileBackground.query.order_by(ProfileBackground.order).all()
     return render_template('admin/admin_manage_backgrounds.html', backgrounds=backgrounds)
 
+@bp.route('/robots.txt')
+def robots():
+    return send_from_directory('static', 'robots.txt')
+
+
 @bp.route('/admin/toggle_background/<int:background_id>', methods=['POST'])
 @login_required
 @admin_required
