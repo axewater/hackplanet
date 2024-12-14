@@ -85,6 +85,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const userData = {
             name: document.getElementById('username').value,
             email: document.getElementById('email').value,
+            password: document.getElementById('password').value,
             role: document.getElementById('role').value,
             state: document.getElementById('status').value === '1'
         };

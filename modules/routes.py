@@ -725,6 +725,10 @@ def create_user():
             role=data['role'],
             state=data['state']
         )
+        if 'password' in data and data['password']:
+            user.set_password(data['password'])
+        else:
+            return jsonify({'success': False, 'message': 'Password is required'}), 400
         db.session.add(user)
         db.session.commit()
         return jsonify({'success': True, 'message': 'User created successfully'})
