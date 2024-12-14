@@ -443,61 +443,6 @@ def send_invite_email(email, invite_url):
     send_email(email, subject, html_content)
 
 
-@bp.route('/admin/create_user', methods=['GET', 'POST'])
-@login_required
-@admin_required
-def create_user():
-    form = CreateUserForm()
-
-    if form.validate_on_submit():
-        try:
-            user = User(
-                name=form.username.data,
-                email=form.email.data.lower(),
-                role='user',
-                is_email_verified=True,
-                user_id=str(uuid4()),
-                created=datetime.utcnow()
-            )
-            user.set_password(form.password.data)
-            print(f"Debug: User created: {user}")
-            db.session.add(user)
-            db.session.commit()
-
-            flash('User created successfully.', 'success')
-            return redirect(url_for('main.usermanager'))
-        except Exception as e:
-            db.session.rollback()
-            flash(f'An error occurred: {str(e)}', 'danger')
-
-    return render_template('admin/create_user.html', form=form)
-
-@bp.route('/admin/user_created')
-@login_required
-@admin_required
-def user_created():
-    return render_template('admin/create_user_done.html')
-
-@bp.route('/api/current_user_role', methods=['GET'])
-@login_required
-def get_current_user_role():
-    # print(f"Route: /api/current_user_role - {current_user.role}")
-    return jsonify({'role': current_user.role}), 200
-
-@bp.route('/api/check_username', methods=['POST'])
-@login_required
-def check_username():
-    # print(F"Route: /api/check_username - {current_user.name} - {current_user.role}")
-    data = request.get_json()
-    username = data.get('username')
-
-    if not username:
-        print(f"Check username: Missing username")
-        return jsonify({"error": "Missing username parameter"}), 400
-    print(f"Checking username: {username}")
-    existing_user = User.query.filter(func.lower(User.name) == func.lower(username)).first()
-    return jsonify({"exists": existing_user is not None})
-
 @bp.route('/delete_avatar/<path:avatar_path>', methods=['POST'])
 @login_required
 def delete_avatar(avatar_path):
@@ -770,10 +715,8 @@ def usermanager():
     users_query = User.query.order_by(User.name).all()
     form.user_id.choices = [(user.id, user.name) for user in users_query]
     print(f"ADMIN USRMGR: User list : {users_query}")
-    # Pre-populate the form when the page loads or re-populate upon validation failure
     if request.method == 'GET' or not form.validate_on_submit():
-        # You could also use a default user here or based on some criteria
-        default_user_id = request.args.get('user_id', 3)  # Example of getting a user_id from query parameters
+        default_user_id = request.args.get('user_id', 3)
         default_user = User.query.get(default_user_id)
         if default_user:
             form.user_id.data = default_user.id
@@ -782,17 +725,14 @@ def usermanager():
             form.role.data = default_user.role
             form.state.data = default_user.state
             form.is_email_verified.data = default_user.is_email_verified
-            form.about.data = default_user.about  # Pre-populate the 'about' field
-
+            form.about.data = default_user.about
     else:
-        # This block handles the form submission for both updating and deleting users
         print(f"ADMIN USRMGR: Form data: {form.data}")
         user_id = form.user_id.data
         user = User.query.get(user_id)
         if not user:
             flash(f'User not found with ID: {user_id}', 'danger')
-            return redirect(url_for('.usermanager'))  # Make sure the redirect is correct
-
+            return redirect(url_for('.usermanager')) 
         if form.submit.data:
             # Update user logic
             try:
@@ -808,9 +748,7 @@ def usermanager():
             except Exception as e:
                 db.session.rollback()
                 flash(f'Database error on update: {e}', 'danger')
-
         elif form.delete.data:
-            # Delete user logic
             try:
                 db.session.delete(user)
                 db.session.commit()
@@ -818,8 +756,57 @@ def usermanager():
             except Exception as e:
                 db.session.rollback()
                 flash(f'Database error on delete: {e}', 'danger')
-
     return render_template('admin/user_manager.html', form=form, users=users_query)
+
+
+@bp.route('/admin/create_user', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def create_user():
+    form = CreateUserForm()
+    if form.validate_on_submit():
+        try:
+            user = User(
+                name=form.username.data,
+                email=form.email.data.lower(),
+                role='user',
+                is_email_verified=True,
+                user_id=str(uuid4()),
+                created=datetime.utcnow()
+            )
+            user.set_password(form.password.data)
+            print(f"Debug: User created: {user}")
+            db.session.add(user)
+            db.session.commit()
+            flash('User created successfully.', 'success')
+            return redirect(url_for('main.usermanager'))
+        except Exception as e:
+            db.session.rollback()
+            flash(f'An error occurred: {str(e)}', 'danger')
+    return render_template('admin/create_user.html', form=form)
+
+@bp.route('/admin/user_created')
+@login_required
+@admin_required
+def user_created():
+    return render_template('admin/create_user_done.html')
+
+@bp.route('/api/current_user_role', methods=['GET'])
+@login_required
+def get_current_user_role():
+    return jsonify({'role': current_user.role}), 200
+
+@bp.route('/api/check_username', methods=['POST'])
+@login_required
+def check_username():
+    data = request.get_json()
+    username = data.get('username')
+    if not username:
+        print(f"Check username: Missing username")
+        return jsonify({"error": "Missing username parameter"}), 400
+    print(f"Checking username: {username}")
+    existing_user = User.query.filter(func.lower(User.name) == func.lower(username)).first()
+    return jsonify({"exists": existing_user is not None})
 
 
 @bp.route('/get_user/<int:user_id>', methods=['GET'])
@@ -853,19 +840,15 @@ def manage_settings():
         if not settings_record:
             settings_record = GlobalSettings(settings={})
             db.session.add(settings_record)
-        
         settings_record.settings = new_settings
         settings_record.last_updated = datetime.utcnow()
         db.session.commit()
         cache.delete('global_settings')
-
         flash('HackPlanet.EU Settings updated successfully, Captain!', 'success')
         return jsonify({'message': 'Settings updated successfully'}), 200
-
     else:  # GET request
         settings_record = GlobalSettings.query.first()
         current_settings = settings_record.settings if settings_record else {}
-        # Convert settings to the appropriate format for the template if necessary
         return render_template('admin/admin_settings.html', current_settings=current_settings)
 
 @bp.before_request
