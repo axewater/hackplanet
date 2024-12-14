@@ -640,97 +640,7 @@ def settings_panel():
 
     return render_template('settings/settings_panel.html', form=form)
 
-@bp.route('/admin/dashboard')
-@login_required
-@admin_required
-def admin_dashboard():
-    pass
-    return render_template('admin/admin_dashboard.html')
 
-@bp.route('/admin/user_manager_new')
-@login_required
-@admin_required
-def user_manager_new():
-    return render_template('admin/user_manager_new.html')
-
-@bp.route('/api/users')
-@login_required
-@admin_required
-def get_users():
-    search = request.args.get('search', '').lower()
-    query = User.query
-    if search:
-        query = query.filter(
-            db.or_(
-                func.lower(User.name).contains(search),
-                func.lower(User.email).contains(search)
-            )
-        )
-    users = query.all()
-    return jsonify([{
-        'id': user.id,
-        'name': user.name,
-        'email': user.email,
-        'role': user.role,
-        'state': user.state,
-        'avatar': user.avatarpath
-    } for user in users])
-
-@bp.route('/api/users/<user_id>', methods=['GET', 'PUT', 'DELETE'])
-@login_required
-@admin_required
-def manage_user(user_id):
-    if request.method == 'GET':
-        user = User.query.get_or_404(user_id)
-        return jsonify({
-            'name': user.name,
-            'email': user.email,
-            'role': user.role,
-            'state': user.state
-        })
-    
-    elif request.method == 'PUT':
-        user = User.query.get_or_404(user_id)
-        data = request.json
-        try:
-            user.name = data['name']
-            user.email = data['email']
-            user.role = data['role']
-            user.state = data['state']
-            db.session.commit()
-            return jsonify({'success': True, 'message': 'User updated successfully'})
-        except Exception as e:
-            db.session.rollback()
-            return jsonify({'success': False, 'message': str(e)})
-    
-    elif request.method == 'DELETE':
-        user = User.query.get_or_404(user_id)
-        try:
-            db.session.delete(user)
-            db.session.commit()
-            return jsonify({'success': True})
-        except Exception as e:
-            db.session.rollback()
-            return jsonify({'success': False, 'message': str(e)})
-
-@bp.route('/api/users/new', methods=['POST'])
-@login_required
-@admin_required
-def create_user():
-    data = request.json
-    try:
-        user = User(
-            name=data['name'],
-            email=data['email'],
-            role=data['role'],
-            state=data['state']
-        )
-        db.session.add(user)
-        db.session.commit()
-        return jsonify({'success': True, 'message': 'User created successfully'})
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({'success': False, 'message': str(e)})
 
 
 @bp.route('/admin/newsletter', methods=['GET', 'POST'])
@@ -796,6 +706,90 @@ def delete_whitelist(id):
 
 
 
+@bp.route('/admin/user_manager', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def usermanager():
+    print("ADMIN USRMGR: username: Request method:", request.method)
+    form = UserManagementForm()
+    users_query = User.query.order_by(User.name).all()
+    form.user_id.choices = [(user.id, user.name) for user in users_query]
+    print(f"ADMIN USRMGR: User list : {users_query}")
+    if request.method == 'GET' or not form.validate_on_submit():
+        default_user_id = request.args.get('user_id', 3)
+        default_user = User.query.get(default_user_id)
+        if default_user:
+            form.user_id.data = default_user.id
+            form.name.data = default_user.name
+            form.email.data = default_user.email
+            form.role.data = default_user.role
+            form.state.data = default_user.state
+            form.is_email_verified.data = default_user.is_email_verified
+            form.about.data = default_user.about
+    else:
+        print(f"ADMIN USRMGR: Form data: {form.data}")
+        user_id = form.user_id.data
+        user = User.query.get(user_id)
+        if not user:
+            flash(f'User not found with ID: {user_id}', 'danger')
+            return redirect(url_for('.usermanager')) 
+        if form.submit.data:
+            # Update user logic
+            try:
+                user.name = form.name.data or user.name
+                user.email = form.email.data or user.email
+                user.role = form.role.data or user.role
+                user.state = form.state.data if form.state.data is not None else user.state
+                user.is_email_verified = form.is_email_verified.data
+                user.about = form.about.data
+                print(f"ADMIN USRMGR: User updated: {user} about field : {user.about}")
+                db.session.commit()
+                flash('User updated successfully!', 'success')
+            except Exception as e:
+                db.session.rollback()
+                flash(f'Database error on update: {e}', 'danger')
+        elif form.delete.data:
+            try:
+                db.session.delete(user)
+                db.session.commit()
+                flash('User deleted successfully!', 'success')
+            except Exception as e:
+                db.session.rollback()
+                flash(f'Database error on delete: {e}', 'danger')
+    return render_template('admin/user_manager.html', form=form, users=users_query)
+
+
+@bp.route('/admin/create_user', methods=['GET', 'POST'])
+@login_required
+@admin_required
+def create_user():
+    form = CreateUserForm()
+    if form.validate_on_submit():
+        try:
+            user = User(
+                name=form.username.data,
+                email=form.email.data.lower(),
+                role='user',
+                is_email_verified=True,
+                user_id=str(uuid4()),
+                created=datetime.utcnow()
+            )
+            user.set_password(form.password.data)
+            print(f"Debug: User created: {user}")
+            db.session.add(user)
+            db.session.commit()
+            flash('User created successfully.', 'success')
+            return redirect(url_for('main.usermanager'))
+        except Exception as e:
+            db.session.rollback()
+            flash(f'An error occurred: {str(e)}', 'danger')
+    return render_template('admin/create_user.html', form=form)
+
+@bp.route('/admin/user_created')
+@login_required
+@admin_required
+def user_created():
+    return render_template('admin/create_user_done.html')
 
 @bp.route('/api/current_user_role', methods=['GET'])
 @login_required
@@ -939,6 +933,12 @@ def update_invites():
 
     return jsonify({'success': True, 'new_quota': new_quota})
 
+@bp.route('/admin/dashboard')
+@login_required
+@admin_required
+def admin_dashboard():
+    pass
+    return render_template('admin/admin_dashboard.html')
 
 
 @bp.route('/admin/messaging', methods=['GET', 'POST'])
