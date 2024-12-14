@@ -29,11 +29,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 users.forEach(user => {
                     userTable.innerHTML += `
                         <tr>
-                            <td><img src="${user.avatar || '/static/newstyle/avatar_default.jpg'}" class="avatar" alt="Avatar"></td>
+                            <td><img src="/static/${user.avatar || 'newstyle/avatar_default.jpg'}" class="avatar" alt="Avatar"></td>
                             <td>${user.name}</td>
                             <td>${user.email}</td>
                             <td>${user.role}</td>
                             <td>${user.state ? '<span class="badge bg-success">Active</span>' : '<span class="badge bg-danger">Inactive</span>'}</td>
+                            <td>${user.about || '<em>No description</em>'}</td>
+                            <td>${user.is_email_verified ? '<span class="badge bg-success">Verified</span>' : '<span class="badge bg-warning">Not Verified</span>'}</td>
                             <td>
                                 <button class="btn btn-sm btn-primary edit-user" data-id="${user.id}">
                                     <i class="fas fa-edit"></i>

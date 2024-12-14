@@ -673,7 +673,9 @@ def get_users():
         'email': user.email,
         'role': user.role,
         'state': user.state,
-        'avatar': user.avatarpath
+        'avatar': user.avatarpath,
+        'about': user.about,
+        'is_email_verified': user.is_email_verified
     } for user in users])
 
 @bp.route('/api/users/<user_id>', methods=['GET', 'PUT', 'DELETE'])
