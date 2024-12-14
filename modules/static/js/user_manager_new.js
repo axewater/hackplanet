@@ -73,8 +73,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.getElementById('userId').value = userId;
                 document.getElementById('username').value = user.name;
                 document.getElementById('email').value = user.email;
+                document.getElementById('about').value = user.about || '';
+                document.getElementById('invite_quota').value = user.invite_quota || 0;
                 document.getElementById('role').value = user.role;
                 document.getElementById('status').value = user.state ? '1' : '0';
+                document.getElementById('is_email_verified').value = user.is_email_verified ? '1' : '0';
+                document.getElementById('password').value = '';  // Clear password field
                 document.getElementById('userModalLabel').textContent = 'Edit User';
                 userModal.show();
             });
@@ -87,7 +91,8 @@ document.addEventListener('DOMContentLoaded', function() {
             email: document.getElementById('email').value,
             password: document.getElementById('password').value,
             role: document.getElementById('role').value,
-            state: document.getElementById('status').value === '1'
+            state: document.getElementById('status').value === '1',
+            is_email_verified: document.getElementById('is_email_verified').value === '1'
         };
 
         fetch(`/api/users/${userId || 'new'}`, {

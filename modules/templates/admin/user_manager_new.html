@@ -59,8 +59,17 @@
                         <input type="email" class="form-control" id="email" required>
                     </div>
                     <div class="mb-3">
+                        <label for="about" class="form-label">About</label>
+                        <textarea class="form-control" id="about"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="invite_quota" class="form-label">Invite Quota</label>
+                        <input type="number" class="form-control" id="invite_quota" min="0">
+                    </div>
+                    <div class="mb-3">
                         <label for="password" class="form-label">Password</label>
-                        <input type="password" class="form-control" id="password" required>
+                        <input type="password" class="form-control" id="password">
+                        <small class="text-muted">Leave blank to keep existing password</small>
                     </div>
                     <div class="mb-3">
                         <label for="role" class="form-label">Role</label>
@@ -74,6 +83,13 @@
                         <select class="form-control" id="status">
                             <option value="1">Active</option>
                             <option value="0">Inactive</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="is_email_verified" class="form-label">Email Verification</label>
+                        <select class="form-control" id="is_email_verified">
+                            <option value="1">Verified</option>
+                            <option value="0">Not Verified</option>
                         </select>
                     </div>
                 </form>

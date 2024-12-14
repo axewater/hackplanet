@@ -686,7 +686,12 @@ def manage_user(user_id):
             'name': user.name,
             'email': user.email,
             'role': user.role,
-            'state': user.state
+            'state': user.state,
+            'about': user.about,
+            'invite_quota': user.invite_quota,
+            'is_email_verified': user.is_email_verified,
+            'created': user.created.isoformat() if user.created else None,
+            'lastlogin': user.lastlogin.isoformat() if user.lastlogin else None
         })
     
     elif request.method == 'PUT':
@@ -697,6 +702,7 @@ def manage_user(user_id):
             user.email = data['email']
             user.role = data['role']
             user.state = data['state']
+            user.is_email_verified = data['is_email_verified']
             db.session.commit()
             return jsonify({'success': True, 'message': 'User updated successfully'})
         except Exception as e:
