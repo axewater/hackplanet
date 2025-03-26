@@ -675,7 +675,6 @@ def delete_avatar(avatar_path):
     return redirect(url_for('main.bot_generator'))
 
 
-
 @bp.route('/ctf/host_details/<int:host_id>')
 @login_required
 def host_details(host_id):
@@ -689,8 +688,6 @@ def host_details(host_id):
     else:
         print("No Azure VM ID associated with this host")
     return render_template('site/host_details.html', host=host, vm_status=vm_status, auth_status=auth_status)
-
-
 
 @bp.route('/admin/delete_host/<int:host_id>', methods=['POST'])
 @login_required
@@ -878,8 +875,6 @@ def delete_question(question_id):
     else:
         flash('Question not found.', 'error')
         return redirect(url_for('main.quiz_manager'))
-    
-    
 
 @bp.route('/manage_vm', methods=['POST'])
 @login_required
@@ -937,8 +932,6 @@ def manage_vm():
         print(f"Error managing VM: {e}")
         return jsonify({"status": "error", "message": str(e)}), 400
 
-
-
 @bp.route('/manage_vpn', methods=['POST'])
 @login_required
 def manage_vpn():
@@ -987,7 +980,6 @@ def manage_vpn():
     except Exception as e:
         print(f"Detailed error while managing VPN: {e}")
         return jsonify({"status": "error", "message": str(e)}), 400
-    
 
 @bp.route('/admin/flag_manager')
 @login_required
@@ -1576,52 +1568,12 @@ def host_status():
         print(str(e))
         return jsonify({'error': str(e)}), 500
     
-    
-@bp.route('/admin/backgrounds')
-@login_required
-@admin_required
-def manage_backgrounds():
-    # Scan the backgrounds directory
-    backgrounds_dir = os.path.join(current_app.static_folder, 'images', 'profilebackdrops')
-    if not os.path.exists(backgrounds_dir):
-        os.makedirs(backgrounds_dir)
-    
-    # Get all JPG files
-    jpg_files = [f for f in os.listdir(backgrounds_dir) if f.lower().endswith('.jpg')]
-    
-    # Sync with database
-    for jpg_file in jpg_files:
-        if not ProfileBackground.query.filter_by(filename=jpg_file).first():
-            new_background = ProfileBackground(
-                filename=jpg_file,
-                display_name=jpg_file.replace('.jpg', '').replace('_', ' ').title()
-            )
-            db.session.add(new_background)
-    
-    # Remove entries for files that no longer exist
-    for background in ProfileBackground.query.all():
-        if background.filename not in jpg_files:
-            db.session.delete(background)
-    
-    db.session.commit()
-    
-    # Get all backgrounds ordered by order field
-    backgrounds = ProfileBackground.query.order_by(ProfileBackground.order).all()
-    return render_template('admin/admin_manage_backgrounds.html', backgrounds=backgrounds)
-
 @bp.route('/robots.txt')
 def robots():
     return send_from_directory('static', 'robots.txt')
 
 
-@bp.route('/admin/toggle_background/<int:background_id>', methods=['POST'])
-@login_required
-@admin_required
-def toggle_background(background_id):
-    background = ProfileBackground.query.get_or_404(background_id)
-    background.enabled = not background.enabled
-    db.session.commit()
-    return jsonify({'success': True})
+
 
 
 def check_leaderboard_position_change(user_id):

@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify, send_file, send_from_directory, current_app
 from flask_login import login_required
 from modules import db, cache, mail
-from modules.models import GlobalSettings, Whitelist, SystemMessage, User, Lab, Host, Challenge, ChallengesObtained
+from modules.models import GlobalSettings, Whitelist, SystemMessage, User, Lab, Host, Challenge, ChallengesObtained, ProfileBackground
 from modules.forms import NewsletterForm, WhitelistForm, SystemMessageForm, CsrfProtectForm, LabForm, ChallengeForm, HostForm
 from sqlalchemy.orm import joinedload
 from modules.utilities import admin_required
@@ -662,3 +662,46 @@ def get_image_choices():
     image_folder = os.path.join(current_app.config['UPLOAD_FOLDER'], 'images', 'hosts')
     image_files = [f for f in os.listdir(image_folder) if f.lower().endswith(('.png', '.jpg', '.jpeg', '.gif'))]
     return image_files
+
+
+
+@bp_admin.route('/admin/backgrounds')
+@login_required
+@admin_required
+def manage_backgrounds():
+    # Scan the backgrounds directory
+    backgrounds_dir = os.path.join(current_app.static_folder, 'images', 'profilebackdrops')
+    if not os.path.exists(backgrounds_dir):
+        os.makedirs(backgrounds_dir)
+    
+    # Get all JPG files
+    jpg_files = [f for f in os.listdir(backgrounds_dir) if f.lower().endswith('.jpg')]
+    
+    # Sync with database
+    for jpg_file in jpg_files:
+        if not ProfileBackground.query.filter_by(filename=jpg_file).first():
+            new_background = ProfileBackground(
+                filename=jpg_file,
+                display_name=jpg_file.replace('.jpg', '').replace('_', ' ').title()
+            )
+            db.session.add(new_background)
+    
+    # Remove entries for files that no longer exist
+    for background in ProfileBackground.query.all():
+        if background.filename not in jpg_files:
+            db.session.delete(background)
+    
+    db.session.commit()
+    
+    # Get all backgrounds ordered by order field
+    backgrounds = ProfileBackground.query.order_by(ProfileBackground.order).all()
+    return render_template('admin/admin_manage_backgrounds.html', backgrounds=backgrounds)
+
+@bp_admin.route('/admin/toggle_background/<int:background_id>', methods=['POST'])
+@login_required
+@admin_required
+def toggle_background(background_id):
+    background = ProfileBackground.query.get_or_404(background_id)
+    background.enabled = not background.enabled
+    db.session.commit()
+    return jsonify({'success': True})
