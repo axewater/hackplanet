@@ -6,7 +6,7 @@
             <h1>Flag Editor</h1>
             <a href="{{ url_for('main.flag_manager') }}" class="btn btn-secondary">Back to Flag Manager</a>
 
-            <a href="{{ url_for('main.admin_dashboard') }}" class="btn btn-secondary">Back to Dashboard</a>
+            <a href="{{ url_for('bp_admin.admin_dashboard') }}" class="btn btn-secondary">Back to Dashboard</a>
         </div>
         <form method="POST" action="{{ url_for('main.edit_flag', flag_id=flag.id) if flag else url_for('main.add_flag') }}">
             {{ form.hidden_tag() }}

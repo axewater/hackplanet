@@ -15,7 +15,7 @@
 <div class="glass-panel">
                 <!-- Back to Dashboard Button -->
                 <div class="container mt-3">
-                    <a href="{{ url_for('main.admin_dashboard') }}" class="btn btn-lg btn-primary">Back to Dashboard</a>
+                    <a href="{{ url_for('bp_admin.admin_dashboard') }}" class="btn btn-lg btn-primary">Back to Dashboard</a>
                 </div>
     <h1>Hackers allowed to register:
         <div class="image-whitelist">
@@ -50,7 +50,7 @@
             <tr>
                 <td>{{ entry.email }}</td>
                 <td>
-                    <form action="{{ url_for('main.delete_whitelist', id=entry.id) }}" method="POST" style="display: inline;">
+                    <form action="{{ url_for('bp_admin.delete_whitelist', id=entry.id) }}" method="POST" style="display: inline;">
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                         <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Are you sure you want to remove this email from the whitelist?');">Delete</button>
                     </form>

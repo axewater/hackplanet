@@ -13,7 +13,7 @@
 <div class="glass-panel container mt-5">
     <!-- Back to Dashboard Button -->
     <div class="container mt-3">
-      <a href="{{ url_for('main.admin_dashboard') }}" class="btn btn-lg btn-primary">Back to Dashboard</a>
+      <a href="{{ url_for('bp_admin.admin_dashboard') }}" class="btn btn-lg btn-primary">Back to Dashboard</a>
     </div>
     <h2 class="mb-4">Manage User Invites</h2>
     <div class="table-responsive">
@@ -58,7 +58,7 @@ function changeInvites(userId, change) {
 
 function saveInvites(userId) {
     const change = inviteChanges[userId] || 0;
-    fetch("{{ url_for('main.update_invites') }}", {
+    fetch("{{ url_for('bp_admin.update_invites') }}", {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

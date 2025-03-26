@@ -74,12 +74,14 @@ def create_app():
     from modules.routes_integrations import int_bp
     from modules.routes_settings import bp_settings
     from modules.routes_login import bp_login
+    from modules.routes_admin import bp_admin
 
     app.register_blueprint(routes.bp)
     app.register_blueprint(site_bp)
     app.register_blueprint(int_bp)
     app.register_blueprint(bp_settings)
     app.register_blueprint(bp_login)
+    app.register_blueprint(bp_admin)
     return app
 
 
