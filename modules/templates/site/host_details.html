@@ -204,9 +204,26 @@
 </div>
 
 
-{% endblock %}
-
 <style>
+.rating-input i {
+    transition: transform 0.2s, color 0.2s;
+}
+.rating-input i.enlarged {
+    transform: scale(1.2);
+}
+.rating-input i.hovered,
+.rating-input i.active {
+    color: #FFD700;
+}
+.rating-input i.clicked {
+    animation: starPulse 0.3s ease-in-out;
+}
+@keyframes starPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+    
 .rating-input i {
     cursor: pointer;
     transition: transform 0.2s, color 0.2s;
@@ -248,3 +265,4 @@
     margin-top: 10px;
 }
 </style>
+{% endblock %}

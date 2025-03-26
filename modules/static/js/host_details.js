@@ -74,41 +74,43 @@ $(document).ready(function() {
         // For interactive rating inputs
         $('.rating-input i').on('mouseover', function() {
             const value = $(this).data('value');
-            const parent = $(this).parent();
+            const $parent = $(this).parent();
             
-            parent.find('i').removeClass('active hovered');
-            parent.find('i').each(function() {
+            $parent.find('i').removeClass('active hovered');
+            $parent.find('i').each(function() {
                 if ($(this).data('value') <= value) {
                     $(this).addClass('hovered');
                 }
             });
+            $(this).addClass('enlarged');
         }).on('mouseout', function() {
-            $(this).parent().find('i').removeClass('hovered');
+            $(this).parent().find('i').removeClass('hovered enlarged');
         });
         
         $('.rating-input').on('mouseout', function() {
-            const parent = $(this).parent();
-            const inputValue = parent.siblings('input[type="hidden"]').val();
-            
-            parent.find('i').removeClass('active');
-            parent.find('i').each(function() {
-                if ($(this).data('value') <= inputValue) {
-                    $(this).addClass('active');
-                }
-            });
+            updateStarDisplay($(this));
         });
         
         $('.rating-input i').on('click', function() {
             const value = $(this).data('value');
-            const parent = $(this).parent();
-            parent.find('i').removeClass('active');
-            parent.find('i').each(function() {
-                if ($(this).data('value') <= value) {
+            const $parent = $(this).parent();
+            $parent.siblings('input[type="hidden"]').val(value);
+            
+            $(this).addClass('clicked');
+            setTimeout(() => $(this).removeClass('clicked'), 300);
+            
+            updateStarDisplay($parent);
+        });
+        
+        function updateStarDisplay($parent) {
+            const inputValue = $parent.siblings('input[type="hidden"]').val();
+            $parent.find('i').removeClass('active');
+            $parent.find('i').each(function() {
+                if ($(this).data('value') <= inputValue) {
                     $(this).addClass('active');
                 }
             });
-            parent.siblings('input[type="hidden"]').val(value);
-        });
+        }
         
         // Set default values for rating inputs
         setDefaultRatingValues(3);
@@ -280,3 +282,5 @@ $(document).ready(function() {
         });
     }
 });
+
+
