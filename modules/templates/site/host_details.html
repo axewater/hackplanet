@@ -75,7 +75,7 @@
                             </div>
                         {% endif %}
 
-                        <form id="vm-form" method="post" action="{{ url_for('main.manage_vm') }}" class="mt-3">
+                        <form id="vm-form" method="post" action="{{ url_for('bp_vm.manage_vm') }}" class="mt-3">
                             <input type="hidden" id="resource_group" name="resource_group" value="CTF">
                             <input type="hidden" id="vm_name" name="vm_name" value="{{ host.azure_vm_id.split('/')[-1] if host.azure_vm_id else '' }}">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
