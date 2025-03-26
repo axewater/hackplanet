@@ -1,6 +1,6 @@
 # modules/routes.py
-import sys,ast, uuid, json, random, requests, html, os, re, shutil, traceback, time, schedule, os, platform, tempfile, socket, logging, requests
-from threading import Thread
+import requests, html, os, re, shutil, os, requests
+
 
 from config import Config
 from flask import Flask, render_template, flash, redirect, url_for, request, Blueprint, jsonify, session, abort, current_app, send_from_directory, send_file, make_response
@@ -23,7 +23,7 @@ from uuid import uuid4
 from datetime import datetime, timedelta, timezone
 from PIL import Image as PILImage
 from PIL import ImageOps
-from itsdangerous import URLSafeTimedSerializer, SignatureExpired, BadSignature
+from itsdangerous import URLSafeTimedSerializer
 from authlib.jose import jwt
 from urllib.parse import unquote
 
@@ -37,11 +37,9 @@ from modules.models import (
     Flag, FlagsObtained, ChallengesObtained, Quiz, Question, UserQuizProgress, UserQuestionProgress, Course,
     SystemMessage, message_read_status
 )
-from modules.utilities import (
-    admin_required, _authenticate_and_redirect, square_image, send_email, send_password_reset_email, 
-)
+from modules.utilities import admin_required
 from feedgen.feed import FeedGenerator
-from modules.azure_utils import check_azure_authentication, get_azure_cli_path
+from modules.azure_utils import check_azure_authentication
 from modules.theme_manager import ThemeManager
 import logging
 
@@ -141,142 +139,6 @@ def inject_settings():
 @bp.context_processor
 def utility_processor():
     return dict(datetime=datetime)
-
-
-
-
-
-
-
-
-@bp.route('/api/users')
-@login_required
-@admin_required
-def get_users():
-    search = request.args.get('search', '').lower()
-    query = User.query
-    if search:
-        query = query.filter(
-            db.or_(
-                func.lower(User.name).contains(search),
-                func.lower(User.email).contains(search)
-            )
-        )
-    users = query.all()
-    return jsonify([{
-        'id': user.id,
-        'name': user.name,
-        'email': user.email,
-        'role': user.role,
-        'state': user.state,
-        'avatar': user.avatarpath,
-        'about': user.about,
-        'is_email_verified': user.is_email_verified
-    } for user in users])
-
-@bp.route('/api/users/<user_id>', methods=['GET', 'PUT', 'DELETE'])
-@login_required
-@admin_required
-def manage_user(user_id):
-    if request.method == 'GET':
-        user = User.query.get_or_404(user_id)
-        return jsonify({
-            'name': user.name,
-            'email': user.email,
-            'role': user.role,
-            'state': user.state,
-            'about': user.about,
-            'invite_quota': user.invite_quota,
-            'is_email_verified': user.is_email_verified,
-            'created': user.created.isoformat() if user.created else None,
-            'lastlogin': user.lastlogin.isoformat() if user.lastlogin else None
-        })
-    
-    elif request.method == 'PUT':
-        user = User.query.get_or_404(user_id)
-        data = request.json
-        try:
-            user.name = data['name']
-            user.email = data['email']
-            user.role = data['role']
-            user.state = data['state']
-            user.is_email_verified = data['is_email_verified']
-            db.session.commit()
-            return jsonify({'success': True, 'message': 'User updated successfully'})
-        except Exception as e:
-            db.session.rollback()
-            return jsonify({'success': False, 'message': str(e)})
-    
-    elif request.method == 'DELETE':
-        user = User.query.get_or_404(user_id)
-        try:
-            db.session.delete(user)
-            db.session.commit()
-            return jsonify({'success': True})
-        except Exception as e:
-            db.session.rollback()
-            return jsonify({'success': False, 'message': str(e)})
-
-@bp.route('/api/users/new', methods=['POST'])
-@login_required
-@admin_required
-def create_user():
-    data = request.json
-    try:
-        user = User(
-            name=data['name'],
-            email=data['email'],
-            role=data['role'],
-            state=data['state']
-        )
-        if 'password' in data and data['password']:
-            user.set_password(data['password'])
-        else:
-            return jsonify({'success': False, 'message': 'Password is required'}), 400
-        db.session.add(user)
-        db.session.commit()
-        return jsonify({'success': True, 'message': 'User created successfully'})
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({'success': False, 'message': str(e)})
-
-
-@bp.route('/api/current_user_role', methods=['GET'])
-@login_required
-def get_current_user_role():
-    return jsonify({'role': current_user.role}), 200
-
-@bp.route('/api/check_username', methods=['POST'])
-@login_required
-def check_username():
-    data = request.get_json()
-    username = data.get('username')
-    if not username:
-        print(f"Check username: Missing username")
-        return jsonify({"error": "Missing username parameter"}), 400
-    print(f"Checking username: {username}")
-    existing_user = User.query.filter(func.lower(User.name) == func.lower(username)).first()
-    return jsonify({"exists": existing_user is not None})
-
-
-@bp.route('/get_user/<int:user_id>', methods=['GET'])
-@login_required
-@admin_required
-def get_user(user_id):
-    user = User.query.get(user_id)
-    if user:
-        user_data = {
-            'name': user.name,
-            'email': user.email,
-            'role': user.role,
-            'state': user.state,
-            'about': user.about,
-            'is_email_verified': user.is_email_verified
-        }
-        return jsonify(user_data)
-    else:
-        print(f"User not found with id: {user_id}")
-        return jsonify({'error': 'User not found'}), 404
 
 
 @bp.route('/ctf')
@@ -749,8 +611,6 @@ def quiz_editor(quiz_id=None):
         form.sequential.data = quiz.sequential
 
     return render_template('admin/quiz_editor.html', form=form, quiz=quiz)
-
-
 
 @bp.route('/admin/delete_quiz/<int:quiz_id>', methods=['POST'])
 @login_required
