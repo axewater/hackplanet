@@ -83,6 +83,7 @@
                                 <div id="review-button-container">
                                     {% if host.has_completed_both_flags(current_user.id) %}
                                         {% if host.has_user_reviewed(current_user.id) %}
+                                            <button id="delete-review-btn" class="btn btn-danger">Delete Your Review</button>
                                             <button id="edit-review-btn" class="btn btn-primary">Edit Your Review</button>
                                         {% else %}
                                             <button id="add-review-btn" class="btn btn-success">Review This Host</button>
@@ -206,12 +207,24 @@
 <style>
 .rating-input i {
     cursor: pointer;
-    color: #ccc;
-    font-size: 24px;
-    margin-right: 5px;
+    transition: transform 0.2s, color 0.2s;
+}
+.rating-input i:hover {
+    transform: scale(1.2);
+}
+.rating-input i.hovered {
+    color: #FFD700;
 }
 .rating-input i.active {
     color: #FFD700;
+}
+@keyframes starPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+}
+.rating-input i.active {
+    animation: starPulse 0.3s ease-in-out;
 }
 .stars {
     display: inline-block;

@@ -213,3 +213,13 @@ def get_user_host_review(host_id):
     }
     
     return jsonify({'success': True, 'review': formatted_review})
+
+@bp_api.route('/api/host/<int:host_id>/review', methods=['DELETE'])
+@login_required
+def delete_review(host_id):
+    review = HostReview.query.filter_by(host_id=host_id, user_id=current_user.id).first()
+    if review:
+        db.session.delete(review)
+        db.session.commit()
+        return jsonify(success=True)
+    return jsonify(success=False, message='Review not found or you do not have permission to delete this review.')

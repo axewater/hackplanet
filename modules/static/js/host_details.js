@@ -76,15 +76,17 @@ $(document).ready(function() {
             const value = $(this).data('value');
             const parent = $(this).parent();
             
-            parent.find('i').removeClass('active');
+            parent.find('i').removeClass('active hovered');
             parent.find('i').each(function() {
                 if ($(this).data('value') <= value) {
-                    $(this).addClass('active');
+                    $(this).addClass('hovered');
                 }
             });
+        }).on('mouseout', function() {
+            $(this).parent().find('i').removeClass('hovered');
         });
         
-        $('.rating-input i').on('mouseout', function() {
+        $('.rating-input').on('mouseout', function() {
             const parent = $(this).parent();
             const inputValue = parent.siblings('input[type="hidden"]').val();
             
@@ -99,16 +101,13 @@ $(document).ready(function() {
         $('.rating-input i').on('click', function() {
             const value = $(this).data('value');
             const parent = $(this).parent();
-            const inputId = parent.attr('id').replace('-rating', '_rating_input');
-            
-            $(`#${inputId}`).val(value);
-            
             parent.find('i').removeClass('active');
             parent.find('i').each(function() {
                 if ($(this).data('value') <= value) {
                     $(this).addClass('active');
                 }
             });
+            parent.siblings('input[type="hidden"]').val(value);
         });
         
         // Set default values for rating inputs
@@ -212,6 +211,29 @@ $(document).ready(function() {
         reviewModal.show();
     });
     
+    // Delete review
+    $('#delete-review-btn').on('click', function() {
+        if (confirm('Are you sure you want to delete your review?')) {
+            $.ajax({
+                url: `/api/host/${hostId}/review`,
+                type: 'DELETE',
+                headers: {
+                    'X-CSRFToken': getCsrfToken()
+                },
+                success: function(response) {
+                    if (response.success) {
+                        location.reload();
+                    } else {
+                        alert(response.message || 'Error deleting review');
+                    }
+                },
+                error: function(xhr) {
+                    alert('Error deleting review: ' + (xhr.responseJSON?.message || xhr.statusText));
+                }
+            });
+        }
+    });
+    
     // Submit review
     $('#submit-review').on('click', function() {
         const reviewData = {
@@ -231,7 +253,7 @@ $(document).ready(function() {
             },
             success: function(response) {
                 if (response.success) {
-                    // Close modal and reload reviews
+                    updateStarRatings();
                     bootstrap.Modal.getInstance(document.getElementById('reviewModal')).hide();
                     loadReviews();
                     // Reload page to update average ratings
@@ -245,4 +267,16 @@ $(document).ready(function() {
             }
         });
     });
+    
+    function updateStarRatings() {
+        $('.rating-input').each(function() {
+            const value = $(this).siblings('input[type="hidden"]').val();
+            $(this).find('i').removeClass('active');
+            $(this).find('i').each(function() {
+                if ($(this).data('value') <= value) {
+                    $(this).addClass('active');
+                }
+            });
+        });
+    }
 });
