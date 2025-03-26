@@ -26,7 +26,7 @@
             <div class="alert alert-warning" role="alert">
                 There are no labs defined. Please ask your administrator to define new labs.
                 {% if is_admin %}
-                    <a href="{{ url_for('main.lab_manager') }}" class="btn btn-primary">Go to Lab Manager</a>
+                    <a href="{{ url_for('bp_admin.lab_manager') }}" class="btn btn-primary">Go to Lab Manager</a>
                 {% endif %}
             </div>
         {% else %}
@@ -62,7 +62,7 @@
                     <div class="alert alert-warning" role="alert">
                         There are no hosts defined for this lab.
                         {% if is_admin %}
-                            <a href="{{ url_for('main.host_editor') }}" class="btn btn-primary">Add Host</a>
+                            <a href="{{ url_for('bp_admin.host_editor') }}" class="btn btn-primary">Add Host</a>
                         {% endif %}
                     </div>
                 {% else %}

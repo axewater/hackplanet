@@ -13,11 +13,11 @@
     <div class="glass-panel">
         <div class="container mt-3">
             <a href="{{ url_for('bp_admin.admin_dashboard') }}" class="btn btn-lg btn-primary">Back to Dashboard</a>
-            <a href="{{ url_for('main.lab_manager') }}" class="btn btn-lg btn-secondary">Back to Lab Manager</a>
+            <a href="{{ url_for('bp_admin.lab_manager') }}" class="btn btn-lg btn-secondary">Back to Lab Manager</a>
         </div>
         <h1>Host Manager</h1>
         <div class="text-center mb-3">
-            <a href="{{ url_for('main.host_editor') }}" class="btn btn-success mb-3" style="width: 50%;">Add New Host</a>
+            <a href="{{ url_for('bp_admin.host_editor') }}" class="btn btn-success mb-3" style="width: 50%;">Add New Host</a>
         </div>
         <table class="table">
             <thead>
@@ -41,7 +41,7 @@
                     <td>{{ "Active" if host.status else "Inactive" }}</td>
                     <td>{{ host.lab.name }}</td>
                     <td>
-                        <a href="{{ url_for('main.host_editor', host_id=host.id) }}" class="btn btn-sm btn-primary">Edit</a>
+                        <a href="{{ url_for('bp_admin.host_editor', host_id=host.id) }}" class="btn btn-sm btn-primary">Edit</a>
                         <button onclick="deleteHost({{ host.id }})" class="btn btn-sm btn-danger">Delete</button>
                     </td>
                 </tr>

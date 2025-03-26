@@ -14,10 +14,10 @@
     <div class="glass-panel">
         <div class="container mt-3">
             <a href="{{ url_for('bp_admin.admin_dashboard') }}" class="btn btn-lg btn-primary">Back to Dashboard</a>
-            <a href="{{ url_for('main.host_manager') }}" class="btn btn-lg btn-secondary">Back to Host Manager</a>
+            <a href="{{ url_for('bp_admin.host_manager') }}" class="btn btn-lg btn-secondary">Back to Host Manager</a>
         </div>
         <h1>{{ 'Edit Host' if host else 'Create New Host' }}</h1>
-        <form id="host-form" method="POST" action="{{ url_for('main.host_editor', host_id=host.id if host else None) }}">
+        <form id="host-form" method="POST" action="{{ url_for('bp_admin.host_editor', host_id=host.id if host else None) }}">
             {{ form.hidden_tag() }}
             {% for field in form if field.name != 'csrf_token' and field.name != 'submit' and field.name != 'lab_id' and field.name != 'image_url' %}
                 <div class="mb-3">

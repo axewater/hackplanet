@@ -13,7 +13,7 @@
     <div class="glass-panel">
         <div class="container mt-3">
             <a href="{{ url_for('bp_admin.admin_dashboard') }}" class="btn btn-lg btn-primary">Back to Dashboard</a>
-            <a href="{{ url_for('main.lab_editor') }}" class="btn btn-lg btn-success float-end">
+            <a href="{{ url_for('bp_admin.lab_editor') }}" class="btn btn-lg btn-success float-end">
                 <i class="fas fa-plus"></i> Create New Lab
             </a>
         </div>
@@ -54,7 +54,7 @@
                     <td>
                         <button class="btn btn-primary edit-lab" data-lab-id="{{ lab.id }}">Edit</button>
                         <button class="btn btn-danger delete-lab" data-lab-id="{{ lab.id }}">Delete</button>
-                        <a href="{{ url_for('main.host_editor', lab_id=lab.id) }}" class="btn btn-success">Add Host</a>
+                        <a href="{{ url_for('bp_admin.host_editor', lab_id=lab.id) }}" class="btn btn-success">Add Host</a>
                     </td>
                 </tr>
                 {% endfor %}
@@ -62,7 +62,7 @@
         </table>
 
 <div class="text-center mt-4">
-    <a href="{{ url_for('main.host_manager') }}" class="btn btn-success btn-lg">Host Manager</a>
+    <a href="{{ url_for('bp_admin.host_manager') }}" class="btn btn-success btn-lg">Host Manager</a>
     <a href="{{ url_for('main.flag_manager') }}" class="btn btn-primary btn-lg">Flag Manager</a>
 
     

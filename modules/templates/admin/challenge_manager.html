@@ -15,7 +15,7 @@
     <h1>Challenge Manager</h1>
     <a href="{{ url_for('bp_admin.admin_dashboard') }}" class="btn btn-secondary">Back to Dashboard</a>
     <div>
-    <a href="{{ url_for('main.challenge_editor') }}" class="btn btn-primary mb-3">Add New Challenge</a>
+    <a href="{{ url_for('bp_admin.challenge_editor') }}" class="btn btn-primary mb-3">Add New Challenge</a>
     </div>
     <table class="table">
         <thead>
@@ -52,7 +52,7 @@
                     {% endif %}
                 </td>
                 <td>
-                    <a href="{{ url_for('main.challenge_editor', challenge_id=challenge.id) }}" class="btn btn-sm btn-primary">Edit</a>
+                    <a href="{{ url_for('bp_admin.challenge_editor', challenge_id=challenge.id) }}" class="btn btn-sm btn-primary">Edit</a>
                     <button onclick="deleteChallenge({{ challenge.id }})" class="btn btn-sm btn-danger">Delete</button>
                 </td>
             </tr>

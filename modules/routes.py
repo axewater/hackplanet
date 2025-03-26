@@ -149,24 +149,6 @@ def utility_processor():
 
 
 
-@bp.route('/delete_avatar/<path:avatar_path>', methods=['POST'])
-@login_required
-def delete_avatar(avatar_path):
-    
-    full_avatar_path = os.path.join(current_app.static_folder, avatar_path)
-    print(f"Route: /delete_avatar {full_avatar_path}")
-
-    if os.path.exists(full_avatar_path):
-        os.remove(full_avatar_path)
-        flash(f'Avatar image {full_avatar_path} deleted successfully!')
-        print(f"Avatar image {full_avatar_path} deleted successfully!")
-    else:
-        flash(f'Avatar image {full_avatar_path} not found.')
-
-    return redirect(url_for('main.bot_generator'))
-
-
-
 
 
 @bp.route('/api/users')
@@ -297,41 +279,6 @@ def get_user(user_id):
     else:
         print(f"User not found with id: {user_id}")
         return jsonify({'error': 'User not found'}), 404
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 @bp.route('/ctf')
@@ -476,230 +423,6 @@ def get_hint(challenge_id):
         }), 500
 
 
-
-@bp.route('/admin/lab_editor/<int:lab_id>', methods=['GET', 'POST'])
-@bp.route('/admin/lab_editor', methods=['GET', 'POST'])
-@login_required
-@admin_required
-def lab_editor(lab_id=None):
-    form = LabForm()
-    lab = Lab.query.get(lab_id) if lab_id else None
-
-    if request.method == 'GET':
-        if lab:
-            form = LabForm(obj=lab)
-        return render_template('admin/lab_editor.html', form=form, lab=lab)
-
-    if request.method == 'POST':
-        data = request.get_json()
-        print(f"Received JSON data: {data}")
-        
-        form = LabForm(data=data)
-        if form.validate():
-            try:
-                if lab:
-                    form.populate_obj(lab)
-                    print(f"Updating existing lab: {lab.id}")
-                else:
-                    lab = Lab(
-                        name=form.name.data,
-                        image=form.image.data,
-                        description=form.description.data,
-                        vpn_server=form.vpn_server.data,
-                        vpn_file=form.vpn_file.data,
-                        date_created=datetime.utcnow()
-                    )
-                    db.session.add(lab)
-                    print("Creating new lab")
-                
-                # Update the image field with the selected filename
-                if form.image.data:
-                    lab.image = form.image.data
-
-                db.session.commit()
-                print(f"Lab saved successfully: {lab.id}")
-                return jsonify({'success': True, 'message': 'Lab saved successfully.', 'lab_id': lab.id})
-            except Exception as e:
-                db.session.rollback()
-                logging.error(f"Error saving lab: {str(e)}")
-                return jsonify({'success': False, 'message': 'An error occurred while saving the lab.', 'error': str(e)}), 500
-        else:
-            print(f"Form validation errors: {form.errors}")
-            return jsonify({'success': False, 'message': 'Form validation failed.', 'errors': form.errors}), 400
-
-@bp.route('/admin/lab_manager', methods=['GET'])
-@login_required
-@admin_required
-def lab_manager():
-    print("Entered lab_manager route")
-    labs = Lab.query.options(joinedload(Lab.hosts).joinedload(Host.flags)).all()
-    csrf_form = CsrfProtectForm()
-    
-    labs_without_flags = []
-    for lab in labs:
-        if not any(host.flags for host in lab.hosts):
-            labs_without_flags.append(lab)
-    
-    return render_template('admin/lab_manager.html', labs=labs, form=csrf_form, labs_without_flags=labs_without_flags)
-
-@bp.route('/admin/delete_lab/<int:lab_id>', methods=['POST'])
-@login_required
-@admin_required
-def delete_lab(lab_id):
-    try:
-        lab = Lab.query.get(lab_id)
-        if lab:
-            print(f"Deleting lab: {lab.name}")
-            try:
-                # Delete associated hosts first
-                hosts_deleted = Host.query.filter_by(lab_id=lab_id).delete()
-                db.session.delete(lab)
-                db.session.commit()
-                print(f"Lab and {hosts_deleted} associated hosts deleted successfully")
-                return jsonify({'success': True, 'message': f'Lab and {hosts_deleted} associated hosts deleted successfully'})
-            except Exception as e:
-                db.session.rollback()
-                print(f"Error deleting lab: {str(e)}", exc_info=True)
-                return jsonify({
-                    'success': False,
-                    'message': f'An error occurred while deleting the lab: {str(e)}'
-                }), 500
-        else:
-            print(f"Lab not found: {lab_id}")
-            return jsonify({
-                'success': False,
-                'message': 'Lab not found'
-            }), 404
-    except Exception as e:
-        print(f"Unexpected error in delete_lab: {str(e)}", exc_info=True)
-        return jsonify({
-            'success': False,
-            'message': f'An unexpected error occurred: {str(e)}'
-        }), 500
-
-@bp.route('/admin/get_lab/<int:lab_id>', methods=['GET'])
-@login_required
-@admin_required
-def get_lab(lab_id):
-    lab = Lab.query.get_or_404(lab_id)
-    return jsonify({
-        'name': lab.name,
-        'image': lab.image,
-        'description': lab.description,
-        'vpn_server': lab.vpn_server,
-        'vpn_file': lab.vpn_file
-    })
-
-@bp.route('/admin/challenge_manager', methods=['GET'])
-@login_required
-@admin_required
-def challenge_manager():
-    print("Entered challenge_manager route")
-    challenges = Challenge.query.all()
-    csrf_form = CsrfProtectForm()
-    return render_template('admin/challenge_manager.html', challenges=challenges, form=csrf_form)
-
-@bp.route('/admin/delete_challenge/<int:challenge_id>', methods=['POST'])
-@login_required
-@admin_required
-def delete_challenge(challenge_id):
-    challenge = Challenge.query.get(challenge_id)
-    if challenge:
-        try:
-            # Check for related data
-            related_data = ChallengesObtained.query.filter_by(challenge_id=challenge_id).first()
-            if related_data:
-                return jsonify({
-                    'success': False,
-                    'message': 'Cannot delete challenge. It has related user progress data.'
-                }), 400
-
-            db.session.delete(challenge)
-            db.session.commit()
-            flash('Challenge deleted successfully.', 'success')
-            return jsonify({'success': True})
-        except Exception as e:
-            db.session.rollback()
-            logging.error(f"Error deleting challenge: {str(e)}")
-            return jsonify({
-                'success': False,
-                'message': 'An error occurred while deleting the challenge.'
-            }), 500
-    else:
-        return jsonify({
-            'success': False,
-            'message': 'Challenge not found'
-        }), 404
-
-@bp.route('/admin/get_solution/<int:challenge_id>')
-@login_required
-@admin_required
-def get_solution(challenge_id):
-    challenge = Challenge.query.get_or_404(challenge_id)
-    return jsonify({'solution': challenge.solution})
-
-@bp.route('/admin/get_challenge_description/<int:challenge_id>')
-@login_required
-@admin_required
-def get_challenge_description(challenge_id):
-    challenge = Challenge.query.get_or_404(challenge_id)
-    return jsonify({'description': challenge.description})
-
-@bp.route('/admin/challenge_editor/<int:challenge_id>', methods=['GET', 'POST'])
-@bp.route('/admin/challenge_editor', methods=['GET', 'POST'])
-@login_required
-@admin_required
-def challenge_editor(challenge_id=None):
-    form = ChallengeForm()
-    challenge = Challenge.query.get(challenge_id) if challenge_id else None
-
-    if form.validate_on_submit():
-        try:
-            if challenge:
-                challenge.name = form.name.data
-                challenge.description = form.description.data
-                challenge.flag_uuid = form.flag_uuid.data or str(uuid4())
-                challenge.html_link = form.html_link.data
-                challenge.point_value = form.point_value.data
-                challenge.downloadable_file = form.downloadable_file.data
-                challenge.hint = form.hint.data
-                challenge.hint_cost = form.hint_cost.data
-                challenge.solution = form.solution.data  # Add this line to save the solution
-                challenge.solution = form.solution.data  # New field
-            else:
-                challenge = Challenge(
-                    name=form.name.data,
-                    description=form.description.data,
-                    flag_uuid=form.flag_uuid.data or str(uuid4()),
-                    html_link=form.html_link.data,
-                    point_value=form.point_value.data,
-                    downloadable_file=form.downloadable_file.data,
-                    hint=form.hint.data,
-                    hint_cost=form.hint_cost.data,
-                    solution=form.solution.data  # New field
-                )
-                db.session.add(challenge)
-            
-            db.session.commit()
-            flash('Challenge saved successfully.', 'success')
-            return redirect(url_for('main.challenge_manager'))
-        except Exception as e:
-            db.session.rollback()
-            logging.error(f"Error saving challenge: {str(e)}")
-            flash('An error occurred while saving the challenge. Please try again.', 'danger')
-
-    if challenge:
-        form.name.data = challenge.name
-        form.description.data = challenge.description
-        form.flag_uuid.data = challenge.flag_uuid
-        form.html_link.data = challenge.html_link
-        form.point_value.data = challenge.point_value
-        form.downloadable_file.data = challenge.downloadable_file
-        form.hint.data = challenge.hint
-        form.hint_cost.data = challenge.hint_cost
-        form.solution.data = challenge.solution  # Add this line to populate the solution field
-
-    return render_template('admin/challenge_editor.html', form=form, challenge=challenge)
 
 
 @bp.route('/ctf/quizzes')
@@ -932,66 +655,26 @@ def hacker_profile(user_id):
                            quiz_results=quiz_results,
                            total_score=total_score)
 
-@bp.route('/admin/host_manager', methods=['GET'])
+
+
+
+@bp.route('/delete_avatar/<path:avatar_path>', methods=['POST'])
 @login_required
-@admin_required
-def host_manager():
-    hosts = Host.query.all()
-    csrf_form = CsrfProtectForm()
-    return render_template('admin/host_manager.html', hosts=hosts, form=csrf_form)
+def delete_avatar(avatar_path):
+    
+    full_avatar_path = os.path.join(current_app.static_folder, avatar_path)
+    print(f"Route: /delete_avatar {full_avatar_path}")
 
-@bp.route('/admin/host_editor/<int:host_id>', methods=['GET', 'POST'])
-@bp.route('/admin/host_editor', methods=['GET', 'POST'])
-@login_required
-@admin_required
-def host_editor(host_id=None):
-    form = HostForm()
-    labs = Lab.query.all()
-    host = Host.query.get(host_id) if host_id else None
-
-    if request.method == 'POST':
-        if form.validate_on_submit():
-            try:
-                if host:
-                    form.populate_obj(host)
-                else:
-                    host = Host()
-                    form.populate_obj(host)
-                    db.session.add(host)
-                
-                host.lab_id = form.lab_id.data
-                
-                # Update the image_url field with the selected filename
-                if form.image_url.data:
-                    host.image_url = form.image_url.data
-
-                print(f"Lab ID being set: {host.lab_id}")
-                print(f"Full form data: {form.data}")
-                db.session.commit()
-                return jsonify({'success': True, 'message': 'Host saved successfully.'})
-            except Exception as e:
-                db.session.rollback()
-                print(f"Error saving host: {str(e)}")
-                return jsonify({'success': False, 'message': 'An error occurred while saving the host.', 'errors': form.errors}), 400
-        else:
-            print(f"Form validation failed: {form.errors}")
-            return jsonify({'success': False, 'message': 'Validation failed.', 'errors': form.errors}), 400
-
-    if host:
-        form = HostForm(obj=host)
-        form.lab_id.data = host.lab_id
+    if os.path.exists(full_avatar_path):
+        os.remove(full_avatar_path)
+        flash(f'Avatar image {full_avatar_path} deleted successfully!')
+        print(f"Avatar image {full_avatar_path} deleted successfully!")
     else:
-        form.lab_id.data = labs[0].id if labs else None  # Set a default lab if available
-    
-    # Populate the image choices
-    form.image_url.choices = [('', 'Select an image')] + [(f, f) for f in get_image_choices()]
-    
-    return render_template('admin/host_editor.html', form=form, host=host, labs=labs)
+        flash(f'Avatar image {full_avatar_path} not found.')
 
-def get_image_choices():
-    image_folder = os.path.join(current_app.config['UPLOAD_FOLDER'], 'images', 'hosts')
-    image_files = [f for f in os.listdir(image_folder) if f.lower().endswith(('.png', '.jpg', '.jpeg', '.gif'))]
-    return image_files
+    return redirect(url_for('main.bot_generator'))
+
+
 
 @bp.route('/ctf/host_details/<int:host_id>')
 @login_required
