@@ -9,8 +9,6 @@ from flask_wtf.csrf import CSRFProtect
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from config import Config
-from modules.routes_site import site_bp
-from modules.routes_integrations import int_bp
 
 from urllib.parse import urlparse
 from flask_caching import Cache
@@ -72,9 +70,14 @@ def create_app():
     with app.app_context():
         from . import routes, models
         db.create_all()
+    from modules.routes_site import site_bp
+    from modules.routes_integrations import int_bp
+    from modules.routes_settings import bp_settings
+
     app.register_blueprint(routes.bp)
     app.register_blueprint(site_bp)
     app.register_blueprint(int_bp)
+    app.register_blueprint(bp_settings)
     return app
 
 
