@@ -75,6 +75,7 @@ def create_app():
     from modules.routes_settings import bp_settings
     from modules.routes_login import bp_login
     from modules.routes_admin import bp_admin
+    from modules.routes_help import bp_help
 
     app.register_blueprint(routes.bp)
     app.register_blueprint(site_bp)
@@ -82,6 +83,7 @@ def create_app():
     app.register_blueprint(bp_settings)
     app.register_blueprint(bp_login)
     app.register_blueprint(bp_admin)
+    app.register_blueprint(bp_help)
     return app
 
 

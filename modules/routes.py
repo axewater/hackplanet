@@ -1474,40 +1474,6 @@ def view_course_material(filename):
     return send_from_directory(current_app.config['UPLOAD_FOLDER'], 'studyfiles/' + filename)
 
 
-@bp.route('/help')
-@login_required
-def help_page():
-    return render_template('help/overview.html')
-
-@bp.route('/help/getting_started')
-@login_required
-def help_getting_started():
-    return render_template('help/getting_started.html')
-
-@bp.route('/help/ctf_challenges')
-@login_required
-def help_ctf_challenges():
-    return render_template('help/ctf_challenges.html')
-
-@bp.route('/help/labs')
-@login_required
-def help_labs():
-    return render_template('help/labs.html')
-
-@bp.route('/help/study_room')
-@login_required
-def help_study_room():
-    return render_template('help/study_room.html')
-
-@bp.route('/help/scoring')
-@login_required
-def help_scoring():
-    return render_template('help/scoring.html')
-
-@bp.route('/help/platform_features')
-@login_required
-def help_platform_features():
-    return render_template('help/platform_features.html')
 
 @bp.route('/api/host_status')
 @login_required

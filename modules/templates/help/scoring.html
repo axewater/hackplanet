@@ -34,7 +34,7 @@
                     <h4>Quick Navigation</h4>
                     <div class="btn-group" role="group" aria-label="Navigation Buttons">
                         <a href="{{ url_for('bp_settings.settings_profile_edit') }}" class="btn btn-primary">Edit Profile</a>
-                        <a href="{{ url_for('main.user_details', user_id=current_user.id) }}" class="btn btn-info">View Profile</a>
+                        <a href="{{ url_for('bp_settings.settings_profile_view', user_id=current_user.id) }}" class="btn btn-info">View Profile</a>
                         <a href="{{ url_for('main.leaderboard') }}" class="btn btn-success">Leaderboard</a>
                     </div>
                 </div>

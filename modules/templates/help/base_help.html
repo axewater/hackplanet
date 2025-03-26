@@ -7,25 +7,25 @@
                 <div class="help-navigation">
                     <h3>Help Topics</h3>
                     <div class="list-group">
-                        <a href="{{ url_for('main.help_page') }}" class="list-group-item list-group-item-action {% if request.endpoint == 'main.help_page' %}active{% endif %}">
+                        <a href="{{ url_for('bp_help.help_page') }}" class="list-group-item list-group-item-action {% if request.endpoint == 'bp_help.help_page' %}active{% endif %}">
                             <i class="fas fa-home"></i> Overview
                         </a>
-                        <a href="{{ url_for('main.help_getting_started') }}" class="list-group-item list-group-item-action {% if request.endpoint == 'main.help_getting_started' %}active{% endif %}">
+                        <a href="{{ url_for('bp_help.help_getting_started') }}" class="list-group-item list-group-item-action {% if request.endpoint == 'bp_help.help_getting_started' %}active{% endif %}">
                             <i class="fas fa-rocket"></i> Getting Started
                         </a>
-                        <a href="{{ url_for('main.help_ctf_challenges') }}" class="list-group-item list-group-item-action {% if request.endpoint == 'main.help_ctf_challenges' %}active{% endif %}">
+                        <a href="{{ url_for('bp_help.help_ctf_challenges') }}" class="list-group-item list-group-item-action {% if request.endpoint == 'bp_help.help_ctf_challenges' %}active{% endif %}">
                             <i class="fas fa-flag"></i> CTF Challenges
                         </a>
-                        <a href="{{ url_for('main.help_labs') }}" class="list-group-item list-group-item-action {% if request.endpoint == 'main.help_labs' %}active{% endif %}">
+                        <a href="{{ url_for('bp_help.help_labs') }}" class="list-group-item list-group-item-action {% if request.endpoint == 'bp_help.help_labs' %}active{% endif %}">
                             <i class="fas fa-server"></i> Hacking Labs
                         </a>
-                        <a href="{{ url_for('main.help_study_room') }}" class="list-group-item list-group-item-action {% if request.endpoint == 'main.help_study_room' %}active{% endif %}">
+                        <a href="{{ url_for('bp_help.help_study_room') }}" class="list-group-item list-group-item-action {% if request.endpoint == 'bp_help.help_study_room' %}active{% endif %}">
                             <i class="fas fa-book"></i> Study Room
                         </a>
-                        <a href="{{ url_for('main.help_scoring') }}" class="list-group-item list-group-item-action {% if request.endpoint == 'main.help_scoring' %}active{% endif %}">
+                        <a href="{{ url_for('bp_help.help_scoring') }}" class="list-group-item list-group-item-action {% if request.endpoint == 'bp_help.help_scoring' %}active{% endif %}">
                             <i class="fas fa-trophy"></i> Scoring
                         </a>
-                        <a href="{{ url_for('main.help_platform_features') }}" class="list-group-item list-group-item-action {% if request.endpoint == 'main.help_platform_features' %}active{% endif %}">
+                        <a href="{{ url_for('bp_help.help_platform_features') }}" class="list-group-item list-group-item-action {% if request.endpoint == 'bp_help.help_platform_features' %}active{% endif %}">
                             <i class="fas fa-cogs"></i> Platform Features
                         </a>
                     </div>
