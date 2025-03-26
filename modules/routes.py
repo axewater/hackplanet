@@ -28,14 +28,12 @@ from authlib.jose import jwt
 from urllib.parse import unquote
 
 from modules.forms import (
-    UserPasswordForm, UserDetailForm, EditProfileForm, NewsletterForm, WhitelistForm, EditUserForm, ChallengeForm,
-    UserManagementForm, CsrfProtectForm, LoginForm, ResetPasswordRequestForm, RegistrationForm, HostForm, RSSConfigForm,
-    UserPreferencesForm, InviteForm, CsrfForm, LabForm, FlagSubmissionForm, ChallengeSubmissionForm,
-    QuizForm, QuestionForm, FlagForm, CourseForm, ThemeUploadForm, UserThemePreferencesForm, SystemMessageForm
+    RSSConfigForm, FlagSubmissionForm, ChallengeSubmissionForm,
+    QuizForm, QuestionForm, FlagForm, CourseForm, ThemeUploadForm, UserThemePreferencesForm
 )
 
 from modules.models import (
-    User, Whitelist, UserPreference, GlobalSettings, InviteToken, Lab, Challenge, Host, RSSConfig, ProfileBackground,
+    User, Whitelist, UserPreference, GlobalSettings, Lab, Challenge, Host, RSSConfig,
     Flag, FlagsObtained, ChallengesObtained, Quiz, Question, UserQuizProgress, UserQuestionProgress, Course,
     SystemMessage, message_read_status
 )
@@ -752,11 +750,7 @@ def quiz_editor(quiz_id=None):
 
     return render_template('admin/quiz_editor.html', form=form, quiz=quiz)
 
-@bp.route('/admin/help')
-@login_required
-@admin_required
-def admin_help():
-    return render_template('admin/admin_help.html')
+
 
 @bp.route('/admin/delete_quiz/<int:quiz_id>', methods=['POST'])
 @login_required

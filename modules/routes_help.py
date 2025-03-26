@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template
 from flask_login import login_required, current_user
 from modules.models import SystemMessage
+from modules.utilities import admin_required
 
 bp_help = Blueprint('bp_help', __name__)
 
@@ -14,6 +15,11 @@ def utility_processor():
         return 0
     return dict(get_unread_message_count=get_unread_message_count)
 
+@bp_help.route('/admin/help')
+@login_required
+@admin_required
+def admin_help():
+    return render_template('admin/admin_help.html')
 
 @bp_help.route('/help')
 @login_required
