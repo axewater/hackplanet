@@ -10,7 +10,10 @@
 </div>
 {% endif %}
 {% endwith %}
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="{{ url_for('static', filename='js/host_details.js') }}"></script>
 
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 
 <div class="container mt-4">
     <a href="{{ url_for('main.hacking_labs') }}" class="btn btn-secondary">Back to Hacking Labs</a>
@@ -200,8 +203,7 @@
     </div>
 </div>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="{{ url_for('static', filename='js/host_details.js') }}"></script>
+
 {% endblock %}
 
 <style>
@@ -216,7 +218,7 @@
     color: #FFD700;
 }
 .rating-input i.active {
-    color: #FFD700;
+    color: #FFD700 !important;
 }
 @keyframes starPulse {
     0% { transform: scale(1); }
@@ -234,7 +236,7 @@
     font-size: 18px;
 }
 .stars i.active {
-    color: #FFD700;
+    color: #FFD700 !important;
 }
 .rating-value {
     font-weight: bold;
@@ -246,5 +248,3 @@
     margin-top: 10px;
 }
 </style>
-
-<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>

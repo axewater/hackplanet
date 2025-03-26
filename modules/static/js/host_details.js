@@ -59,13 +59,13 @@ $(document).ready(function() {
     function initializeStarRatings() {
         // For display-only stars
         $('.stars').each(function() {
-            const rating = parseFloat($(this).data('rating')) || 0;
+            const rating = Math.round(parseFloat($(this).data('rating')) || 0);
             $(this).empty();
             
             for (let i = 1; i <= 5; i++) {
                 const star = $('<i class="fas fa-star"></i>');
                 if (i <= rating) {
-                    star.addClass('active');
+                    star.css('color', '#FFD700'); // Set color to yellow for filled stars
                 }
                 $(this).append(star);
             }
@@ -151,20 +151,20 @@ $(document).ready(function() {
         const reviewsList = $('<div class="reviews-list"></div>');
         
         reviews.forEach(review => {
-            const reviewElement = $(`
+            const reviewElement = `
                 <div class="review-item card mb-3">
                     <div class="card-body">
                         <h5 class="card-title">${review.user_name}</h5>
                         <div class="review-ratings">
-                            <p><strong>Difficulty:</strong> <span class="stars" data-rating="${review.difficulty_rating}"></span></p>
-                            <p><strong>Fun:</strong> <span class="stars" data-rating="${review.fun_rating}"></span></p>
-                            <p><strong>Realism:</strong> <span class="stars" data-rating="${review.realism_rating}"></span></p>
+                            <p><strong>Difficulty:</strong> <span class="stars" data-rating="${review.difficulty_rating}"></span> (${review.difficulty_rating})</p>
+                            <p><strong>Fun:</strong> <span class="stars" data-rating="${review.fun_rating}"></span> (${review.fun_rating})</p>
+                            <p><strong>Realism:</strong> <span class="stars" data-rating="${review.realism_rating}"></span> (${review.realism_rating})</p>
                         </div>
                         ${review.comment ? `<p class="review-comment">${review.comment}</p>` : ''}
                         <small class="text-muted">Reviewed on ${review.created_at}</small>
                     </div>
                 </div>
-            `);
+            `;
             
             reviewsList.append(reviewElement);
         });
