@@ -12,7 +12,7 @@
 <div class="container">
     <div class="glass-panel">
         <h1>Quiz Manager</h1>
-        <a href="{{ url_for('main.quiz_editor') }}" class="btn btn-primary mb-3">Add New Quiz</a>
+        <a href="{{ url_for('bp_quiz.quiz_editor') }}" class="btn btn-primary mb-3">Add New Quiz</a>
         <table class="table">
             <thead>
                 <tr>
@@ -39,9 +39,9 @@
                     <td>{{ quiz.min_score }}</td>
                     <td>{{ quiz.questions|length }}</td>
                     <td>
-                        <a href="{{ url_for('main.quiz_editor', quiz_id=quiz.id) }}" class="btn btn-sm btn-primary">Edit</a>
-                        <a href="{{ url_for('main.question_editor', quiz_id=quiz.id) }}" class="btn btn-sm btn-success">Add Question</a>
-                        <form action="{{ url_for('main.delete_quiz', quiz_id=quiz.id) }}" method="POST" style="display: inline;">
+                        <a href="{{ url_for('bp_quiz.quiz_editor', quiz_id=quiz.id) }}" class="btn btn-sm btn-primary">Edit</a>
+                        <a href="{{ url_for('bp_quiz.question_editor', quiz_id=quiz.id) }}" class="btn btn-sm btn-success">Add Question</a>
+                        <form action="{{ url_for('bp_quiz.delete_quiz', quiz_id=quiz.id) }}" method="POST" style="display: inline;">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                             <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this quiz? This action cannot be undone if the quiz has no questions or user progress.')">Delete</button>
                         </form>

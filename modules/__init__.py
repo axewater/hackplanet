@@ -78,6 +78,7 @@ def create_app():
     from modules.routes_help import bp_help
     from modules.routes_vm import bp_vm
     from modules.routes_api import bp_api
+    from modules.routes_quiz import bp_quiz
 
     app.register_blueprint(routes.bp)
     app.register_blueprint(site_bp)
@@ -88,6 +89,7 @@ def create_app():
     app.register_blueprint(bp_help)
     app.register_blueprint(bp_vm)
     app.register_blueprint(bp_api)
+    app.register_blueprint(bp_quiz)
     return app
 
 
