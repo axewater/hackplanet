@@ -1,7 +1,7 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, abort
 from flask_login import login_required, current_user
 from modules import db
-from modules.models import User
+from modules.models import User, Host, HostReview
 from sqlalchemy import func
 from modules.utilities import admin_required
 
@@ -111,4 +111,105 @@ def check_username():
     existing_user = User.query.filter(func.lower(User.name) == func.lower(username)).first()
     return jsonify({"exists": existing_user is not None})
 
+@bp_api.route('/api/host/<int:host_id>/review', methods=['POST'])
+@login_required
+def submit_host_review(host_id):
+    """API endpoint to submit a review for a host"""
+    host = Host.query.get_or_404(host_id)
+    
+    # Verify the user has completed both flags for this host
+    if not host.has_completed_both_flags(current_user.id):
+        return jsonify({
+            'success': False,
+            'message': 'You must complete both user and root flags before reviewing this host'
+        }), 403
+    
+    data = request.json
+    
+    # Validate rating values
+    for rating_type in ['difficulty', 'fun', 'realism']:
+        rating = data.get(f'{rating_type}_rating')
+        if not rating or not isinstance(rating, int) or rating < 1 or rating > 5:
+            return jsonify({
+                'success': False,
+                'message': f'Invalid {rating_type} rating. Must be an integer between 1 and 5.'
+            }), 400
+    
+    # Check if user has already reviewed this host
+    existing_review = HostReview.query.filter_by(user_id=current_user.id, host_id=host_id).first()
+    
+    try:
+        if existing_review:
+            # Update existing review
+            existing_review.difficulty_rating = data['difficulty_rating']
+            existing_review.fun_rating = data['fun_rating']
+            existing_review.realism_rating = data['realism_rating']
+            existing_review.comment = data.get('comment', '')
+            message = 'Review updated successfully'
+        else:
+            # Create new review
+            review = HostReview(
+                user_id=current_user.id,
+                host_id=host_id,
+                difficulty_rating=data['difficulty_rating'],
+                fun_rating=data['fun_rating'],
+                realism_rating=data['realism_rating'],
+                comment=data.get('comment', '')
+            )
+            db.session.add(review)
+            message = 'Review submitted successfully'
+        
+        db.session.commit()
+        return jsonify({'success': True, 'message': message})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'message': str(e)}), 500
 
+@bp_api.route('/api/host/<int:host_id>/reviews', methods=['GET'])
+@login_required
+def get_host_reviews(host_id):
+    """API endpoint to get reviews for a host"""
+    host = Host.query.get_or_404(host_id)
+    
+    # Get all reviews for this host
+    reviews = HostReview.query.filter_by(host_id=host_id).all()
+    
+    # Format the reviews
+    formatted_reviews = []
+    for review in reviews:
+        user = User.query.get(review.user_id)
+        formatted_reviews.append({
+            'id': review.id,
+            'user_name': user.name,
+            'difficulty_rating': review.difficulty_rating,
+            'fun_rating': review.fun_rating,
+            'realism_rating': review.realism_rating,
+            'comment': review.comment,
+            'created_at': review.created_at.strftime('%Y-%m-%d %H:%M:%S')
+        })
+    
+    # Return the reviews along with average ratings
+    return jsonify({'success': True, 'reviews': formatted_reviews})
+
+@bp_api.route('/api/host/<int:host_id>/user_review', methods=['GET'])
+@login_required
+def get_user_host_review(host_id):
+    """API endpoint to get the current user's review for a host"""
+    host = Host.query.get_or_404(host_id)
+    
+    # Get the user's review for this host
+    review = HostReview.query.filter_by(host_id=host_id, user_id=current_user.id).first()
+    
+    if not review:
+        return jsonify({'success': False, 'message': 'No review found'})
+    
+    # Format the review
+    formatted_review = {
+        'id': review.id,
+        'difficulty_rating': review.difficulty_rating,
+        'fun_rating': review.fun_rating,
+        'realism_rating': review.realism_rating,
+        'comment': review.comment
+    }
+    
+    return jsonify({'success': True, 'review': formatted_review})

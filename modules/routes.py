@@ -35,7 +35,7 @@ from modules.forms import (
 from modules.models import (
     User, Whitelist, UserPreference, GlobalSettings, Lab, Challenge, Host, RSSConfig,
     Flag, FlagsObtained, ChallengesObtained, Quiz, Question, UserQuizProgress, UserQuestionProgress, Course,
-    SystemMessage, message_read_status
+    SystemMessage, message_read_status, HostReview
 )
 from modules.utilities import admin_required
 from feedgen.feed import FeedGenerator
@@ -384,7 +384,10 @@ def take_quiz(quiz_id):
         else:
             flash('Answer recorded. You can continue with the next question or review previous ones.', 'info')
 
-    return render_template('site/take_quiz.html', quiz=quiz, question=current_question, progress=user_progress)
+    return render_template('site/take_quiz.html',
+                           quiz=quiz,
+                           question=current_question,
+                           progress=user_progress)
 
 @bp.route('/ctf/quiz_results/<int:quiz_id>')
 @login_required
@@ -445,6 +448,17 @@ def hacking_labs():
                 
                 host.user_flag_completed = user_flag is not None
                 host.root_flag_completed = root_flag is not None
+                
+                # Calculate average ratings for display
+                # Instead of assigning to the properties directly, we'll just use them
+                # The properties will calculate the values when accessed in the template
+                # We don't need to do anything here, as the properties will be accessed
+                # directly in the template when needed
+                # This avoids the AttributeError since we're not trying to set the properties
+                # that don't have setters
+                
+                # Check if the user has already reviewed this host
+                host.user_has_reviewed = host.has_user_reviewed(current_user.id)
 
     # Instantiate the FlagSubmissionForm
     form = FlagSubmissionForm()
@@ -758,7 +772,7 @@ def delete_theme(theme_name):
 def inject_current_theme():
     current_theme = 'default'
     if current_user.is_authenticated:
-        if current_user.preferences:
+        if current_user.preferences: 
             current_theme = current_user.preferences.theme or 'default'
         else:
             current_user.preferences = UserPreference(user_id=current_user.id)
@@ -1262,3 +1276,106 @@ def submit_challenge_flag():
         db.session.rollback()
         print(f"Error submitting challenge flag: {str(e)}")
         return jsonify({'success': False, 'message': 'An error occurred while submitting the flag'}), 500
+
+@bp.route('/api/host/<int:host_id>/review', methods=['POST'])
+@login_required
+def submit_host_review(host_id):
+    """API endpoint to submit a review for a host"""
+    host = Host.query.get_or_404(host_id)
+    
+    # Verify the user has completed both flags for this host
+    if not host.has_completed_both_flags(current_user.id):
+        return jsonify({
+            'success': False,
+            'message': 'You must complete both user and root flags before reviewing this host'
+        }), 403
+    
+    data = request.json
+    
+    # Validate rating values
+    for rating_type in ['difficulty', 'fun', 'realism']:
+        rating = data.get(f'{rating_type}_rating')
+        if not rating or not isinstance(rating, int) or rating < 1 or rating > 5:
+            return jsonify({
+                'success': False,
+                'message': f'Invalid {rating_type} rating. Must be an integer between 1 and 5.'
+            }), 400
+    
+    # Check if user has already reviewed this host
+    existing_review = HostReview.query.filter_by(user_id=current_user.id, host_id=host_id).first()
+    
+    try:
+        if existing_review:
+            # Update existing review
+            existing_review.difficulty_rating = data['difficulty_rating']
+            existing_review.fun_rating = data['fun_rating']
+            existing_review.realism_rating = data['realism_rating']
+            existing_review.comment = data.get('comment', '')
+            message = 'Review updated successfully'
+        else:
+            # Create new review
+            review = HostReview(
+                user_id=current_user.id,
+                host_id=host_id,
+                difficulty_rating=data['difficulty_rating'],
+                fun_rating=data['fun_rating'],
+                realism_rating=data['realism_rating'],
+                comment=data.get('comment', '')
+            )
+            db.session.add(review)
+            message = 'Review submitted successfully'
+        
+        db.session.commit()
+        return jsonify({'success': True, 'message': message})
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'success': False, 'message': str(e)}), 500
+
+@bp.route('/api/host/<int:host_id>/reviews', methods=['GET'])
+@login_required
+def get_host_reviews(host_id):
+    """API endpoint to get reviews for a host"""
+    host = Host.query.get_or_404(host_id)
+    
+    # Get all reviews for this host
+    reviews = HostReview.query.filter_by(host_id=host_id).all()
+    
+    # Format the reviews
+    formatted_reviews = []
+    for review in reviews:
+        user = User.query.get(review.user_id)
+        formatted_reviews.append({
+            'id': review.id,
+            'user_name': user.name,
+            'difficulty_rating': review.difficulty_rating,
+            'fun_rating': review.fun_rating,
+            'realism_rating': review.realism_rating,
+            'comment': review.comment,
+            'created_at': review.created_at.strftime('%Y-%m-%d %H:%M:%S')
+        })
+    
+    # Return the reviews along with average ratings
+    return jsonify({'success': True, 'reviews': formatted_reviews})
+
+@bp.route('/api/host/<int:host_id>/user_review', methods=['GET'])
+@login_required
+def get_user_host_review(host_id):
+    """API endpoint to get the current user's review for a host"""
+    host = Host.query.get_or_404(host_id)
+    
+    # Get the user's review for this host
+    review = HostReview.query.filter_by(host_id=host_id, user_id=current_user.id).first()
+    
+    if not review:
+        return jsonify({'success': False, 'message': 'No review found'})
+    
+    # Format the review
+    formatted_review = {
+        'id': review.id,
+        'difficulty_rating': review.difficulty_rating,
+        'fun_rating': review.fun_rating,
+        'realism_rating': review.realism_rating,
+        'comment': review.comment
+    }
+    
+    return jsonify({'success': True, 'review': formatted_review})

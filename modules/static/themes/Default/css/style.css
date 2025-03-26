@@ -1742,3 +1742,53 @@ form select {
     }
 }
 
+/* Host Review System Styles */
+.review-item {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    margin-bottom: 15px;
+    transition: transform 0.2s ease;
+}
+
+.review-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.review-ratings {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 10px;
+}
+
+.review-ratings p {
+    margin: 0;
+}
+
+.review-comment {
+    background-color: rgba(0, 0, 0, 0.1);
+    padding: 10px;
+    border-radius: 5px;
+    margin-top: 10px;
+    font-style: italic;
+}
+
+.host-ratings {
+    background-color: rgba(0, 0, 0, 0.2);
+    padding: 5px 10px;
+    border-radius: 5px;
+    margin: 5px 0;
+    display: inline-block;
+}
+
+.rating-value {
+    font-weight: bold;
+    margin-left: 5px;
+}
+
+.review-count {
+    color: #aaa;
+    font-style: italic;
+    margin-top: 10px;
+}

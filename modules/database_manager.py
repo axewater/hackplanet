@@ -154,3 +154,25 @@ class DatabaseManager:
             print(f"An error occurred: {e}")
         finally:
             self.engine.dispose()
+
+    def create_host_reviews_table(self):
+        create_table_sql = """
+        CREATE TABLE IF NOT EXISTS host_reviews (
+            id SERIAL PRIMARY KEY,
+            user_id INTEGER NOT NULL REFERENCES users(id),
+            host_id INTEGER NOT NULL REFERENCES hosts(id),
+            difficulty_rating INTEGER NOT NULL,
+            fun_rating INTEGER NOT NULL,
+            realism_rating INTEGER NOT NULL,
+            comment VARCHAR(500),
+            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        );
+        """
+        print("Creating host_reviews table if it doesn't exist")
+        try:
+            with self.engine.connect() as connection:
+                connection.execute(text(create_table_sql))
+                connection.commit()
+            print("Table 'host_reviews' successfully created.")
+        except Exception as e:
+            print(f"An error occurred: {e}")

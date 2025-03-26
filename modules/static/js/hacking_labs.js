@@ -1,5 +1,22 @@
 var loops = 0;
 
+function initializeStarRatings() {
+    // For display-only stars
+    document.querySelectorAll('.stars').forEach(starsElement => {
+        const rating = parseFloat(starsElement.dataset.rating) || 0;
+        starsElement.innerHTML = '';
+        
+        for (let i = 1; i <= 5; i++) {
+            const star = document.createElement('i');
+            star.className = 'fas fa-star';
+            if (i <= rating) {
+                star.classList.add('active');
+            }
+            starsElement.appendChild(star);
+        }
+    });
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     function updateHostStatus() {
         console.log('Fetching host status...');
@@ -98,4 +115,7 @@ document.addEventListener('DOMContentLoaded', function() {
             manageVPN(event.target.dataset.labId, event.target.classList.contains('start-vpn') ? 'start' : 'stop');
         }
     });
+    
+    // Initialize star ratings when page loads
+    initializeStarRatings();
 });

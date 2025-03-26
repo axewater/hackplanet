@@ -65,6 +65,44 @@
             <div class="mt-4">
                 <div class="card">
                     <div class="card-header bg-primary text-white">
+                        <h2 class="mb-0">Host Ratings</h2>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h4>Average Ratings</h4>
+                                <div class="rating-summary">
+                                    <p><strong>Difficulty:</strong> <span class="stars" data-rating="{{ host.avg_difficulty_rating }}"></span> <span class="rating-value">({{ host.avg_difficulty_rating }})</span></p>
+                                    <p><strong>Fun:</strong> <span class="stars" data-rating="{{ host.avg_fun_rating }}"></span> <span class="rating-value">({{ host.avg_fun_rating }})</span></p>
+                                    <p><strong>Realism:</strong> <span class="stars" data-rating="{{ host.avg_realism_rating }}"></span> <span class="rating-value">({{ host.avg_realism_rating }})</span></p>
+                                    <p><strong>Overall:</strong> <span class="stars" data-rating="{{ host.overall_rating }}"></span> <span class="rating-value">({{ host.overall_rating }})</span></p>
+                                    <p class="review-count"><small>Based on {{ host.reviews|length }} review(s)</small></p>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div id="review-button-container">
+                                    {% if host.has_completed_both_flags(current_user.id) %}
+                                        {% if host.has_user_reviewed(current_user.id) %}
+                                            <button id="edit-review-btn" class="btn btn-primary">Edit Your Review</button>
+                                        {% else %}
+                                            <button id="add-review-btn" class="btn btn-success">Review This Host</button>
+                                        {% endif %}
+                                    {% else %}
+                                        <div class="alert alert-info">
+                                            Complete both user and root flags to review this host.
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div id="reviews-container" class="mt-4"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-4">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
                         <h2 class="mb-0">Azure VM Management</h2>
                     </div>
                     <div class="card-body">
@@ -104,6 +142,96 @@
 
 <input type="hidden" id="host_id" value="{{ host.id }}">
 
+<!-- Review Modal -->
+<div class="modal fade" id="reviewModal" tabindex="-1" aria-labelledby="reviewModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="reviewModalLabel">Review Host: {{ host.name }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="review-form">
+                    <div class="mb-3">
+                        <label for="difficulty-rating" class="form-label">Difficulty</label>
+                        <div class="rating-input" id="difficulty-rating">
+                            <i class="fas fa-star" data-value="1"></i>
+                            <i class="fas fa-star" data-value="2"></i>
+                            <i class="fas fa-star" data-value="3"></i>
+                            <i class="fas fa-star" data-value="4"></i>
+                            <i class="fas fa-star" data-value="5"></i>
+                        </div>
+                        <input type="hidden" name="difficulty_rating" id="difficulty_rating_input" value="3">
+                    </div>
+                    <div class="mb-3">
+                        <label for="fun-rating" class="form-label">Fun</label>
+                        <div class="rating-input" id="fun-rating">
+                            <i class="fas fa-star" data-value="1"></i>
+                            <i class="fas fa-star" data-value="2"></i>
+                            <i class="fas fa-star" data-value="3"></i>
+                            <i class="fas fa-star" data-value="4"></i>
+                            <i class="fas fa-star" data-value="5"></i>
+                        </div>
+                        <input type="hidden" name="fun_rating" id="fun_rating_input" value="3">
+                    </div>
+                    <div class="mb-3">
+                        <label for="realism-rating" class="form-label">Realism</label>
+                        <div class="rating-input" id="realism-rating">
+                            <i class="fas fa-star" data-value="1"></i>
+                            <i class="fas fa-star" data-value="2"></i>
+                            <i class="fas fa-star" data-value="3"></i>
+                            <i class="fas fa-star" data-value="4"></i>
+                            <i class="fas fa-star" data-value="5"></i>
+                        </div>
+                        <input type="hidden" name="realism_rating" id="realism_rating_input" value="3">
+                    </div>
+                    <div class="mb-3">
+                        <label for="comment" class="form-label">Comment (Optional)</label>
+                        <textarea class="form-control" id="comment" name="comment" rows="3"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="submit-review">Submit Review</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script src="{{ url_for('static', filename='js/host_details.js') }}"></script>
 {% endblock %}
+
+<style>
+.rating-input i {
+    cursor: pointer;
+    color: #ccc;
+    font-size: 24px;
+    margin-right: 5px;
+}
+.rating-input i.active {
+    color: #FFD700;
+}
+.stars {
+    display: inline-block;
+}
+.stars i {
+    color: #ccc;
+    font-size: 18px;
+}
+.stars i.active {
+    color: #FFD700;
+}
+.rating-value {
+    font-weight: bold;
+    margin-left: 5px;
+}
+.review-count {
+    color: #aaa;
+    font-style: italic;
+    margin-top: 10px;
+}
+</style>
+
+<script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>

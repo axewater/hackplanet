@@ -15,5 +15,6 @@ if __name__ == '__main__':
     db_manager.add_enable_information_messages_column()
     db_manager.create_profile_backgrounds_table()
     db_manager.add_background_id_to_user_preferences()
+    db_manager.create_host_reviews_table()
     
     app.run(host="0.0.0.0", debug=True, port=5003)

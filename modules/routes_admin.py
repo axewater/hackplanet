@@ -1,7 +1,8 @@
 from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify, send_file, send_from_directory, current_app
 from flask_login import login_required
 from modules import db, cache, mail
-from modules.models import GlobalSettings, Whitelist, SystemMessage, User, Lab, Host, Challenge, ChallengesObtained, ProfileBackground
+from modules.models import GlobalSettings, Whitelist, SystemMessage, User, Lab, Host, Challenge, ChallengesObtained, ProfileBackground, UserPreference
+from modules.theme_manager import ThemeManager
 from modules.forms import NewsletterForm, WhitelistForm, SystemMessageForm, CsrfProtectForm, LabForm, ChallengeForm, HostForm
 from sqlalchemy.orm import joinedload
 from modules.utilities import admin_required
@@ -29,6 +30,20 @@ def utility_processor():
             ).count()
         return 0
     return dict(get_unread_message_count=get_unread_message_count)
+
+@bp_admin.context_processor
+def inject_current_theme():
+    current_theme = 'default'
+    if current_user.is_authenticated:
+        if current_user.preferences:
+            current_theme = current_user.preferences.theme or 'default'
+        else:
+            current_user.preferences = UserPreference(user_id=current_user.id)
+            db.session.add(current_user.preferences)
+            db.session.commit()
+    theme_manager = ThemeManager(current_app)
+    theme_data = theme_manager.get_theme_data(current_theme)
+    return dict(current_theme=current_theme, theme_data=theme_data)
 
 @bp_admin.route('/admin/dashboard')
 @login_required

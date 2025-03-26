@@ -5,10 +5,6 @@ import os
 site_bp = Blueprint('site', __name__)
 
 
-
-
-
-
 @site_bp.route('/logout')
 def logout():
     logout_user()

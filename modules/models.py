@@ -1,7 +1,7 @@
 # modules/models.py
 from argon2.exceptions import VerifyMismatchError
 from modules import db
-from sqlalchemy import Boolean
+from sqlalchemy import Boolean, Float
 from sqlalchemy import Table, Column, Integer, String, ForeignKey, Float, DateTime, Enum, func
 from sqlalchemy.dialects.sqlite import TEXT as SQLite_TEXT
 from sqlalchemy.orm import relationship
@@ -240,8 +240,84 @@ class Host(db.Model):
     def image(self):
         return self.image_url
 
+    def has_completed_both_flags(self, user_id):
+        """Check if a user has completed both user and root flags for this host"""
+        user_flag = Flag.query.filter_by(host_id=self.id, type='user').first()
+        root_flag = Flag.query.filter_by(host_id=self.id, type='root').first()
+        
+        if not user_flag or not root_flag:
+            return False
+            
+        user_flag_obtained = FlagsObtained.query.filter_by(user_id=user_id, flag_id=user_flag.id).first()
+        root_flag_obtained = FlagsObtained.query.filter_by(user_id=user_id, flag_id=root_flag.id).first()
+        
+        return user_flag_obtained is not None and root_flag_obtained is not None
+
+    def has_user_reviewed(self, user_id):
+        """Check if a user has already reviewed this host"""
+        return HostReview.query.filter_by(user_id=user_id, host_id=self.id).first() is not None
+
+    @property
+    def avg_difficulty_rating(self):
+        """Calculate average difficulty rating for this host"""
+        return self.calculate_avg_rating('difficulty')
+
+    @property
+    def avg_fun_rating(self):
+        """Calculate average fun rating for this host"""
+        return self.calculate_avg_rating('fun')
+
+    @property
+    def avg_realism_rating(self):
+        """Calculate average realism rating for this host"""
+        return self.calculate_avg_rating('realism')
+
+    @property
+    def overall_rating(self):
+        """Calculate overall rating for this host"""
+        return self.calculate_overall_rating()
+
+    @property
+    def review_count(self):
+        """Get the number of reviews for this host"""
+        return HostReview.query.filter_by(host_id=self.id).count()
+
+    def calculate_avg_rating(self, rating_type):
+        """Calculate average rating for a specific rating type"""
+        reviews = HostReview.query.filter_by(host_id=self.id).all()
+        if not reviews:
+            return 0
+        
+        total = sum(getattr(review, f"{rating_type}_rating") for review in reviews)
+        return round(total / len(reviews), 1)
+
+    def calculate_overall_rating(self):
+        """Calculate overall rating as average of all rating types"""
+        reviews = HostReview.query.filter_by(host_id=self.id).all()
+        if not reviews:
+            return 0
+        
+        total = sum(review.difficulty_rating + review.fun_rating + review.realism_rating for review in reviews)
+        return round(total / (len(reviews) * 3), 1)
 
 
+class HostReview(db.Model):
+    __tablename__ = 'host_reviews'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    host_id = db.Column(db.Integer, db.ForeignKey('hosts.id'), nullable=False)
+    difficulty_rating = db.Column(db.Integer, nullable=False)
+    fun_rating = db.Column(db.Integer, nullable=False)
+    realism_rating = db.Column(db.Integer, nullable=False)
+    comment = db.Column(db.String(500), nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
+    
+    # Relationships
+    user = db.relationship('User', backref=db.backref('host_reviews', lazy=True))
+    host = db.relationship('Host', backref=db.backref('reviews', lazy=True))
+    
+    def __repr__(self):
+        return f"<HostReview id={self.id}, user_id={self.user_id}, host_id={self.host_id}>"
 
 
 class Challenge(db.Model):

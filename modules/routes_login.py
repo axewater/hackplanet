@@ -1,7 +1,8 @@
-from flask import Blueprint, render_template, redirect, url_for, request, flash, jsonify
+from flask import Blueprint, render_template, redirect, url_for, request, flash, jsonify, current_app
 from flask_login import current_user, login_required
 from modules import db
-from modules.models import User, InviteToken, Whitelist, SystemMessage
+from modules.models import User, InviteToken, Whitelist, SystemMessage, UserPreference
+from modules.theme_manager import ThemeManager
 from modules.forms import LoginForm, RegistrationForm, ResetPasswordRequestForm, InviteForm, CsrfProtectForm
 from modules.utilities import send_email, send_password_reset_email, _authenticate_and_redirect
 from sqlalchemy.exc import IntegrityError
@@ -22,6 +23,20 @@ def utility_processor():
             ).count()
         return 0
     return dict(get_unread_message_count=get_unread_message_count)
+
+@bp_login.context_processor
+def inject_current_theme():
+    current_theme = 'default'
+    if current_user.is_authenticated:
+        if current_user.preferences:
+            current_theme = current_user.preferences.theme or 'default'
+        else:
+            current_user.preferences = UserPreference(user_id=current_user.id)
+            db.session.add(current_user.preferences)
+            db.session.commit()
+    theme_manager = ThemeManager(current_app)
+    theme_data = theme_manager.get_theme_data(current_theme)
+    return dict(current_theme=current_theme, theme_data=theme_data)
 
 @bp_login.route('/restricted')
 @login_required
