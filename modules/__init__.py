@@ -63,7 +63,7 @@ def create_app():
 
     login_manager.init_app(app)
     mail.init_app(app)
-    login_manager.login_view = 'main.login'
+    login_manager.login_view = 'bp_login.login'
     cache.init_app(app)
     limiter.init_app(app)
 
@@ -73,11 +73,13 @@ def create_app():
     from modules.routes_site import site_bp
     from modules.routes_integrations import int_bp
     from modules.routes_settings import bp_settings
+    from modules.routes_login import bp_login
 
     app.register_blueprint(routes.bp)
     app.register_blueprint(site_bp)
     app.register_blueprint(int_bp)
     app.register_blueprint(bp_settings)
+    app.register_blueprint(bp_login)
     return app
 
 

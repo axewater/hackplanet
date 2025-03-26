@@ -188,7 +188,7 @@ def settings_panel():
         db.session.add(current_user.preferences)
         db.session.commit()
         flash('Your settings have been updated.', 'success')
-        return redirect(url_for('main.restricted'))
+        return redirect(url_for('bp_login.restricted'))
     elif request.method == 'GET':
         # Ensure preferences exist
         if not current_user.preferences:

@@ -12,13 +12,13 @@ site_bp = Blueprint('site', __name__)
 @site_bp.route('/logout')
 def logout():
     logout_user()
-    return redirect(url_for('main.login'))
+    return redirect(url_for('bp_login.login'))
 
 
 @site_bp.route('/', methods=['GET', 'POST'])
 @site_bp.route('/index', methods=['GET', 'POST'])
 def index():
-    return redirect(url_for('main.login'))
+    return redirect(url_for('bp_login.login'))
 
 
 

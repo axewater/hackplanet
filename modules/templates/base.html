@@ -43,7 +43,7 @@
         <div id="userAccountMenu" class="user-account-menu hide">
             <a href="{{ url_for('main.hacker_profile', user_id=current_user.id) }}" class="account-menu-option">Profile</a>
             
-            <a href="{{ url_for('main.invites') }}" class="account-menu-option">Invites</a>
+            <a href="{{ url_for('bp_login.invites') }}" class="account-menu-option">Invites</a>
             <a href="{{ url_for('main.user_theme_preferences') }}" class="account-menu-option">Theme</a>
             <a href="{{ url_for('bp_settings.account_pw') }}" class="account-menu-option">Change Password</a>
             <a href="{{ url_for('site.logout') }}" class="account-menu-option">Logout</a>
@@ -109,8 +109,8 @@
             {% endif %}
             
         {% else %}
-            <a href="{{ url_for('main.login') }}" class="sidebar-link"><i class="fas fa-sign-in-alt"></i><span class="link-text">Login</span></a>
-            <a href="{{ url_for('main.register') }}" class="sidebar-link"><i class="fas fa-user-plus"></i><span class="link-text">Register</span></a>
+            <a href="{{ url_for('bp_login.login') }}" class="sidebar-link"><i class="fas fa-sign-in-alt"></i><span class="link-text">Login</span></a>
+            <a href="{{ url_for('bp_login.register') }}" class="sidebar-link"><i class="fas fa-user-plus"></i><span class="link-text">Register</span></a>
         {% endif %}
      
     </div>

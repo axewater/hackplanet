@@ -156,17 +156,17 @@ def _authenticate_and_redirect(username, password):
         
         next_page = request.args.get('next')
         if not next_page or url_parse(next_page).netloc != '':
-            next_page = url_for('main.restricted')
+            next_page = url_for('bp_login.restricted')
         return redirect(next_page)
     else:
         flash('Invalid username or password', 'error')
-        return redirect(url_for('main.login'))
+        return redirect(url_for('bp_login.login'))
 def admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if not current_user.is_authenticated or current_user.role != 'admin':
             flash("You must be an admin to access this page.", "danger")
-            return redirect(url_for('main.login'))
+            return redirect(url_for('bp_login.login'))
         return f(*args, **kwargs)
     return decorated_function
 def escape_special_characters(pattern):
