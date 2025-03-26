@@ -17,7 +17,7 @@ requests
 SQLAlchemy
 typing_extensions
 urllib3
-Werkzeug
+Werkzeug==2.3.0
 WTForms
 flask_migrate
 flask_caching
