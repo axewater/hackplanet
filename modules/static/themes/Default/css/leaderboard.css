@@ -1,0 +1,135 @@
+.leaderboard-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.leaderboard-row {
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.leaderboard-username {
+    font-size: 1.8em;
+    font-weight: bold;
+}
+
+/* Updated Top 3 rank styling */
+.leaderboard-row.rank-1 {
+    background: linear-gradient(45deg, #FFD700, #FFA500);
+    color: #fff;
+}
+
+.leaderboard-row.rank-2 {
+    background: linear-gradient(45deg, #C0C0C0, #E8E8E8);
+    color: #fff;
+}
+
+.leaderboard-row.rank-3 {
+    background: linear-gradient(45deg, #cd7f32, #dda15e);
+    color: #fff;
+}
+
+.trophy-icon {
+    font-size: 24px;
+    margin-right: 8px;
+    filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.3));
+    position: relative;
+    display: inline-block; /* Added to contain the shimmer */
+}
+
+.trophy-icon i {
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+}
+
+.trophy-icon i::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        to right,
+        transparent,
+        rgba(255,255,255,0.6),
+        transparent
+    );
+    animation: glimmer 2s infinite;
+    transform: skewX(-25deg);
+}
+
+.trophy-icon.gold {
+    color: #FFD700;
+}
+
+.trophy-icon.silver {
+    color: #C0C0C0;
+}
+
+.trophy-icon.bronze {
+    color: #cd7f32;
+}
+
+@keyframes glimmer {
+    0% { left: -100%; }
+    100% { left: 200%; }
+}
+
+.rank-number {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.leaderboard-row {
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+.leaderboard-row:hover {
+    background-color: rgba(245, 245, 245, 0.8);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.leaderboard-table {
+    background-color: #fff;
+    border-collapse: separate;
+    border-spacing: 0 10px;
+}
+
+.leaderboard-table thead th {
+    border: none;
+    color: #333;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+/* Add explicit width for rank and avatar columns */
+.leaderboard-table th:nth-child(1),
+.leaderboard-table td:nth-child(1) {
+    width: 75px;
+    min-width: 75px;
+    max-width: 75px;
+}
+
+.leaderboard-table th:nth-child(2),
+.leaderboard-table td:nth-child(2) {
+    width: 75px;
+    min-width: 75px;
+    max-width: 75px;
+}
+
+.leaderboard-table tbody tr {
+    background-color: #f9f9f9;
+    border-radius: 10px;
+}
+
+.leaderboard-table tbody tr td {
+    border: none;
+}
+
+.leaderboard-link {
+    text-decoration: none;
+    color: inherit;
+}

@@ -11,10 +11,12 @@
 </div>
 {% endif %}
 {% endwith %}
+
+<link rel="stylesheet" href="{{ url_for('static', filename='themes/default/css/leaderboard.css') }}">
+
 <div class="container">
     <div class="glass-panel">
         <div class="hackplanet_titles">
-
             <h1>HackPlanet World Leaderboard</h1>
         </div>
         <table class="table table-striped leaderboard-table">
@@ -28,7 +30,7 @@
             </thead>
             <tbody>
                 {% for user in users %}
-                <tr class="leaderboard-row" onclick="window.location='{{ url_for('main.hacker_profile', user_id=user['id']) }}'">
+                <tr class="leaderboard-row {% if loop.index == 1 %}rank-1{% elif loop.index == 2 %}rank-2{% elif loop.index == 3 %}rank-3{% endif %}" onclick="window.location='{{ url_for('main.hacker_profile', user_id=user['id']) }}'">
                     <td class="align-middle text-center">
                         {% if loop.index == 1 %}
                             <span class="trophy-icon gold"><i class="fas fa-trophy"></i></span>
